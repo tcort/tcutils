@@ -50,9 +50,6 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  yes 'Hello, world!'\n");
 				exit(EXIT_SUCCESS);
 				break;
-				fprintf(stdout, "usage: yes [-h] [-V] [MSG...]\n");
-				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				fprintf(stdout, "yes (tcutils) v1.0.0\n");
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
