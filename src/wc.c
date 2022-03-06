@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 		first = 1;
 	}
 
-	fprintf(stdout, "\n", chars);
+	fprintf(stdout, "\n");
 
 	exit(EXIT_SUCCESS);
 }
