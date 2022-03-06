@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		perror("fopen");
 		fprintf(stderr, "Could not open /usr/share/dict/words\n");
 		fprintf(stderr, "To use an alternative dictionary do:\n");
-		fprintf(stderr, "xkcdpass -w /path/to/dict\n", argv[0]);
+		fprintf(stderr, "xkcdpass -w /path/to/dict\n");
 		free(w);
 		w = NULL;
 		exit(EXIT_FAILURE);
