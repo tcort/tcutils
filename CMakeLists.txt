@@ -16,9 +16,9 @@ list(APPEND PROGS arch basename cat cmp coinflip copy d6 date dc dirname)
 list(APPEND PROGS dos2unix echo expand extract factor false fgrep grep head)
 list(APPEND PROGS hexdump hostid hostname kill leave line link litc logger)
 list(APPEND PROGS logname lowercase ls luhn machine makewords md2 mismatch moo)
-list(APPEND PROGS mugwump nl printenv pwd rev shell sleep spell stat sum sync)
-list(APPEND PROGS tmpl true tty uname unexpand unix2dos uuidgen wc whoami)
-list(APPEND PROGS  xkcdpass yes)
+list(APPEND PROGS mugwump nl printenv pwd rev scrub shell sleep spell stat sum)
+list(APPEND PROGS sync tmpl true tty uname unexpand unix2dos uuidgen wc whoami)
+list(APPEND PROGS xkcdpass yes)
 
 
 foreach(PROG IN LISTS PROGS CURSES_PROGS)
