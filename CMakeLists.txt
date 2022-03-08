@@ -13,12 +13,12 @@ include_directories(${CURSES_INCLUDE_DIR})
 list(APPEND CURSES_PROGS clear snek)
 
 list(APPEND PROGS arch basename cat cmp coinflip copy d6 date dc dirname)
-list(APPEND PROGS dos2unix echo expand extract factor false fgrep grep head)
-list(APPEND PROGS hexdump hostid hostname kill leave line link litc ln logger)
-list(APPEND PROGS logname lowercase ls luhn machine makewords md2 mismatch moo)
-list(APPEND PROGS mugwump nl printenv pwd rev rmdir scrub shell sleep spell)
-list(APPEND PROGS stat sum sync tmpl true tty uname unexpand unix2dos uuidgen)
-list(APPEND PROGS wc whoami xkcdpass yes)
+list(APPEND PROGS dos2unix echo expand extract factor false fgrep fold grep)
+list(APPEND PROGS head hexdump hostid hostname kill leave line link litc ln)
+list(APPEND PROGS logger logname lowercase ls luhn machine makewords md2)
+list(APPEND PROGS mismatch moo mugwump nl printenv pwd rev rmdir scrub shell)
+list(APPEND PROGS sleep spell stat sum sync tmpl true tty uname unexpand)
+list(APPEND PROGS unix2dos uuidgen wc whoami xkcdpass yes)
 
 
 foreach(PROG IN LISTS PROGS CURSES_PROGS)
