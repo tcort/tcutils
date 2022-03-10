@@ -17,7 +17,7 @@ list(APPEND PROGS dos2unix echo expand extract factor false fgrep fold grep)
 list(APPEND PROGS head hexdump hostid hostname kill leave line link litc ln)
 list(APPEND PROGS logger logname lowercase ls luhn machine makewords md2)
 list(APPEND PROGS mismatch mktemp moo mugwump nl printenv pwd rev rmdir scrub)
-list(APPEND PROGS shell sleep spell stat sum sync tee tmpl true tty uname)
+list(APPEND PROGS shell sleep spell stat sum sync tac tee tmpl true tty uname)
 list(APPEND PROGS unexpand unix2dos uuidgen wc whoami xkcdpass yes)
 
 
