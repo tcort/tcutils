@@ -28,6 +28,7 @@
 #define TAB_CHAR ('\t')
 #define BACKSPACE_CHAR ('\b')
 #define NEWLINE_CHAR ('\n')
+#define CARRAIGE_RETURN_CHAR ('\r')
 
 int main(int argc, char *argv[]) {
 
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
 	int bflag = 0;
 	FILE *fp = NULL;
 	size_t cap = 0;
-	ssize_t len = 0, i = 0;
+	ssize_t len = 0, i = 0, col = 0;
 	char *line = NULL;
 
 	static struct option long_options[] = {
@@ -103,8 +104,40 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	while ((len = getline(&line, &cap, fp)) > 0) {
-		printf("%s", line);
+	while ((len = getline(&line, &cap, fp)) >= 0) {
+
+		col = 0;
+		for (i = 0; i < len; i++) {
+			int ch = line[i];
+
+			switch (ch) {
+				case TAB_CHAR:
+					col = col + (TAB_WIDTH - (col % TAB_WIDTH));
+					break;
+				case BACKSPACE_CHAR:
+					col = col == 0 ? 0 : col - 1;
+					break;
+				case NEWLINE_CHAR:
+					col = 0;
+					break;
+				case CARRAIGE_RETURN_CHAR:
+					col = 0;
+					break;
+				default:
+					col += 1;
+					break;
+			}
+
+			if (col > width) {
+				fputc('\n', stdout);
+				col = 1;
+				if (line[i] == TAB_CHAR) {
+					col = TAB_WIDTH;
+				}
+			}
+
+			fputc(line[i], stdout);
+		}
 	}
 
 	free(line);
