@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hn:V", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "sum -- compute a BSD checksum of the input\n");
