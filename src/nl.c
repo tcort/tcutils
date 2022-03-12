@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "body-numbering", required_argument, 0, 'b' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -55,10 +56,10 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: nl [OPTIONS] FILE\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -b opt         control line numbering. opt is one of:\n");
-				fprintf(stdout, "                   a - all lines numbered\n");
-				fprintf(stdout, "                   t - non-empty lines numbered\n");
-				fprintf(stdout, "                   n - no lines numbered\n");
+				fprintf(stdout, "  -b opt, --body-numbering=opt   control line numbering. opt is one of:\n");
+				fprintf(stdout, "                                    a - all lines numbered\n");
+				fprintf(stdout, "                                    t - non-empty lines numbered\n");
+				fprintf(stdout, "                                    n - no lines numbered\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
 				fprintf(stdout, "  -V, --version  print version and copyright info\n");
 				fprintf(stdout, "\n");
