@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "lines", required_argument, 0, 'n' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -60,9 +61,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: head [OPTIONS] [FILE]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -n INTEGER     number of lines to show (default 10)\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -h, --help                   print help text\n");
+				fprintf(stdout, "  -n INTEGER, --lines=INTEGER  number of lines to show (default 10)\n");
+				fprintf(stdout, "  -V, --version                print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
