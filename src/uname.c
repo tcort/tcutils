@@ -40,6 +40,12 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "all", no_argument, 0, 'a' },
+		{ "machine", no_argument, 0, 'm' },
+		{ "nodename", no_argument, 0, 'n' },
+		{ "kernel-release", no_argument, 0, 'r' },
+		{ "kernel-version", no_argument, 0, 'v' },
+		{ "kernel-name", no_argument, 0, 's' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -50,14 +56,14 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: uname [OPTIONS]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -a             print all fields\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -m             print machine hardware name\n");
-				fprintf(stdout, "  -n             print node name\n");
-				fprintf(stdout, "  -r             print kernel release\n");
-				fprintf(stdout, "  -s             print kernel name\n");
-				fprintf(stdout, "  -v             print kernel version\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -a, --all             print all fields\n");
+				fprintf(stdout, "  -h, --help            print help text\n");
+				fprintf(stdout, "  -m, --machine         print machine hardware name\n");
+				fprintf(stdout, "  -n, --nodename        print node name\n");
+				fprintf(stdout, "  -r, --kernel-release  print kernel release\n");
+				fprintf(stdout, "  -s, --kernel-name     print kernel name\n");
+				fprintf(stdout, "  -v, --kernel-version  print kernel version\n");
+				fprintf(stdout, "  -V, --version         print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
