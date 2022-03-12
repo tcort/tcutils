@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "ignore-case", no_argument, 0, 'i' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -48,9 +49,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: extract [OPTIONS] PATTERN FORMAT [FILE]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -i             case insensitive search\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -h, --help         print help text\n");
+				fprintf(stdout, "  -i, --ignore-case  case insensitive search\n");
+				fprintf(stdout, "  -V, --version      print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
