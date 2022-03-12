@@ -37,6 +37,9 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "bytes", no_argument, 0, 'c' },
+		{ "lines", no_argument, 0, 'l' },
+		{ "words", no_argument, 0, 'w' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -62,10 +65,10 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: wc [OPTIONS]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -c             include character count in output\n");
+				fprintf(stdout, "  -c, --bytes    include character count in output\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -l             include line count in output\n");
-				fprintf(stdout, "  -w             include word count in output\n");
+				fprintf(stdout, "  -l, --lines    include line count in output\n");
+				fprintf(stdout, "  -w, --words    include word count in output\n");
 				fprintf(stdout, "  -V, --version  print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
