@@ -12,7 +12,7 @@ find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 list(APPEND CURSES_PROGS clear more snek)
 
-list(APPEND PROGS arch basename cat cmp coinflip copy d6 date dc dirname)
+list(APPEND PROGS arch basename cat cmp coinflip copy crc32 d6 date dc dirname)
 list(APPEND PROGS dos2unix echo expand extract factor false fgrep fold grep)
 list(APPEND PROGS head hexdump hostid hostname kill leave line link litc ln)
 list(APPEND PROGS logger logname lowercase ls luhn machine makewords md2)
