@@ -62,6 +62,12 @@ int main(int argc, char *argv[]) {
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "extended-regexp", no_argument, 0, 'E' },
+		{ "fixed-strings", no_argument, 0, 'F' },
+		{ "basic-regexp", no_argument, 0, 'G' },
+		{ "count", no_argument, 0, 'c' },
+		{ "ignore-case", no_argument, 0, 'i' },
+		{ "line-number", no_argument, 0, 'n' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -75,14 +81,14 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: grep [OPTIONS] PATTERN [FILE...]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -E             use POSIX extended regular expression syntax\n");
-				fprintf(stdout, "  -F             performed fixed string search (similar to fgrep)\n");
-				fprintf(stdout, "  -G             use POSIX basic regular expression syntax\n");
-				fprintf(stdout, "  -c             just count matchiing lines\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -i             case insensitive search\n");
-				fprintf(stdout, "  -n             prepend line numbers to output\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -E, --extended-regexp  use POSIX extended regular expression syntax\n");
+				fprintf(stdout, "  -F, --fixed-strings    performed fixed string search (similar to fgrep)\n");
+				fprintf(stdout, "  -G, --basic-regexp     use POSIX basic regular expression syntax\n");
+				fprintf(stdout, "  -c, --count            just count matchiing lines\n");
+				fprintf(stdout, "  -h, --help             print help text\n");
+				fprintf(stdout, "  -i, --ignore-case      case insensitive search\n");
+				fprintf(stdout, "  -n, --line-number      prepend line numbers to output\n");
+				fprintf(stdout, "  -V, --version          print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
