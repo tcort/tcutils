@@ -10,7 +10,7 @@ project(tcutils VERSION 2022 LANGUAGES C)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
-list(APPEND CURSES_PROGS clear snek)
+list(APPEND CURSES_PROGS clear more snek)
 
 list(APPEND PROGS arch basename cat cmp coinflip copy d6 date dc dirname)
 list(APPEND PROGS dos2unix echo expand extract factor false fgrep fold grep)
