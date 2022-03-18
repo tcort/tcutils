@@ -37,7 +37,10 @@ int main(int argc, char *argv[]) {
 	char *fmt;
 
 	static struct option long_options[] = {
+		{ "filename-safe", no_argument, 0, 'f' },
+		{ "iso8601", no_argument, 0, 'i' },
 		{ "help", no_argument, 0, 'h' },
+		{ "unix", no_argument, 0, 'u' },
 		{ "version", no_argument, 0, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -55,11 +58,11 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: date [OPTIONS]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -f             filename safe format (YYYYmmddHHMMSS)\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -i             ISO8601 format\n");
-				fprintf(stdout, "  -u             UNIX timestamp\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -f, --filename-safe  filename safe format (YYYYmmddHHMMSS)\n");
+				fprintf(stdout, "  -h, --help           print help text\n");
+				fprintf(stdout, "  -i, --iso8601        ISO8601 format\n");
+				fprintf(stdout, "  -u, --unix           UNIX timestamp\n");
+				fprintf(stdout, "  -V, --version        print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
