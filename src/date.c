@@ -26,6 +26,7 @@
 #define FMT_HUMAN "%Y-%m-%d %H:%M:%S"
 #define FMT_ISO8601 "%FT%T%z"
 #define FMT_FILE "%Y%m%d%H%M%S"
+#define FMT_UNIX "%s"
 
 int main(int argc, char *argv[]) {
 
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
 	/* defaults */
 	fmt = FMT_HUMAN;
 
-	while ((ch = getopt_long(argc, argv, "fhiV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "fhiuV", long_options, NULL)) != -1) {
 		switch (ch) {
 			case 'f':
 				fmt = FMT_FILE;
@@ -57,6 +58,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  -f             filename safe format (YYYYmmddHHMMSS)\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
 				fprintf(stdout, "  -i             ISO8601 format\n");
+				fprintf(stdout, "  -u             UNIX timestamp\n");
 				fprintf(stdout, "  -V, --version  print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
@@ -73,6 +75,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'i':
 				fmt = FMT_ISO8601;
+				break;
+			case 'u':
+				fmt = FMT_UNIX;
 				break;
 			case 'V':
 				fprintf(stdout, "date (tcutils) v1.0.0\n");
