@@ -71,7 +71,7 @@ static int should_count(char *pathname) {
 	cflags |= REG_ICASE;
 	cflags |= REG_EXTENDED;
 
-	pattern = "\\.c$";
+	pattern = "\\.(asm|bas|c|coffee|cpp|cxx|erl|go|h|hpp|hxx|java|js|lol|p|pas|pl|py|rb|ts)$";
 
 	errcode = regcomp(&preg, pattern, cflags);
 	if (errcode != 0) {
