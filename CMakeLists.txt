@@ -8,6 +8,16 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(tcutils VERSION 2022 LANGUAGES C)
 
+configure_file (
+    "${PROJECT_SOURCE_DIR}/include/config.h.in"
+    "${PROJECT_BINARY_DIR}/include/config.h"
+)
+
+include_directories(
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_BINARY_DIR}/include"
+)
+
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 list(APPEND CURSES_PROGS clear more snek)

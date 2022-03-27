@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <getopt.h>
 #include <ctype.h>
 #include <regex.h>
@@ -117,7 +119,7 @@ int main(int argc, char *argv[]) {
 				cflags &= ~(REG_EXTENDED);
 				break;
 			case 'V':
-				fprintf(stdout, "grep (tcutils) v1.0.0\n");
+				fprintf(stdout, "grep (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
