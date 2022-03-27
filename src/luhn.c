@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "luhn (tcutils) v1.0.0\n");
+				fprintf(stdout, "luhn (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
