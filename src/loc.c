@@ -22,6 +22,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <limits.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
