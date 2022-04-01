@@ -24,6 +24,10 @@ list(APPEND CURSES_PROGS clear)
 list(APPEND CURSES_PROGS more)
 list(APPEND CURSES_PROGS snek)
 
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIR})
+list(APPEND CURL_PROGS up)
+
 list(APPEND PROGS arch)
 list(APPEND PROGS basename)
 list(APPEND PROGS cat)
@@ -102,12 +106,17 @@ list(APPEND PROGS whoami)
 list(APPEND PROGS xkcdpass)
 list(APPEND PROGS yes)
 
-foreach(PROG IN LISTS PROGS CURSES_PROGS)
+foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
     add_executable(${PROG} src/${PROG}.c)
 
     list(FIND CURSES_PROGS ${PROG} CURSES_NEEDED)
     if (NOT (${CURSES_NEEDED} EQUAL -1))
         target_link_libraries(${PROG} ${CURSES_LIBRARY})
+    endif()
+
+    list(FIND CURL_PROGS ${PROG} CURL_NEEDED)
+    if (NOT (${CURL_NEEDED} EQUAL -1))
+        target_link_libraries(${PROG} ${CURL_LIBRARY})
     endif()
 
     install(TARGETS ${PROG} DESTINATION bin)
