@@ -27,6 +27,90 @@ make install
 vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 ```
 
+## Programs Included
+
+- arch -- print architecture type of this machine
+- basename -- print the filename portion of a pathname
+- cat -- concatenate and print files
+- catfacts -- writes a random cat fact to standard output
+- clear -- clear the terminal screen
+- cmp -- compare two files
+- coinflip -- simulates a coinflip and prints the result
+- copy -- copy characters from standard input to standard output
+- crc32 -- output the 32-bit cyclic redundancy check value for an input
+- d6 -- simulates a 6-sided dice roll and prints the reults
+- date -- print the current date and time
+- dc -- desk calculator
+- dirname -- print the directory portion of a pathname
+- dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
+- echo -- prints it's command line arguments
+- expand -- converts tabs to spaces
+- extract -- extract values from the input and print them to the output
+- factor -- prints the prime factors of a number
+- false -- exits with a failure return code
+- fgrep -- searches for and prints lines that exactly match a given string
+- fold -- wraps long lines for fixed width viewing mediums
+- grep -- searches for and prints lines that match a given pattern
+- head -- prints lines at the beginning of an input text
+- hexdump -- prints the contents of a file in hexadecimal
+- host -- DNS lookup utility
+- hostid -- prints the current hostid of the system
+- hostname -- prints the current hostname of the system
+- kill -- kill a process
+- leave -- kindly reminds the user to leave
+- line -- read a line of input
+- link -- creates a file link
+- litc -- extract literate programs from markdown documents
+- ln -- creates a file link
+- loc -- counts lines of code
+- logger -- add an entry in the system logs
+- logname -- prints the current user's login name
+- lowercase -- convert input text to lower case
+- ls -- list the contents of a directory
+- luhn -- luhn checker
+- machine -- print architecture type of this machine
+- makewords -- split the lines into words and print each on its own line
+- md2 -- calculate a message-digest fingerprint for a file
+- mismatch -- finds lines that are in input but not in FILE
+- mkdir -- create directories
+- mktemp -- create a temporary file or directory with a unique name
+- moo -- guess the bulls
+- more -- filter for paging through text, one screen at a time
+- mugwump -- find all the mugwumps
+- nl -- number lines of text
+- printenv -- print environment variables and their values
+- pwd -- print the current working directory
+- rev -- reverse text, line by line
+- rmdir -- remove a directory from the file system
+- scrub -- overwrites files using the 35 pass Gutmann technique
+- seq -- write a sequence of numbers to standard output
+- shell -- command shell
+- sleep -- sleep for a given number of seconds
+- snek -- hungry snake simulation game
+- spell -- checks the spelling of words
+- stat -- print file statistics
+- sum -- compute a BSD checksum of the input
+- sync -- sync file system contents to persistent storage
+- tac -- concatenate and print files in reverse
+- tail -- prints lines at the end of an input text
+- tee -- copy characters from standard input to standard output and a file
+- tmpl -- template processor
+- touch -- change file timestamps
+- true -- exits with a success return code
+- tty -- print the filename associated with the tty connected to stdin
+- uname -- print system information (name and hardware details)
+- unexpand -- converts spaces to tabs
+- uniq -- show or hide duplicate lines in a file
+- unix2dos -- replaces UNIX line endings '\n' with DOS line endings '\r\n'
+- up -- universal ping, checks the status of a URL
+- uptime -- show how long the system has been up
+- uuidgen - COMB UUIDs (UUID v4 Variant B) generator
+- wc -- counts lines, words, and characters and prints the results
+- whoami -- prints the current user's effective username
+- who -- list users currently logged in
+- xkcdpass -- password generator based on the xkcd (diceware) method
+- yes -- continuously outputs the same line of text over and over again
+
 ## Documentation
 
 All commands provide a `--help` command line option which will output
