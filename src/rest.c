@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 	int ch;
 	char *method;
 	char *url;
+	FILE *input;
 	struct curl_slist *headers;
 	int flag_v;
 	char *username;
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "rest -- tool for making rest requests with JSON\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: rest [OPTIONS] [METHOD] URL\n");
+				fprintf(stderr, "usage: rest [OPTIONS] METHOD URL (DATA|@FILENAME)\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  -h, --help            print help text\n");
 				fprintf(stdout, "  -p, --password=abc23  set password\n");
@@ -73,7 +75,20 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
+				fprintf(stdout, "  # fetch a JSON file from an https server\n");
 				fprintf(stdout, "  rest get www.tcort.dev/foo.json\n");
+				fprintf(stdout, "\n");
+				fprintf(stdout, "  # put a JSON file foo.json to an http server\n");
+				fprintf(stdout, "  rest put http://www.tcort.dev/foo.json @foo.json\n");
+				fprintf(stdout, "\n");
+				fprintf(stdout, "  # post command line argument input to an https server\n");
+				fprintf(stdout, "  rest post https://www.tcort.dev/foo.json '{\"bar\":true}'\n");
+				fprintf(stdout, "\n");
+				fprintf(stdout, "  # put input from standard input to an https server\n");
+				fprintf(stdout, "  echo '{\"bar\":true}' | rest put https://www.tcort.dev/foo.json\n");
+				fprintf(stdout, "\n");
+				fprintf(stdout, "  # delete a file on an https server\n");
+				fprintf(stdout, "  rest delete https://www.tcort.dev/foo.json\n");
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -109,11 +124,22 @@ int main(int argc, char *argv[]) {
 	if (argc == 1) {
 		method = "GET";
 		url = argv[0];
+		input = stdin;
 	} else if (argc == 2) {
 		method = argv[0];
 		url = argv[1];
+		input = stdin;
+	} else if (argc == 3) {
+		method = argv[0];
+		url = argv[1];
+		input = (argv[2][0] == '@' ? fopen((&argv[2][1]), "r") : fmemopen(argv[2], strlen(argv[2]), "r"));
+		if (input == NULL) {
+			perror("fopen");
+			exit(EXIT_FAILURE);
+		}
 	} else {
 		fprintf(stderr, "usage: rest [OPTIONS] [METHOD] URL\n");
+		fprintf(stderr, "usage: rest [OPTIONS] METHOD URL (DATA|@FILENAME)\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -124,6 +150,7 @@ int main(int argc, char *argv[]) {
 	curl = curl_easy_init();
 	if (curl == NULL) {
 		perror("curl_easy_init");
+		fclose(input);
 		exit(EXIT_FAILURE);
 	}
 
@@ -141,13 +168,13 @@ int main(int argc, char *argv[]) {
 	if (strcasecmp(method, "PUT") == 0) {
 		curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-		curl_easy_setopt(curl, CURLOPT_READDATA, stdin);
+		curl_easy_setopt(curl, CURLOPT_READDATA, input);
 		headers = curl_slist_append(headers, "Transfer-Encoding: chunked");
 		headers = curl_slist_append(headers, "Content-Type: application/json");
 	} else if (strcasecmp(method, "POST") == 0) {
 		curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
-		curl_easy_setopt(curl, CURLOPT_READDATA, stdin);
+		curl_easy_setopt(curl, CURLOPT_READDATA, input);
 		headers = curl_slist_append(headers, "Transfer-Encoding: chunked");
 		headers = curl_slist_append(headers, "Content-Type: application/json");
 	} else if (strcasecmp(method, "HEAD") == 0) {
@@ -172,5 +199,6 @@ int main(int argc, char *argv[]) {
 	curl_slist_free_all(headers);
 	curl_global_cleanup();
 
+	fclose(input);
 	exit(rc);
 }
