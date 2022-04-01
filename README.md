@@ -147,6 +147,7 @@ resemblance to standards compliant software is purely coincidental.
 ## Contributing
 
 The author is not open to external contributions at this time.
+Feel free to report bugs or suggest new features.
 
 ## License
 
