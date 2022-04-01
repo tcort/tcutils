@@ -22,6 +22,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]) {
 	char *line = NULL;
 	size_t cap = 0;
 	ssize_t len = 0;
+	struct winsize ws;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -121,12 +123,16 @@ int main(int argc, char *argv[]) {
 
 		fprintf(stdout, "%s", line);
 
-		if (lineno % 24 == 23) {
+		/* look up height of terminal */
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
+
+		if (lineno % ws.ws_row == ws.ws_row - 2) {
 			char ch;
 			ch = getc(stdin);
 			if (ch == 'q' || ch == 'Q') {
 				break;
 			}
+			lineno = 0;
 		}
 	}
 
