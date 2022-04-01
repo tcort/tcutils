@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -135,6 +136,7 @@ int main(int argc, char *argv[]) {
 	struct passwd *passwd;
 	struct group *group;
 	struct stat st;
+	struct winsize ws;
 	char *dir;
 	char modestring[16];
 	char sizestring[16];
@@ -236,7 +238,8 @@ int main(int argc, char *argv[]) {
 		dentrylen = strlen(dentry->d_name);
 		maxdentrylen = dentrylen > maxdentrylen ? dentrylen : maxdentrylen;
 	}
-	dentries_per_row = 80 / (maxdentrylen + 1);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws); /* look up width of terminal */
+	dentries_per_row = ws.ws_col / (maxdentrylen + 1);
 
 	for (i = 0; i < ndentries; i++) {
 		char path[PATH_MAX+1];
