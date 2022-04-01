@@ -262,10 +262,9 @@ int main(int argc, char *argv[]) {
 				dict_load(&root, optarg);
 				break;
 			case 'h':
-				fprintf(stdout, "usage: spell [OPTIONS] [FILENAME]\n");
 				fprintf(stdout, "spell -- checks the spelling of words\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: spell [OPTIONS]\n");
+				fprintf(stdout, "usage: spell [OPTIONS] [FILENAME]\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  -d /path/words specify the location of the dictionary\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
