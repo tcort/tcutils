@@ -14,6 +14,7 @@ alongside the system software.
 * C compiler and standard build tools (make, sh, ...).
 * [cmake](https://cmake.org/)
 * curses library (e.g. [ncurses](https://invisible-island.net/ncurses/))
+* [libcurl](https://curl.se/)
 
 ## Installation
 
