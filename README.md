@@ -153,7 +153,8 @@ Feel free to report bugs or suggest new features.
 
 SPDX: `GPL-3.0-or-later`
 
-See the file `COPYING` for the full license.
+See the file `COPYING` for the full license. Each file in the repository should
+include its own license information.
 
 <!--
   README.md
