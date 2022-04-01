@@ -28,6 +28,7 @@
 
 #define SUPPORTED_PROTOCOLS	(	\
 	CURLPROTO_SCP		|	\
+	CURLPROTO_FTP		|	\
 	CURLPROTO_HTTP		|	\
 	CURLPROTO_HTTPS		|	\
 	CURLPROTO_IMAP		|	\
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
 			case 'h':
 				fprintf(stdout, "up -- universal ping, checks the status of a URL\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "Supported protocols: http, https, imap, imaps, scp, smtp, smtps\n");
+				fprintf(stdout, "Supported protocols: ftp, http, https, imap, imaps, scp, smtp, smtps\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: up [OPTIONS] URL\n");
 				fprintf(stdout, "\n");
@@ -157,6 +158,9 @@ int main(int argc, char *argv[]) {
 		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "EXAMINE INBOX");
 	} else if (strncmp(url, "scp", strlen("scp")) == 0) {
 		/* SCP options */
+		/* none */;
+	} else if (strncmp(url, "ftp", strlen("ftp")) == 0) {
+		/* FTP options */
 		/* none */;
 	} else {
 		/* HTTP/HTTPS options (default) */
