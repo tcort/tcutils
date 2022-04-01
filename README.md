@@ -133,11 +133,11 @@ examples:
   cmp ./foo ./bar
 ```
 
-## Versioning
+## Versioning and Releases
 
-`tcutils` has numbered releases that correspond to the number of times the
-collection of software has been released. Each individual program within
-the collection has its own version number which follows semantic versioning.
+`tcutils` releases once a year on July 1st. The version number corresponds
+to the year the software collection was released. For example, on July 1,
+2038, `tcutils` `v2038` will be released.
 
 ## Conformance
 
