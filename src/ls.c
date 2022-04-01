@@ -32,6 +32,25 @@
 #include <time.h>
 #include <unistd.h>
 
+#define COLOR_RESET   "\x1b[0m"
+#define COLOR_BLACK   "\x1b[30m"
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_YELLOW  "\x1b[33m"
+#define COLOR_BLUE    "\x1b[34m"
+#define COLOR_MAGENTA "\x1b[35m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_WHITE   "\x1b[37m"
+
+#define COLOR_BRIGHT_BLACK   "\x1b[30;1m"
+#define COLOR_BRIGHT_RED     "\x1b[31;1m"
+#define COLOR_BRIGHT_GREEN   "\x1b[32;1m"
+#define COLOR_BRIGHT_YELLOW  "\x1b[33;1m"
+#define COLOR_BRIGHT_BLUE    "\x1b[34;1m"
+#define COLOR_BRIGHT_MAGENTA "\x1b[35;1m"
+#define COLOR_BRIGHT_CYAN    "\x1b[36;1m"
+#define COLOR_BRIGHT_WHITE   "\x1b[37;1m"
+
 static void tc_strmode(mode_t mode, char *out) {
 
 	if (S_ISREG(mode)) {
@@ -111,6 +130,7 @@ int main(int argc, char *argv[]) {
 	int flag_a;
 	int flag_1;
 	int flag_l;
+	int flag_G;
 	struct dirent **dentries;
 	struct passwd *passwd;
 	struct group *group;
@@ -121,6 +141,10 @@ int main(int argc, char *argv[]) {
 	char mtimestring[32];
 
 	static struct option long_options[] = {
+		{ "one", no_argument, 0, '1' },
+		{ "all", no_argument, 0, 'a' },
+		{ "colourize", no_argument, 0, 'G' },
+		{ "list", no_argument, 0, 'l' },
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
 		{ 0, 0, 0, 0 }
@@ -130,8 +154,9 @@ int main(int argc, char *argv[]) {
 	flag_1 = 0;
 	flag_a = 0;
 	flag_l = 0;
+	flag_G = 0;
 
-	while ((ch = getopt_long(argc, argv, "1ahlV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "1aGhlV", long_options, NULL)) != -1) {
 		switch (ch) {
 			case '1':
 				flag_1 = 1;
@@ -142,16 +167,20 @@ int main(int argc, char *argv[]) {
 			case 'l':
 				flag_l = 1;
 				break;
+			case 'G':
+				flag_G = 1;
+				break;
 			case 'h':
 				fprintf(stdout, "ls -- list the contents of a directory\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: ls [OPTIONS] [DIR]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -1             print 1 filename per line\n");
-				fprintf(stdout, "  -a             print all files (including hidden files)\n");
-				fprintf(stdout, "  -l             list files attributes (mode, owner, group, etc)\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -1, --one        print 1 filename per line\n");
+				fprintf(stdout, "  -a, --all        print all files (including hidden files)\n");
+				fprintf(stdout, "  -G, --colourize  colourize output\n");
+				fprintf(stdout, "  -l, --list       list files attributes (mode, owner, group, etc)\n");
+				fprintf(stdout, "  -h, --help       print help text\n");
+				fprintf(stdout, "  -V, --version    print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
@@ -240,6 +269,39 @@ int main(int argc, char *argv[]) {
 		tc_bytes(st.st_size, sizestring);
 		tc_time(st.st_mtime, mtimestring);
 
+		if (flag_G) {
+			switch (modestring[0]) {
+				case 'd': /* directory */
+					fprintf(stdout, "%s", COLOR_BRIGHT_BLUE);
+					break;
+				case 's': /* socket */
+					fprintf(stdout, "%s", COLOR_MAGENTA);
+					break;
+				case 'b': /* block device */
+					fprintf(stdout, "%s", COLOR_BRIGHT_YELLOW);
+					break;
+				case 'c': /* char device */
+					fprintf(stdout, "%s", COLOR_BRIGHT_YELLOW);
+					break;
+				case 'l': /* link */
+					fprintf(stdout, "%s", COLOR_CYAN);
+					break;
+				case 'p': /* fifo */
+					fprintf(stdout, "%s", COLOR_YELLOW);
+					break;
+				case '?': /* unknown */
+					fprintf(stdout, "%s", COLOR_BRIGHT_RED);
+					break;
+				case '-': /* regular file */
+					if (modestring[3] == 'x' || modestring[6] == 'x' || modestring[9] == 'x') {
+						fprintf(stdout, "%s", COLOR_BRIGHT_GREEN);
+					} else {
+						fprintf(stdout, "%s", COLOR_BRIGHT_WHITE);
+					}
+					break;
+			}
+		}
+
 		if (flag_1) {
 			fprintf(stdout, "%s\n", dentry->d_name);
 		} else if (flag_l) {
@@ -252,6 +314,10 @@ int main(int argc, char *argv[]) {
 			if (i % dentries_per_row == dentries_per_row - 1 || i + 1 == ndentries) {
 				fprintf(stdout, "\n");
 			}
+		}
+
+		if (flag_G) {
+			fprintf(stdout, "%s", COLOR_RESET);
 		}
 
 		free(dentry);
