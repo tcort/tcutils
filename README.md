@@ -81,6 +81,7 @@ vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 - nl -- number lines of text
 - printenv -- print environment variables and their values
 - pwd -- print the current working directory
+- rest -- tool for making rest requests with JSON
 - rev -- reverse text, line by line
 - rmdir -- remove a directory from the file system
 - scrub -- overwrites files using the 35 pass Gutmann technique

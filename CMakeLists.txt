@@ -26,6 +26,7 @@ list(APPEND CURSES_PROGS snek)
 
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
+list(APPEND CURL_PROGS rest)
 list(APPEND CURL_PROGS up)
 
 list(APPEND PROGS arch)
