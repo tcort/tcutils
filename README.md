@@ -112,6 +112,7 @@ vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 - wc -- counts lines, words, and characters and prints the results
 - whoami -- prints the current user's effective username
 - who -- list users currently logged in
+- witch -- find an executable in $PATH
 - xkcdpass -- password generator based on the xkcd (diceware) method
 - yes -- continuously outputs the same line of text over and over again
 

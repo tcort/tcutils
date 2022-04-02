@@ -106,6 +106,7 @@ list(APPEND PROGS uuidgen)
 list(APPEND PROGS wc)
 list(APPEND PROGS who)
 list(APPEND PROGS whoami)
+list(APPEND PROGS witch)
 list(APPEND PROGS xkcdpass)
 list(APPEND PROGS yes)
 
