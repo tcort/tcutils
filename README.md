@@ -78,7 +78,7 @@ vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 - mkdir -- create directories
 - mktemp -- create a temporary file or directory with a unique name
 - moo -- guess the bulls
-- more -- filter for paging through text, one screen at a time
+- moar -- filter for paging through text, one screen at a time
 - mugwump -- find all the mugwumps
 - nl -- number lines of text
 - printenv -- print environment variables and their values
