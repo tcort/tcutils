@@ -44,6 +44,7 @@ vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 - dc -- desk calculator
 - dirname -- print the directory portion of a pathname
 - dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
+- du -- show disk usage
 - echo -- prints it's command line arguments
 - expand -- converts tabs to spaces
 - extract -- extract values from the input and print them to the output
