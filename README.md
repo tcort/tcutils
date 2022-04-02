@@ -66,6 +66,7 @@ vi ~/.profile # export PATH=${HOME}/bin:${PATH}
 - loc -- counts lines of code
 - logger -- add an entry in the system logs
 - logname -- prints the current user's login name
+- lolcat -- concatenate and print files with funky colours
 - lowercase -- convert input text to lower case
 - ls -- list the contents of a directory
 - luhn -- luhn checker
