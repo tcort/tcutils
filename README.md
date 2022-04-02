@@ -25,7 +25,20 @@ cd bin
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${HOME} ..
 make
 make install
-vi ~/.profile # export PATH=${HOME}/bin:${PATH}
+```
+
+Add the following to `${HOME}/.profile`:
+
+```
+export PATH=${HOME}/bin:${PATH}
+export PAGER=moar
+
+# disable internal commands (GNU bash)
+enable -n echo
+enable -n false
+enable -n kill
+enable -n pwd
+enable -n true
 ```
 
 ## Programs Included
