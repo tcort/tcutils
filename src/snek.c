@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curses.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <time.h>
@@ -41,8 +42,8 @@ int main(int argc, char *argv[]) {
 	size_t d; /* direction */
 	sk_t sk[2048];
 	sk_t a;
-	size_t my=24, mx=80;
-
+	size_t my, mx;
+	struct winsize ws;
 	int ch;
 
 	static struct option long_options[] = {
@@ -89,6 +90,10 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	srand((unsigned int) getpid());
+
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
+	my = ws.ws_row;
+	mx = ws.ws_col;
 
 	d = 2; l = 1;
 	for (i = 0; i < 2048; i++) {
