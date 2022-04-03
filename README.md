@@ -105,6 +105,7 @@ enable -n true
 - sleep -- sleep for a given number of seconds
 - snek -- hungry snake simulation game
 - spell -- checks the spelling of words
+- sponge -- soak up standard input and write to a file
 - stat -- print file statistics
 - sum -- compute a BSD checksum of the input
 - sync -- sync file system contents to persistent storage
