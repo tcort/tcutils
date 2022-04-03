@@ -115,6 +115,7 @@ enable -n true
 - tmpl -- template processor
 - touch -- change file timestamps
 - true -- exits with a success return code
+- ts -- copy lines from standard input to standard output adding timestamps
 - tty -- print the filename associated with the tty connected to stdin
 - uname -- print system information (name and hardware details)
 - unexpand -- converts spaces to tabs
