@@ -65,6 +65,7 @@ enable -n true
 - false -- exits with a failure return code
 - fgrep -- searches for and prints lines that exactly match a given string
 - fold -- wraps long lines for fixed width viewing mediums
+- forage -- find files, directories and more using regular expressions
 - grep -- searches for and prints lines that match a given pattern
 - head -- prints lines at the beginning of an input text
 - hexdump -- prints the contents of a file in hexadecimal
