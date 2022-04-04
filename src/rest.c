@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
 	int rc;
 
 	static struct option long_options[] = {
+		{ "header", required_argument, 0, 'H' },
 		{ "help", no_argument, 0, 'h' },
 		{ "password", required_argument, 0, 'p' },
 		{ "username", required_argument, 0, 'u' },
@@ -54,24 +55,35 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
+	curl = NULL;
+	method = NULL;
+	url = NULL;
+	headers = NULL;
+	input = NULL;
 	rc = EXIT_SUCCESS;
 	flag_v = 0;
 	username = NULL;
 	password = NULL;
 
-	while ((ch = getopt_long(argc, argv, "hu:p:Vv", long_options, NULL)) != -1) {
+	curl_global_init(CURL_GLOBAL_ALL);
+
+	while ((ch = getopt_long(argc, argv, "H:hu:p:Vv", long_options, NULL)) != -1) {
 		switch (ch) {
+			case 'H':
+				headers = curl_slist_append(headers, optarg);
+				break;
 			case 'h':
 				fprintf(stdout, "rest -- tool for making rest requests with JSON\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: rest [OPTIONS] [METHOD] URL\n");
 				fprintf(stderr, "usage: rest [OPTIONS] METHOD URL (DATA|@FILENAME)\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help            print help text\n");
-				fprintf(stdout, "  -p, --password=abc23  set password\n");
-				fprintf(stdout, "  -u, --username=alice  set username\n");
-				fprintf(stdout, "  -V, --version         print version and copyright info\n");
-				fprintf(stdout, "  -v, --verbose         print verbose debugging details\n");
+				fprintf(stdout, "  -H, --header=\"Foo: bar\"  set a header\n");
+				fprintf(stdout, "  -h, --help                 print help text\n");
+				fprintf(stdout, "  -p, --password=abc23       set password\n");
+				fprintf(stdout, "  -u, --username=alice       set username\n");
+				fprintf(stdout, "  -V, --version              print version and copyright info\n");
+				fprintf(stdout, "  -v, --verbose              print verbose debugging details\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
@@ -89,6 +101,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # delete a file on an https server\n");
 				fprintf(stdout, "  rest delete https://www.tcort.dev/foo.json\n");
+				curl_slist_free_all(headers);
+				headers = NULL;
+				curl_global_cleanup();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -99,6 +114,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
+				curl_slist_free_all(headers);
+				headers = NULL;
+				curl_global_cleanup();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'v':
@@ -112,6 +130,9 @@ int main(int argc, char *argv[]) {
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
+				curl_slist_free_all(headers);
+				headers = NULL;
+				curl_global_cleanup();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -135,22 +156,30 @@ int main(int argc, char *argv[]) {
 		input = (argv[2][0] == '@' ? fopen((&argv[2][1]), "r") : fmemopen(argv[2], strlen(argv[2]), "r"));
 		if (input == NULL) {
 			perror("fopen");
+			curl_slist_free_all(headers);
+			headers = NULL;
+			curl_global_cleanup();
 			exit(EXIT_FAILURE);
 		}
 	} else {
 		fprintf(stderr, "usage: rest [OPTIONS] [METHOD] URL\n");
 		fprintf(stderr, "usage: rest [OPTIONS] METHOD URL (DATA|@FILENAME)\n");
+		curl_slist_free_all(headers);
+		headers = NULL;
+		curl_global_cleanup();
 		exit(EXIT_FAILURE);
 	}
 
-	headers = NULL;
 	errbuf[0] = '\0';
 
-	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if (curl == NULL) {
 		perror("curl_easy_init");
 		fclose(input);
+		input = NULL;
+		curl_slist_free_all(headers);
+		headers = NULL;
+		curl_global_cleanup();
 		exit(EXIT_FAILURE);
 	}
 
@@ -196,9 +225,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	curl_easy_cleanup(curl);
+	curl = NULL;
 	curl_slist_free_all(headers);
+	headers = NULL;
 	curl_global_cleanup();
 
 	fclose(input);
+	input = NULL;
+
 	exit(rc);
 }
