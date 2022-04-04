@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <libgen.h>
+#include <limits.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,10 +31,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#ifndef PATH_MAX
-#define PATH_MAX (2048)
-#endif
 
 static int select_all_but_self_parent(const struct dirent *dentry) {
 	return strcmp(dentry->d_name, "..") != 0 &&
