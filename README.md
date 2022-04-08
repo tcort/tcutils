@@ -66,6 +66,7 @@ enable -n true
 - fgrep -- searches for and prints lines that exactly match a given string
 - fold -- wraps long lines for fixed width viewing mediums
 - forage -- find files, directories and more using regular expressions
+- foreach -- executes a command for every line of standard input
 - grep -- searches for and prints lines that match a given pattern
 - head -- prints lines at the beginning of an input text
 - hexdump -- prints the contents of a file in hexadecimal
@@ -91,8 +92,8 @@ enable -n true
 - mismatch -- finds lines that are in input but not in FILE
 - mkdir -- create directories
 - mktemp -- create a temporary file or directory with a unique name
-- moo -- guess the bulls
 - moar -- filter for paging through text, one screen at a time
+- moo -- guess the bulls
 - mugwump -- find all the mugwumps
 - nl -- number lines of text
 - printenv -- print environment variables and their values
@@ -126,9 +127,9 @@ enable -n true
 - uptime -- show how long the system has been up
 - uuidgen - COMB UUIDs (UUID v4 Variant B) generator
 - wc -- counts lines, words, and characters and prints the results
-- whoami -- prints the current user's effective username
 - who -- list users currently logged in
-- witch -- find an executable in $PATH
+- whoami -- prints the current user's effective username
+- witch -- finds an executable in $PATH
 - xkcdpass -- password generator based on the xkcd (diceware) method
 - yes -- continuously outputs the same line of text over and over again
 
