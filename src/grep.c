@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "EFGVchin", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "CEFGVchin", long_options, NULL)) != -1) {
 		switch (ch) {
 			case 'C':
 				if (strcmp(optarg, "auto") == 0) {
