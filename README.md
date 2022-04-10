@@ -58,6 +58,7 @@ enable -n true
 - dirname -- print the directory portion of a pathname
 - dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
 - du -- show disk usage
+- duck -- virtual rubber duck debugging tool
 - echo -- prints it's command line arguments
 - expand -- converts tabs to spaces
 - extract -- extract values from the input and print them to the output
