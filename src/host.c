@@ -21,16 +21,39 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
+
+static char *sa2s(struct sockaddr *sa) {
+
+	static char s[64+1];
+	memset(s, '\0', 64+1);
+
+	switch (sa->sa_family) {
+		case AF_INET:
+			inet_ntop(AF_INET, &(((struct sockaddr_in *)sa)->sin_addr), s, 64);
+			break;
+		case AF_INET6:
+			inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)sa)->sin6_addr), s, 64);
+			break;
+		default:
+			snprintf(s, 64, "UNKNOW ADDRESS FAMILY\n");
+			break;
+	}
+
+	return s;
+}
 
 int main(int argc, char *argv[]) {
 
-	int ch, i;
-	struct hostent *host;
+	int ch, i, rc;
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	char *hostname;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -80,19 +103,24 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	host = gethostbyname(argv[0]);
-	if (host == NULL) {
-		herror(argv[0]);
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_CANONNAME;
+	hints.ai_protocol = 0;
+
+	rc = getaddrinfo(argv[0], NULL, &hints, &result);
+	if (rc != 0) {
+		fprintf(stderr, "getaddrinfo: %s", gai_strerror(rc));
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; host->h_aliases[i] != NULL; i++) {
-		fprintf(stdout, "%s is an alias for %s\n", host->h_aliases[i], host->h_name);
+	hostname = result->ai_canonname;;
+	for (rp = result; rp; rp = rp->ai_next) {
+		fprintf(stdout, "%s has address %s\n", hostname, sa2s(rp->ai_addr));
 	}
-	for (i = 0; host->h_addr_list[i] != NULL; i++) {
-		struct in_addr *addr = (struct in_addr *) host->h_addr_list[i];
-		fprintf(stdout, "%s has address %s\n", host->h_name, inet_ntoa(*addr));
-	}
+
+	freeaddrinfo(result);
 
 	exit(EXIT_SUCCESS);
 }
