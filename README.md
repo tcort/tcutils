@@ -48,6 +48,7 @@ enable -n true
 - cat -- concatenate and print files
 - catfacts -- writes a random cat fact to standard output
 - clear -- clear the terminal screen
+- chef -- Swedish Chef translator
 - cmp -- compare two files
 - coinflip -- simulates a coinflip and prints the result
 - copy -- copy characters from standard input to standard output
