@@ -24,7 +24,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static void fgrep(FILE *in, char *pattern) {
+static void fgrep(FILE *in, char *pattern, char *filename, int flag_H) {
 
 	char *p;
 	char *line = NULL;
@@ -34,6 +34,9 @@ static void fgrep(FILE *in, char *pattern) {
 	while ((len = getline(&line, &cap, in)) != EOF) {
 		p = strstr(line, pattern);
 		if (p != NULL) {
+			if (flag_H == 1) {
+				fprintf(stdout, "%s:\t", filename);
+			}
 			fprintf(stdout, "%s", line);
 		}
 	}
@@ -47,22 +50,29 @@ int main(int argc, char *argv[]) {
 	int i;
 	FILE *in;
 	char *pattern;
+	int flag_H;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+		{ "filenames", no_argument, 0, 'H' },
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	/* defaults */
+
+	flag_H = 0;
+
+	while ((ch = getopt_long(argc, argv, "hHV", long_options, NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "fgrep -- searches for and prints lines that exactly match a given string\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "usage: fgrep [OPTIONS] PATTERN [FILE...]\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
+				fprintf(stdout, "  -h, --help       print help text\n");
+				fprintf(stdout, "  -H, --filenames  print filenames with output lines\n");
+				fprintf(stdout, "  -V, --version    print version and copyright info\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
@@ -79,6 +89,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
 				exit(EXIT_SUCCESS);
+				break;
+			case 'H':
+				flag_H = 1;
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
@@ -99,7 +112,7 @@ int main(int argc, char *argv[]) {
 	pattern = argv[0];
 
 	if (argc == 1) {
-		fgrep(stdin, pattern);
+		fgrep(stdin, pattern, "<stdin>", flag_H);
 	} else {
 		for (i = 1; i < argc; i++) {
 			in = fopen(argv[i], "r");
@@ -108,7 +121,7 @@ int main(int argc, char *argv[]) {
 				exit(EXIT_FAILURE);
 			}
 
-			fgrep(in, pattern);
+			fgrep(in, pattern, argv[i], flag_H);
 
 			fclose(in);
 
