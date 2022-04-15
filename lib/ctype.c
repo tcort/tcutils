@@ -132,8 +132,9 @@ int tc_tolower(int ch) {
 		case 'X': return 'x';
 		case 'Y': return 'y';
 		case 'Z': return 'z';
-		defaut: return ch;
 	}
+
+	return ch;
 }
 
 int tc_toupper(int ch) {
@@ -164,6 +165,7 @@ int tc_toupper(int ch) {
 		case 'x': return 'X';
 		case 'y': return 'Y';
 		case 'z': return 'Z';
-		defaut: return ch;
 	}
+
+	return ch;
 }
