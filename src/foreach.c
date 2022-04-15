@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <regex.h>
@@ -29,7 +32,7 @@ void chomp(char *s) {
 	char *p;
 
 	p = strstr(s, "\n");
-	if (p != NULL) {
+	if (p != TC_NULL) {
 		*p = '\0';
 	}
 }
@@ -46,13 +49,13 @@ void foreach(int argc, char *argv[], char *line) {
 
 	/* combine argv into one string */
 	for (i = 0; i < argc; i++) {
-		len += strlen(argv[i]) + 1;
+		len += tc_strlen(argv[i]) + 1;
 	}
 
 	cmd = (char *) malloc(len + 1);
-	if (cmd == NULL) {
+	if (cmd == TC_NULL) {
 		perror("malloc");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	memset(cmd, '\0', len + 1);
 
@@ -67,24 +70,24 @@ void foreach(int argc, char *argv[], char *line) {
 
 	/* find instances of {} and replace with line */
 	n = 0;
-	for (i = 0; i < strlen(cmd); i++) {
+	for (i = 0; i < tc_strlen(cmd); i++) {
 		if (cmd[i] == '{' && cmd[i+1] == '}') {
 			n++;
 		}
 	}
 
-	len = strlen(cmd) + (n * strlen(cmd)) + 1;
+	len = tc_strlen(cmd) + (n * tc_strlen(cmd)) + 1;
 	result = (char *) malloc(len + 1);
-	if (result == NULL) {
+	if (result == TC_NULL) {
 		perror("malloc");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	memset(result, '\0', len + 1);
 
 	/* i is index in cmd, j is index in result, k is index in line */
-	for (i = j = 0; i < strlen(cmd); i++) {
+	for (i = j = 0; i < tc_strlen(cmd); i++) {
 		if (cmd[i] == '{' && cmd[i+1] == '}') {
-			for (k = 0; k < strlen(line); k++) {
+			for (k = 0; k < tc_strlen(line); k++) {
 				result[j] = line[k];
 				j += 1;
 			}
@@ -96,12 +99,12 @@ void foreach(int argc, char *argv[], char *line) {
 	}
 
 	free(cmd);
-	cmd = NULL;
+	cmd = TC_NULL;
 
 	system(result);
 
 	free(result);
-	result = NULL;
+	result = TC_NULL;
 
 }
 
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "foreach -- executes a command for every line of standard input\n");
@@ -138,21 +141,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  # rename files *.dat to *.dat.done\n");
 				fprintf(stdout, "  # {} is the placeholder for standard input\n");
 				fprintf(stdout, "  ls -1 *.dat | foreach mv {} {}.done\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "foreach (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "foreach (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -161,17 +164,17 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	line = NULL;
+	line = TC_NULL;
 	linecap = 0;
 
 	while ((linelen = getline(&line, &linecap, stdin)) > 0) {
 		foreach(argc, argv, line);
 	}
 
-	if (line != NULL) {
+	if (line != TC_NULL) {
 		free(line);
-		line = NULL;
+		line = TC_NULL;
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

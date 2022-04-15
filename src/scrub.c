@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/stdlib.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdint.h>
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "scrub -- overwrites files using the 35 pass Gutmann technique\n");
@@ -107,21 +110,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # overrite foo.txt\n");
 				fprintf(stdout, "  scrub foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "scrub (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "scrub (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -132,31 +135,30 @@ int main(int argc, char *argv[]) {
 
 	if (argc != 1) {
 		fprintf(stderr, "usage: scrub [OPTIONS] FILENAME\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	fp = fopen(argv[0], "r+");
-	if (fp == NULL) {
+	if (fp == TC_NULL) {
 		perror("fopen");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	fd = fileno(fp);
 	if (fd == -1) {
 		perror("fileno");
 		fclose(fp);
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	rc = fstat(fd, &st);
 	if (rc == -1) {
 		perror("fstat");
 		fclose(fp);
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	/* if OS randomizes PIDs, then this is a random seed */
-	srand((unsigned int) getpid());
+	tc_srand((unsigned int) getpid());
 
 	for (i = 0; i < NPASSES; i++) {
 		rewind(fp);
@@ -170,7 +172,7 @@ int main(int argc, char *argv[]) {
 
 				case RANDOM:
 				default:
-					fputc(rand(), fp);
+					fputc(tc_rand(), fp);
 					break;
 			}
 		}
@@ -183,5 +185,5 @@ int main(int argc, char *argv[]) {
 
 	fclose(fp);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

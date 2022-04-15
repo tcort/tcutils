@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <errno.h>
@@ -53,13 +55,13 @@ static void prompt(void) {
 	uid = getuid();
 
 	passwd = getpwuid(uid);
-	if (passwd == NULL) {
+	if (passwd == TC_NULL) {
 		return;
 	}
 
 	memset(path, '\0', sizeof(char) * (MAXPATHLEN+1));
 	p = getcwd(path, MAXPATHLEN);
-	if (p == NULL) {
+	if (p == TC_NULL) {
 		return;
 	}
 
@@ -93,11 +95,11 @@ static char **argvify(char *cmdline) {
 		}
 	}
 
-	n++; /* last entry in argv must be NULL */
+	n++; /* last entry in argv must be TC_NULL */
 
 	argv = (char **) malloc(sizeof(char*) * n);
-	if (argv == NULL) {
-		return NULL;
+	if (argv == TC_NULL) {
+		return TC_NULL;
 	}
 	memset(argv, '\0', sizeof(char*) * n);
 
@@ -142,7 +144,7 @@ static int tryexternal(char *argv[]) {
 		return -1;
 	} else if (pid == 0) {
 		execvp(argv[0], argv);
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	waitpid(pid, &wstatus, 0);
@@ -153,7 +155,7 @@ int main(int argc, char *argv[]) {
 
 	int ch;
 	char **cmdargv;
-	char *cmdline = NULL;
+	char *cmdline = TC_NULL;
 	size_t cap = 0;
 	ssize_t len = 0;
 
@@ -163,7 +165,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "shell -- command shell\n");
@@ -177,21 +179,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # launch the command shell\n");
 				fprintf(stdout, "  shell\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "shell (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "shell (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		cmdargv = argvify(cmdline);
-		if (cmdargv == NULL) {
+		if (cmdargv == TC_NULL) {
 			perror("malloc");
 			break;
 		}
@@ -223,7 +225,7 @@ int main(int argc, char *argv[]) {
 	} while (!done);
 
 	free(cmdline);
-	cmdline = NULL;
+	cmdline = TC_NULL;
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

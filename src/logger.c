@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -52,7 +55,7 @@ int main(int argc, char *argv[]) {
 	level = LOG_INFO;
 	message[0] = '\0';
 
-	while ((ch = getopt_long(argc, argv, "chist:V", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "chist:V", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'c':
 				logopt |= LOG_CONS;
@@ -82,21 +85,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # log an application error for foobard, including PID\n");
 				fprintf(stdout, "  logger -i -t foobard 'failed to authenticate user Alice'\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "logger (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "logger (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -107,23 +110,23 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		fprintf(stderr, "usage: logger [OPTIONS] MESSAGE...\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	memset(message, '\0', MSGSZ);
 	msgsize = 1 /* NUL byte */;
 	for (i = 0; i < argc; i++) {
-		msgsize += strlen(argv[i]);
+		msgsize += tc_strlen(argv[i]);
 		if (msgsize >= MSGSZ) {
 			fprintf(stderr, "Message too long\n");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 		strncat(message, argv[i], MSGSZ - msgsize);
 		if (i + 1 < argc) {
 			msgsize += 1;
 			if (msgsize >= MSGSZ) {
 				fprintf(stderr, "Message too long\n");
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 			strncat(message, " ", MSGSZ - msgsize);
 		}
@@ -133,5 +136,5 @@ int main(int argc, char *argv[]) {
 	syslog(level, "%s", message);
 	closelog();
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

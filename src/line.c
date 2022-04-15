@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -26,7 +28,7 @@
 int main(int argc, char *argv[]) {
 
 	int ch;
-	char *line = NULL;
+	char *line = TC_NULL;
 	size_t cap = 0;
 	ssize_t len = 0;
 
@@ -36,7 +38,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "line -- read a line of input\n");
@@ -52,20 +54,20 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  echo -n \"What is your name?\"\n");
 				fprintf(stdout, "  NAME=$(line)\n");
 				fprintf(stdout, "  echo \"Hello, ${NAME}!\"\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 			case 'V':
-				fprintf(stdout, "line (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "line (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -82,5 +84,5 @@ int main(int argc, char *argv[]) {
 	}
 	free(line);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

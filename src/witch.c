@@ -16,9 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define PATHSEP ":"
-
-#include "config.h"
+#include "tc/const.h"
+#include "tc/colours.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <limits.h>
@@ -26,9 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#define COLOR_RESET   "\x1b[0m"
-#define COLOR_BRIGHT_GREEN   "\x1b[32;1m"
 
 int main(int argc, char *argv[]) {
 
@@ -44,7 +42,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "witch -- finds an executable in $PATH\n");
@@ -58,21 +56,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # find the C compiler\n");
 				fprintf(stdout, "  witch cc\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "witch (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "witch (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -83,19 +81,19 @@ int main(int argc, char *argv[]) {
 
 	if (argc != 1) {
 		fprintf(stderr, "usage: witch [OPTIONS] PROGNAME\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	prog = argv[0];
 
 	path = getenv("PATH");
-	if (path == NULL) {
+	if (path == TC_NULL) {
 		fprintf(stderr, "$PATH not set in environment\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	dir = strtok(path, PATHSEP);
-	while (dir != NULL) {
+	dir = strtok(path, TC_PATHSEP);
+	while (dir != TC_NULL) {
 		int rc;
 
 		snprintf(progpath, PATH_MAX, "%s/%s", dir, prog);
@@ -103,19 +101,19 @@ int main(int argc, char *argv[]) {
 		rc = access(progpath, X_OK);
 		if (rc == 0) {
 			if (isatty(STDOUT_FILENO)) {
-				fprintf(stdout, "%s", COLOR_BRIGHT_GREEN);
+				fprintf(stdout, "%s", COLOUR_BRIGHT_GREEN);
 			}
 			fprintf(stdout, "%s", progpath);
 			if (isatty(STDOUT_FILENO)) {
-				fprintf(stdout, "%s", COLOR_RESET);
+				fprintf(stdout, "%s", COLOUR_RESET);
 			}
 			fprintf(stdout, "\n");
-			exit(EXIT_SUCCESS);
+			tc_exit(TC_EXIT_SUCCESS);
 		}
 
-		dir = strtok(NULL, PATHSEP);
+		dir = strtok(TC_NULL, TC_PATHSEP);
 	}
 
 	/* not found :( */
-	exit(EXIT_FAILURE);
+	tc_exit(TC_EXIT_FAILURE);
 }

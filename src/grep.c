@@ -16,10 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/colours.h"
+#include "tc/ctype.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
-#include <ctype.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,35 +32,16 @@
 #include <unistd.h>
 
 enum color_mode {
-	COLOR_MODE_NEVER,
-	COLOR_MODE_AUTO,
-	COLOR_MODE_ALWAYS
+	COLOUR_MODE_NEVER,
+	COLOUR_MODE_AUTO,
+	COLOUR_MODE_ALWAYS
 };
 
-#define COLOR_RESET   "\x1b[0m"
-
-#define COLOR_BLACK   "\x1b[30m"
-#define COLOR_RED     "\x1b[31m"
-#define COLOR_GREEN   "\x1b[32m"
-#define COLOR_YELLOW  "\x1b[33m"
-#define COLOR_BLUE    "\x1b[34m"
-#define COLOR_MAGENTA "\x1b[35m"
-#define COLOR_CYAN    "\x1b[36m"
-#define COLOR_WHITE   "\x1b[37m"
-
-#define COLOR_BRIGHT_BLACK   "\x1b[30;1m"
-#define COLOR_BRIGHT_RED     "\x1b[31;1m"
-#define COLOR_BRIGHT_GREEN   "\x1b[32;1m"
-#define COLOR_BRIGHT_YELLOW  "\x1b[33;1m"
-#define COLOR_BRIGHT_BLUE    "\x1b[34;1m"
-#define COLOR_BRIGHT_MAGENTA "\x1b[35;1m"
-#define COLOR_BRIGHT_CYAN    "\x1b[36;1m"
-#define COLOR_BRIGHT_WHITE   "\x1b[37;1m"
 
 static int tccmp(char *x, char *y, int icase) {
 	size_t i;
-	for (i = 0; i < strlen(x) && i < strlen(y); i++) {
-		if (x[i] != y[i] && !(icase && tolower(x[i]) == tolower(y[i]))) {
+	for (i = 0; i < tc_strlen(x) && i < tc_strlen(y); i++) {
+		if (x[i] != y[i] && !(icase && tc_tolower(x[i]) == tc_tolower(y[i]))) {
 			return -1;
 		}
 	}
@@ -66,8 +51,8 @@ static int tccmp(char *x, char *y, int icase) {
 static int tcstrstr(char *hay, char *need, int icase) {
 	size_t i;
 	int rc;
-	for (i = 0; i < strlen(hay); i++) {
-		if (hay[i] == need[0] || (icase && tolower(hay[i]) == tolower(need[0]))) {
+	for (i = 0; i < tc_strlen(hay); i++) {
+		if (hay[i] == need[0] || (icase && tc_tolower(hay[i]) == tc_tolower(need[0]))) {
 			rc = tccmp(hay + i, need, icase);
 			if (rc == 0) {
 				return 0;
@@ -83,10 +68,10 @@ int main(int argc, char *argv[]) {
 	FILE *in = stdin;
 	regex_t preg;
 	regmatch_t pmatch[1];
-	char *pattern = NULL, errbuf[128], line[2048], *retp = NULL;
+	char *pattern = TC_NULL, errbuf[128], line[2048], *retp = TC_NULL;
 	int cflags = 0, eflags = 0, errcode = 0, ch = 0, show_lineno = 0, line_len = sizeof(line), fixed_mode = 0, icase = 0, just_count = 0;
 	size_t nmatch = 1, lineno = 0, count = 0;
-	enum color_mode colors = COLOR_MODE_AUTO;
+	enum color_mode colors = COLOUR_MODE_AUTO;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -102,18 +87,18 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "CEFGVchin", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "CEFGVchin", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'C':
 				if (strcmp(optarg, "auto") == 0) {
-					colors = COLOR_MODE_AUTO;
+					colors = COLOUR_MODE_AUTO;
 				} else if (strcmp(optarg, "never") == 0) {
-					colors = COLOR_MODE_NEVER;
+					colors = COLOUR_MODE_NEVER;
 				} else if (strcmp(optarg, "always") == 0) {
-					colors = COLOR_MODE_ALWAYS;
+					colors = COLOUR_MODE_ALWAYS;
 				} else {
 					fprintf(stderr, "grep: invalid colour options. must be one of auto, never, always\n");
-					exit(EXIT_FAILURE);
+					tc_exit(TC_EXIT_FAILURE);
 				}
 
 				break;
@@ -143,7 +128,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  # print the count of lines in foo.txt that contain bar\n");
 				fprintf(stdout, "  grep -c bar foo.txt\n");
 				fprintf(stdout, "\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'i':
 				cflags |= REG_ICASE;
@@ -162,18 +147,18 @@ int main(int argc, char *argv[]) {
 				cflags &= ~(REG_EXTENDED);
 				break;
 			case 'V':
-				fprintf(stdout, "grep (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "grep (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -184,19 +169,19 @@ int main(int argc, char *argv[]) {
 
 	if (argc != 1 && argc != 2) {
 		fprintf(stderr, "usage: grep [OPTIONS] PATTERN [FILE]\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	if (colors == COLOR_MODE_AUTO) {
-		colors = (isatty(fileno(stdout))) ? COLOR_MODE_ALWAYS : COLOR_MODE_NEVER;
+	if (colors == COLOUR_MODE_AUTO) {
+		colors = (isatty(fileno(stdout))) ? COLOUR_MODE_ALWAYS : COLOUR_MODE_NEVER;
 	}
 
 	pattern = argv[0];
 	if (argc == 2) {
 		in = fopen(argv[1], "r");
-		if (in == NULL) {
+		if (in == TC_NULL) {
 			perror("fopen");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
 
@@ -205,15 +190,15 @@ int main(int argc, char *argv[]) {
 		regerror(errcode, &preg, errbuf, sizeof(errbuf));
 		fprintf(stdout, "Bad Pattern: %s", errbuf);
 		regfree(&preg);
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	do {
 		retp = fgets(line, line_len, in);
-		if (retp == NULL) {
+		if (retp == TC_NULL) {
 			break;
 		} else if (line[0] != '\0') {
-			line[strlen(line)-1] = '\0';
+			line[tc_strlen(line)-1] = '\0';
 		}
 
 		lineno++;
@@ -222,20 +207,20 @@ int main(int argc, char *argv[]) {
 		if (errcode == 0) {
 			if (just_count == 0) {
 				if (show_lineno) {
-					if (colors == COLOR_MODE_ALWAYS) {
-						fprintf(stdout, "%s", COLOR_BRIGHT_CYAN);
+					if (colors == COLOUR_MODE_ALWAYS) {
+						fprintf(stdout, "%s", COLOUR_BRIGHT_CYAN);
 					}
 					fprintf(stdout, "%lu:", lineno);
-					if (colors == COLOR_MODE_ALWAYS) {
-						fprintf(stdout, "%s", COLOR_RESET);
+					if (colors == COLOUR_MODE_ALWAYS) {
+						fprintf(stdout, "%s", COLOUR_RESET);
 					}
 				}
-				if (colors == COLOR_MODE_ALWAYS) {
-					fprintf(stdout, "%s", COLOR_BRIGHT_WHITE);
+				if (colors == COLOUR_MODE_ALWAYS) {
+					fprintf(stdout, "%s", COLOUR_BRIGHT_WHITE);
 				}
 				fprintf(stdout, "%s\n", line);
-				if (colors == COLOR_MODE_ALWAYS) {
-					fprintf(stdout, "%s", COLOR_RESET);
+				if (colors == COLOUR_MODE_ALWAYS) {
+					fprintf(stdout, "%s", COLOUR_RESET);
 				}
 			}
 			count++;
@@ -243,18 +228,18 @@ int main(int argc, char *argv[]) {
 	} while (!feof(in) && !ferror(in));
 
 	if (just_count == 1) {
-		if (colors == COLOR_MODE_ALWAYS) {
-			fprintf(stdout, "%s", COLOR_BRIGHT_GREEN);
+		if (colors == COLOUR_MODE_ALWAYS) {
+			fprintf(stdout, "%s", COLOUR_BRIGHT_GREEN);
 		}
 		fprintf(stdout, "%lu\n", count);
-		if (colors == COLOR_MODE_ALWAYS) {
-			fprintf(stdout, "%s", COLOR_RESET);
+		if (colors == COLOUR_MODE_ALWAYS) {
+			fprintf(stdout, "%s", COLOUR_RESET);
 		}
 	}
 
 	fclose(in);
 	regfree(&preg);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }
 

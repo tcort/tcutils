@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -28,18 +31,18 @@ enum location { FIRST, MIDDLE, LAST };
 
 static enum location where(char *w, size_t i) {
 	if (i == 0) return FIRST;
-	else if (i == strlen(w)-1) return LAST;
+	else if (i == tc_strlen(w)-1) return LAST;
 	else return MIDDLE;
 }
 
 static int match(char *word, size_t i, char *find) {
-	return !strncmp(&word[i], find, strlen(find));
+	return !strncmp(&word[i], find, tc_strlen(find));
 }
 
 static void tr(char *word) {
 	size_t i;
 
-	for (i = 0; i < strlen(word); i++) {
+	for (i = 0; i < tc_strlen(word); i++) {
 
 		     if (match(word,i,"an")) { printf( "un"); i++; }		
 		else if (match(word,i,"An")) { printf( "Un"); i++; }		
@@ -64,7 +67,7 @@ static void tr(char *word) {
 		else if (match(word,i,"V")) { printf( "F"); }		
 		else if (match(word,i,"w")) { printf( "v"); }		
 		else if (match(word,i,"W")) { printf( "V"); }		
-		else putc(word[i], stdout);
+		else tc_putc(TC_STDOUT, word[i]);
 	}
 }
 
@@ -80,7 +83,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "chef -- Swedish Chef translator\n");
@@ -94,21 +97,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # translate foo.txt to chef-speak\n");
 				fprintf(stdout, "  chef < foo.txt > bar.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "chef (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "chef (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -123,7 +126,7 @@ int main(int argc, char *argv[]) {
 							|| ch == '\'') {
 			buf[i] = (char) ch;
 		} else if (i == 0) {
-			putc(ch, stdout);
+			tc_putc(TC_STDOUT, ch);
 			i--;
 			continue;
 		} else {
@@ -137,5 +140,5 @@ int main(int argc, char *argv[]) {
 	return 0;
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

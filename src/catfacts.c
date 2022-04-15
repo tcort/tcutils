@@ -16,12 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "tc/args.h"
+#include "tc/const.h"
+#include "tc/stdio.h"
+#include "tc/stdlib.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 static char *catfacts[] = {
 	"Kittens have 26 teeth while adult cats have 30 teeth",
@@ -54,72 +54,66 @@ static int ncatfacts = sizeof(catfacts) / sizeof(catfacts[0]);
 
 int main(int argc, char *argv[]) {
 
-	int ch, i, flag_a;
+	int i, flag_a;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "all", no_argument, 0, 'a' },
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'a', .longarg = "all", .description = "print all cat facts", .has_value = 0 },
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "catfacts", .description = "show a random fact about cats" },
+		{ .command = "catfacts --all", .description = "show all facts about cats in the knowledge base" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "catfacts",
+		.usage = "[OPTIONS]",
+		.description = "writes a random cat fact to standard output",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
 	};
 
 	flag_a = 0;
 
-	while ((ch = getopt_long(argc, argv, "ahV", long_options, NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'a':
 				flag_a = 1;
 				break;
 			case 'h':
-				fprintf(stdout, "catfacts -- writes a random cat fact to standard output\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: catfacts [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -a, --all      print all cat facts\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # show a random fact about cats\n");
-				fprintf(stdout, "  catfacts\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # show all facts about cats in the knowledge base\n");
-				fprintf(stdout, "  catfacts --all\n");
-				exit(EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "catfacts (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
-
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
-	/* if OS randomizes PIDs, then this is a random seed */
-	srand((unsigned int) getpid());
+	tc_srand((unsigned int) tc_getpid());
 
 	if (flag_a == 1) {
 		for (i = 0; i < ncatfacts; i++) {
-			fprintf(stdout, "%s\n", catfacts[i]);
+			tc_puts(TC_STDOUT, catfacts[i]);
+			tc_puts(TC_STDOUT, "\n");
 		}
 	} else {
-		fprintf(stdout, "%s\n", catfacts[rand() % ncatfacts]);
+		tc_puts(TC_STDOUT, catfacts[tc_rand() % ncatfacts]);
+		tc_puts(TC_STDOUT, "\n");
 	}
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -27,13 +29,13 @@
 static void fgrep(FILE *in, char *pattern, char *filename, int flag_H) {
 
 	char *p;
-	char *line = NULL;
+	char *line = TC_NULL;
 	size_t cap = 0;
 	ssize_t len = 0;
 
 	while ((len = getline(&line, &cap, in)) != EOF) {
 		p = strstr(line, pattern);
-		if (p != NULL) {
+		if (p != TC_NULL) {
 			if (flag_H == 1) {
 				fprintf(stdout, "%s:\t", filename);
 			}
@@ -63,7 +65,7 @@ int main(int argc, char *argv[]) {
 
 	flag_H = 0;
 
-	while ((ch = getopt_long(argc, argv, "hHV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hHV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "fgrep -- searches for and prints lines that exactly match a given string\n");
@@ -78,24 +80,24 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # search the files foo.txt and bar.txt for the fixed string hello\n");
 				fprintf(stdout, "  fgrep hello foo.txt bar.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "fgrep (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "fgrep (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'H':
 				flag_H = 1;
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc < 1) {
 		fprintf(stderr, "usage: fgrep [OPTIONS] PATTERN [FILE...]\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	pattern = argv[0];
@@ -116,9 +118,9 @@ int main(int argc, char *argv[]) {
 	} else {
 		for (i = 1; i < argc; i++) {
 			in = fopen(argv[i], "r");
-			if (in == NULL) {
+			if (in == TC_NULL) {
 				perror("fopen");
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 
 			fgrep(in, pattern, argv[i], flag_H);
@@ -128,6 +130,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }
 

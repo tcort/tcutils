@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <curl/curl.h>
 #include <getopt.h>
@@ -55,19 +58,19 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	curl = NULL;
-	method = NULL;
-	url = NULL;
-	headers = NULL;
-	input = NULL;
-	rc = EXIT_SUCCESS;
+	curl = TC_NULL;
+	method = TC_NULL;
+	url = TC_NULL;
+	headers = TC_NULL;
+	input = TC_NULL;
+	rc = TC_EXIT_SUCCESS;
 	flag_v = 0;
-	username = NULL;
-	password = NULL;
+	username = TC_NULL;
+	password = TC_NULL;
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	while ((ch = getopt_long(argc, argv, "H:hu:p:Vv", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "H:hu:p:Vv", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'H':
 				headers = curl_slist_append(headers, optarg);
@@ -102,12 +105,12 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "  # delete a file on an https server\n");
 				fprintf(stdout, "  rest delete https://www.tcort.dev/foo.json\n");
 				curl_slist_free_all(headers);
-				headers = NULL;
+				headers = TC_NULL;
 				curl_global_cleanup();
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "rest (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "rest (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
@@ -115,9 +118,9 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
 				curl_slist_free_all(headers);
-				headers = NULL;
+				headers = TC_NULL;
 				curl_global_cleanup();
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'v':
 				flag_v = 1;
@@ -131,9 +134,9 @@ int main(int argc, char *argv[]) {
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
 				curl_slist_free_all(headers);
-				headers = NULL;
+				headers = TC_NULL;
 				curl_global_cleanup();
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -153,34 +156,34 @@ int main(int argc, char *argv[]) {
 	} else if (argc == 3) {
 		method = argv[0];
 		url = argv[1];
-		input = (argv[2][0] == '@' ? fopen((&argv[2][1]), "r") : fmemopen(argv[2], strlen(argv[2]), "r"));
-		if (input == NULL) {
+		input = (argv[2][0] == '@' ? fopen((&argv[2][1]), "r") : fmemopen(argv[2], tc_strlen(argv[2]), "r"));
+		if (input == TC_NULL) {
 			perror("fopen");
 			curl_slist_free_all(headers);
-			headers = NULL;
+			headers = TC_NULL;
 			curl_global_cleanup();
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 	} else {
 		fprintf(stderr, "usage: rest [OPTIONS] [METHOD] URL\n");
 		fprintf(stderr, "usage: rest [OPTIONS] METHOD URL (DATA|@FILENAME)\n");
 		curl_slist_free_all(headers);
-		headers = NULL;
+		headers = TC_NULL;
 		curl_global_cleanup();
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	errbuf[0] = '\0';
 
 	curl = curl_easy_init();
-	if (curl == NULL) {
+	if (curl == TC_NULL) {
 		perror("curl_easy_init");
 		fclose(input);
-		input = NULL;
+		input = TC_NULL;
 		curl_slist_free_all(headers);
-		headers = NULL;
+		headers = TC_NULL;
 		curl_global_cleanup();
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	/* general options */
@@ -191,8 +194,8 @@ int main(int argc, char *argv[]) {
 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, flag_v == 1 ? 1L : 0L);
 
-	if (username != NULL) curl_easy_setopt(curl, CURLOPT_USERNAME, username);
-	if (password != NULL) curl_easy_setopt(curl, CURLOPT_PASSWORD, password);
+	if (username != TC_NULL) curl_easy_setopt(curl, CURLOPT_USERNAME, username);
+	if (password != TC_NULL) curl_easy_setopt(curl, CURLOPT_PASSWORD, password);
 
 	if (strcasecmp(method, "PUT") == 0) {
 		curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
@@ -221,17 +224,17 @@ int main(int argc, char *argv[]) {
 	res = curl_easy_perform(curl);
 	if (res != CURLE_OK) {
 		fprintf(stderr, "FAIL %s\n", errbuf[0] == '\0' ? "request failed" : errbuf);
-		rc = EXIT_FAILURE;
+		rc = TC_EXIT_FAILURE;
 	}
 
 	curl_easy_cleanup(curl);
-	curl = NULL;
+	curl = TC_NULL;
 	curl_slist_free_all(headers);
-	headers = NULL;
+	headers = TC_NULL;
 	curl_global_cleanup();
 
 	fclose(input);
-	input = NULL;
+	input = TC_NULL;
 
-	exit(rc);
+	tc_exit(rc);
 }

@@ -16,9 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/ctype.h"
+#include "tc/math.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
-#include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,18 +46,18 @@ static char *skip_fields(char *x, size_t nskip_fields) {
 	size_t n, i = 0;
 
 	/* eat whitespace until first field */
-	while (x[i] != '\0' && isspace(x[i])) {
+	while (x[i] != '\0' && tc_isspace(x[i])) {
 		i++;
 	}
 
 	/* skip over the fields */
 	for (n = 1; x[i] != '\0' && n <= nskip_fields; n++) {
 		/* eat field contents */
-		while (x[i] != '\0' && !isspace(x[i])) {
+		while (x[i] != '\0' && !tc_isspace(x[i])) {
 			i++;
 		}
 		/* eat whitespace until next field */
-		while (x[i] != '\0' && isspace(x[i])) {
+		while (x[i] != '\0' && tc_isspace(x[i])) {
 			i++;
 		}
 		n++;
@@ -72,14 +76,14 @@ static int duplicate(char *x, char *y, int ignore_case, size_t nskip_fields, siz
 	}
 
 	/* not the same length? definitely unique */
-	if (strlen(x) != strlen(y)) {
+	if (tc_strlen(x) != tc_strlen(y)) {
 		return 0;
 	}
 
 	/* compare each character until a mismatch or done */
-	for (i = nskip_chars; i < strlen(x); i++) {
+	for (i = nskip_chars; i < tc_strlen(x); i++) {
 		if (ignore_case) {
-			if (tolower(x[i]) != tolower(y[i])) {
+			if (tc_tolower(x[i]) != tc_tolower(y[i])) {
 				return 0;
 			}
 		} else {
@@ -111,7 +115,7 @@ static void show(FILE *o, char *s, size_t c, int show_count, int delimiter) {
 }
 
 static void unique(op_t *op) {
-	char *first = NULL, *line = NULL, *last = NULL;
+	char *first = TC_NULL, *line = TC_NULL, *last = TC_NULL;
 	size_t size = 0, sizelast=0, c=1;
 	ssize_t len, lenlast;
 	
@@ -123,21 +127,21 @@ static void unique(op_t *op) {
 		chomp(line, op->delimiter);
 		if (duplicate(line, last, op->ignore_case, op->nskip_fields, op->nskip_chars)) {
 			c++;
-			if (first == NULL) {
+			if (first == TC_NULL) {
 				first = strdup(last);
 			}
 		} else {
-			if (op->unique_only && first == NULL) {
+			if (op->unique_only && first == TC_NULL) {
 				show(op->output, last, c, op->show_count, op->delimiter);
-			} else if (op->duplicate&& first != NULL) {
+			} else if (op->duplicate&& first != TC_NULL) {
 				show(op->output, first, c, op->show_count, op->delimiter);
 			} else if (!op->duplicate&& !op->unique_only) {
-				show(op->output, first == NULL ? last : first, c, op->show_count, op->delimiter);
+				show(op->output, first == TC_NULL ? last : first, c, op->show_count, op->delimiter);
 			}
 			c = 1;
-			if (first != NULL) {
+			if (first != TC_NULL) {
 				free(first);
-				first = NULL;
+				first = TC_NULL;
 			}
 		}
 
@@ -145,16 +149,16 @@ static void unique(op_t *op) {
 		last = strdup(line);
 	}
 
-	if (op->unique_only && first == NULL) {
+	if (op->unique_only && first == TC_NULL) {
 		show(op->output, last, c, op->show_count, op->delimiter);
-	} else if (op->duplicate && first != NULL) {
+	} else if (op->duplicate && first != TC_NULL) {
 		show(op->output, first, c, op->show_count, op->delimiter);
 	} else if (!op->duplicate && !op->unique_only) {
-		show(op->output, first == NULL ? last : first, c, op->show_count, op->delimiter);
+		show(op->output, first == TC_NULL ? last : first, c, op->show_count, op->delimiter);
 	}
 
-	if (line != NULL) free(line);
-	if (last != NULL) free(last);
+	if (line != TC_NULL) free(line);
+	if (last != TC_NULL) free(last);
 }
 
 int main(int argc, char *argv[]) {
@@ -185,7 +189,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "cdf:hiuVs:z", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "cdf:hiuVs:z", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'c':
 				op.show_count = 1;
@@ -200,10 +204,10 @@ int main(int argc, char *argv[]) {
 				op.unique_only = 1;
 				break;
 			case 's':
-				op.nskip_chars = (size_t) abs(atoi(optarg));
+				op.nskip_chars = (size_t) tc_abs(atoi(optarg));
 				break;
 			case 'f':
-				op.nskip_fields = (size_t) abs(atoi(optarg));
+				op.nskip_fields = (size_t) tc_abs(atoi(optarg));
 				break;
 			case 'z':
 				op.delimiter = '\0';
@@ -220,21 +224,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # collapse duplicate lines from foo.txt\n");
 				fprintf(stdout, "  uniq foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "uniq (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "uniq (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -246,18 +250,18 @@ int main(int argc, char *argv[]) {
 	/* optional input file */
 	if (argc > 0) {
 		op.input = fopen(argv[0], "r");
-		if (op.input == NULL) {
+		if (op.input == TC_NULL) {
 			perror("fopen");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		/* optional output file */
 		if (argc > 1) {
 			op.output = fopen(argv[1], "r");
-			if (op.output == NULL) {
+			if (op.output == TC_NULL) {
 				perror("fopen");
 				fclose(op.input);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 		}
 	}
@@ -268,7 +272,7 @@ int main(int argc, char *argv[]) {
 	fclose(op.output);
 	fclose(op.input);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 	perror("exit");
 	return 1;
 }

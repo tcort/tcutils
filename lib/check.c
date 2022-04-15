@@ -1,5 +1,5 @@
- /*
-    config.h -- build-time configuration for all utilities
+/*
+    check.c - unit testing framework
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -14,13 +14,32 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "tc/check.h"
+#include "tc/const.h"
+#include "tc/stdio.h"
+
+/*
+ * Execute a series of checks in 'checks'
+ * Returns TC_CHECK_PASS if all return it, otherwise return on first fail/skip
  */
+int tc_check(struct check *checks) {
+	int i;
 
-#ifndef TCUTILS_CONFIG_H
-#define TCUTILS_CONFIG_H
+	for (i = 0; checks[i].message != TC_NULL; i++) {
+		int rc;
 
-#define PROJECT_NAME "@PROJECT_NAME@"
-#define PROJECT_VERSION "@PROJECT_VERSION@"
-#define PROJECT_STRING "@PROJECT_NAME@ @PROJECT_VERSION@"
+		rc = checks[i].fn();
+		if (rc == 0) {
+			tc_puterr("check \"");
+			tc_puterr(checks[i].message);
+			tc_puterr("\" failed");
+			tc_puterrln("");
+			return rc;
+		}
+	}
 
-#endif
+	return TC_CHECK_PASS;
+}
+

@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -35,7 +37,7 @@ static void make_directory(char *path, int ignore_exists) {
 	rc = mkdir(path, 0777);
 	if (rc == -1 && !(ignore_exists && errno == EEXIST)) {
 		perror("mkdir");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 }
 
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
 
 	flag_p = 0;
 
-	while ((ch = getopt_long(argc, argv, "hpV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hpV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "mkdir -- create directories\n");
@@ -85,24 +87,24 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # create empty directory bar and any other path components as needed\n");
 				fprintf(stdout, "  mkdir -p foo/bar\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'p':
 				flag_p = 1;
 				break;
 			case 'V':
-				fprintf(stdout, "mkdir (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "mkdir (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		fprintf(stderr, "usage: mkdir [OPTIONS] DIRNAME...\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	for (i = 0; i < argc; i++) {
@@ -124,5 +126,5 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

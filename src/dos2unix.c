@@ -16,66 +16,61 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "tc/args.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 int main(int argc, char *argv[]) {
 
 	int ch;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "dos2unix < dosfile.txt > unixfile.txt", .description = "convert line endings" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "dos2unix",
+		.usage = "[OPTIONS]",
+		.description = "replaces DOS line endings '\\r\\n' with UNIX line endings '\\n'",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "dos2unix -- replaces DOS line endings '\\r\\n' with UNIX line endings '\\n'\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: dos2unix [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # convert line endings\n");
-				fprintf(stdout, "  dos2unix < dosfile.txt > unixfile.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "dos2unix (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
-	while ((ch = getc(stdin)) != EOF) {
+	while ((ch = tc_getc(TC_STDIN)) != TC_EOF) {
 		if (ch == '\r') {
 			continue;
 		}
-		putc(ch, stdout);
+		tc_putc(TC_STDOUT, ch);
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }
