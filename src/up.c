@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <curl/curl.h>
 #include <getopt.h>
@@ -64,10 +67,10 @@ int main(int argc, char *argv[]) {
 	};
 
 	flag_v = 0;
-	username = NULL;
-	password = NULL;
+	username = TC_NULL;
+	password = TC_NULL;
 
-	while ((ch = getopt_long(argc, argv, "hu:p:Vv", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hu:p:Vv", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "up -- universal ping, checks the status of a URL\n");
@@ -89,17 +92,17 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # get the status of a mail server\n");
 				fprintf(stdout, "  up smtp://mail.tcort.dev\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "up (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "up (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'v':
 				flag_v = 1;
@@ -112,7 +115,7 @@ int main(int argc, char *argv[]) {
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -123,18 +126,18 @@ int main(int argc, char *argv[]) {
 
 	if (argc != 1) {
 		fprintf(stderr, "usage: up [OPTIONS] URL\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	url = argv[0];
-	headers = NULL;
+	headers = TC_NULL;
 	errbuf[0] = '\0';
 
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
-	if (curl == NULL) {
+	if (curl == TC_NULL) {
 		perror("curl_easy_init");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	/* general options */
@@ -147,19 +150,19 @@ int main(int argc, char *argv[]) {
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, flag_v == 1 ? 1L : 0L);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, blackhole);
 
-	if (username != NULL) curl_easy_setopt(curl, CURLOPT_USERNAME, username);
-	if (password != NULL) curl_easy_setopt(curl, CURLOPT_PASSWORD, password);
+	if (username != TC_NULL) curl_easy_setopt(curl, CURLOPT_USERNAME, username);
+	if (password != TC_NULL) curl_easy_setopt(curl, CURLOPT_PASSWORD, password);
 
-	if (strncmp(url, "smtp", strlen("smtp")) == 0 || strncmp(url, "smtps", strlen("smtps")) == 0) {
+	if (strncmp(url, "smtp", tc_strlen("smtp")) == 0 || strncmp(url, "smtps", tc_strlen("smtps")) == 0) {
 		/* SMTP/SMTPS Options */
 		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "NOOP");
-	} else if (strncmp(url, "imap", strlen("imap")) == 0 || strncmp(url, "imaps", strlen("imaps")) == 0) {
+	} else if (strncmp(url, "imap", tc_strlen("imap")) == 0 || strncmp(url, "imaps", tc_strlen("imaps")) == 0) {
 		/* IMAP/IMAPS options */
 		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "EXAMINE INBOX");
-	} else if (strncmp(url, "scp", strlen("scp")) == 0) {
+	} else if (strncmp(url, "scp", tc_strlen("scp")) == 0) {
 		/* SCP options */
 		/* none */;
-	} else if (strncmp(url, "ftp", strlen("ftp")) == 0) {
+	} else if (strncmp(url, "ftp", tc_strlen("ftp")) == 0) {
 		/* FTP options */
 		/* none */;
 	} else {
@@ -184,5 +187,5 @@ int main(int argc, char *argv[]) {
 	curl_slist_free_all(headers);
 	curl_global_cleanup();
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

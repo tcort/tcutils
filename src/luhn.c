@@ -16,9 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/ctype.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
-#include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,21 +54,21 @@ static int luhn(char *s) {
 	int computed_check_digit;
 
 	/* must be at least 2 digits (1 digit + check digit) */
-	if (strlen(s) < 2) {
+	if (tc_strlen(s) < 2) {
 		return -1;
 	}
 
 	/* all characters in string must be digits */
-	for (i = 0; i < strlen(s); i++) {
-		if (!isdigit(s[i])) {
+	for (i = 0; i < tc_strlen(s); i++) {
+		if (!tc_isdigit(s[i])) {
 			return -1;
 		}
 	}
 
 	dub = 1;
-	check_digit = ctoi(s[strlen(s) - 1]);
+	check_digit = ctoi(s[tc_strlen(s) - 1]);
 	computed_check_digit = 0;
-	for (i = strlen(s) - 2; i >= 0; i--) {
+	for (i = tc_strlen(s) - 2; i >= 0; i--) {
 		computed_check_digit += dub ? doubles[ctoi(s[i])] : ctoi(s[i]);
 		dub = !dub;
 	}
@@ -88,7 +91,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "luhn -- luhn checker\n");
@@ -105,21 +108,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # check several at once\n");
 				fprintf(stdout, "  luhn 4030000010001234 4003050500040005 5100000010001004\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "luhn (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "luhn (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -140,5 +143,5 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	exit(failure == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+	tc_exit(failure == 0 ? TC_EXIT_SUCCESS : TC_EXIT_FAILURE);
 }

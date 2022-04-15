@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <errno.h>
 #include <getopt.h>
@@ -66,7 +68,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "uptime -- show how long the system has been up\n");
@@ -80,21 +82,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # show uptime of the system\n");
 				fprintf(stdout, "  uptime\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "uptime (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "uptime (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -103,7 +105,7 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	now = time(NULL);
+	now = time(TC_NULL);
 	tm = localtime(&now);
 	fprintf(stdout, "%02d:%02d:%02d ", tm->tm_hour, tm->tm_min, tm->tm_sec);
 
@@ -114,7 +116,7 @@ int main(int argc, char *argv[]) {
 	do {
 		struct utmpx *ut;
 		ut = getutxent();
-		if (ut == NULL) {
+		if (ut == TC_NULL) {
 			break;
 		}
 		if (ut->ut_type == BOOT_TIME) {
@@ -167,7 +169,7 @@ int main(int argc, char *argv[]) {
 	do {
 		struct utmpx *ut;
 		ut = getutxent();
-		if (ut == NULL) {
+		if (ut == TC_NULL) {
 			break;
 		}
 		if (ut->ut_type == USER_PROCESS) {
@@ -181,9 +183,9 @@ int main(int argc, char *argv[]) {
 	rc = getloadavg(load, sizeof(load)/sizeof(load[0]));
 	if (rc == -1) {
 		perror("getloadavg");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	fprintf(stdout, "load average: %.2f, %.2f, %.2f\n", load[0], load[1], load[2]);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

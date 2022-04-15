@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <signal.h>
@@ -35,8 +37,8 @@
 static void exit_if_user_left(void) {
 	char *tty;
 	tty = ttyname(STDIN_FILENO);
-	if (tty == NULL) {
-		exit(EXIT_SUCCESS);
+	if (tty == TC_NULL) {
+		tc_exit(TC_EXIT_SUCCESS);
 	}
 }
 
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
     				fprintf(stdout, "leave -- kindly reminds the user to leave\n");
@@ -75,21 +77,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # set leave reminders to leave in 30 minutes\n");
 				fprintf(stdout, "  leave +0030\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "leave (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "leave (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -100,15 +102,15 @@ int main(int argc, char *argv[]) {
 
 	if (argc > 1) {
 		fprintf(stderr, "usage: leave [OPTIONS] [[+]hhmm]\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	if (argc == 0) {
 		fprintf(stdout, "When do you have to leave? ");
 		fflush(stdout);
 		when = fgets(buf, BUFSZ, stdin);
-		if (when == NULL || when[0] == '\n') {
-			exit(EXIT_SUCCESS);
+		if (when == TC_NULL || when[0] == '\n') {
+			tc_exit(TC_EXIT_SUCCESS);
 		}
 	} else {
 		when = argv[0];
@@ -123,7 +125,7 @@ int main(int argc, char *argv[]) {
 	mm = hhmm % 100;
 	hh = (hhmm - mm) / 100;
 
-	now = time(NULL);
+	now = time(TC_NULL);
 	if (relative == 1) {
 		ss = (hh * HOUR) + (mm * MINUTE);
 		leave = now + ss;
@@ -136,7 +138,7 @@ int main(int argc, char *argv[]) {
 		leave = mktime(t);
 		if (leave <= now) {
 			fprintf(stdout, "You're already late!\n");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 		ss = leave - now;
 	}
@@ -145,12 +147,12 @@ int main(int argc, char *argv[]) {
 	pid = fork();
 	if (pid < 0) {
 		perror("fork");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	} else if (pid > 0) {
 		memset(buf, '\0', BUFSZ);
 		strftime(buf, BUFSZ-1, "%Y-%m-%d %H:%M:%S", t);
 		fprintf(stdout, "Alarm set for %s (pid %d)\n", buf, pid);
-		exit(EXIT_SUCCESS);
+		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	signal(SIGINT, SIG_IGN);
@@ -187,5 +189,5 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "\aI have given up trying to get you out the door on time\n");
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

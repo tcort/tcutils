@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
 	int i;
 	size_t cap = 0;
 	ssize_t len = 0;
-	struct list *head = NULL;
+	struct list *head = TC_NULL;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -43,7 +45,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "tac -- concatenate and print files in reverse\n");
@@ -57,21 +59,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # concatinate and reverse two files\n");
 				fprintf(stdout, "  tac foo.txt bar.txt > foobar.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "cat (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "cat (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -84,35 +86,35 @@ int main(int argc, char *argv[]) {
 		while ((ch = getc(stdin)) != EOF) {
 			putc(ch, stdout);
 		}
-		exit(EXIT_SUCCESS);
+		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	for (i = 0; i < argc; i++) {
 		struct list *cur;
 		FILE *f = fopen(argv[i], "r");
-		if (f == NULL) {
+		if (f == TC_NULL) {
 			perror("fopen");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		while (1) {
 			cur = (struct list *) malloc(sizeof(struct list));
-			if (cur == NULL) {
+			if (cur == TC_NULL) {
 				perror("malloc");
-				while (head != NULL) {
+				while (head != TC_NULL) {
 					free(head->line);
 					cur = head;
 					head = head->next;
 					free(cur);
 				}
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 			memset(cur, '\0', sizeof(struct list));
 
 			cap = 0;
 			len = getline(&cur->line, &cap, f);
 			if (len < 0) {
-				if (cur->line != NULL) {
+				if (cur->line != TC_NULL) {
 					free(cur->line);
 				}
 				free(cur);
@@ -123,7 +125,7 @@ int main(int argc, char *argv[]) {
 			head = cur;
 		}
 
-		while (head != NULL) {
+		while (head != TC_NULL) {
 			fprintf(stdout, "%s", head->line);
 			free(head->line);
 			cur = head;
@@ -134,5 +136,5 @@ int main(int argc, char *argv[]) {
 		fclose(f);
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

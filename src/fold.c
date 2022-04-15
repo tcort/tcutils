@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <errno.h>
 #include <getopt.h>
@@ -37,10 +39,10 @@ int main(int argc, char *argv[]) {
 	int ch = '\0';
 	int width = DEFAULT_WIDTH;
 	int bflag = 0;
-	FILE *fp = NULL;
+	FILE *fp = TC_NULL;
 	size_t cap = 0;
 	ssize_t len = 0, i = 0, col = 0;
-	char *line = NULL;
+	char *line = TC_NULL;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -50,7 +52,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "bhVw:", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "bhVw:", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "fold -- wraps long lines for fixed width viewing mediums\n");
@@ -66,24 +68,24 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # wrap contents of foo.txt at 72 characters\n");
 				fprintf(stdout, "  fold -w 72 foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "fold (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "fold (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'w':
 				width = atoi(optarg);
 				if (width <= 0) {
 					errno = EINVAL;
 					perror("width");
-					exit(EXIT_FAILURE);
+					tc_exit(TC_EXIT_FAILURE);
 				}
 				break;
 			case 'b':
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -101,9 +103,9 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	fp = argc == 0 ? stdin : fopen(argv[0], "r");
-	if (fp == NULL) {
+	if (fp == TC_NULL) {
 		perror("fopen");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	while ((len = getline(&line, &cap, fp)) >= 0) {
@@ -144,5 +146,5 @@ int main(int argc, char *argv[]) {
 
 	free(line);
 	fclose(fp);
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

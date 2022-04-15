@@ -16,7 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/colours.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <errno.h>
@@ -32,25 +36,6 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-
-#define COLOR_RESET   "\x1b[0m"
-#define COLOR_BLACK   "\x1b[30m"
-#define COLOR_RED     "\x1b[31m"
-#define COLOR_GREEN   "\x1b[32m"
-#define COLOR_YELLOW  "\x1b[33m"
-#define COLOR_BLUE    "\x1b[34m"
-#define COLOR_MAGENTA "\x1b[35m"
-#define COLOR_CYAN    "\x1b[36m"
-#define COLOR_WHITE   "\x1b[37m"
-
-#define COLOR_BRIGHT_BLACK   "\x1b[30;1m"
-#define COLOR_BRIGHT_RED     "\x1b[31;1m"
-#define COLOR_BRIGHT_GREEN   "\x1b[32;1m"
-#define COLOR_BRIGHT_YELLOW  "\x1b[33;1m"
-#define COLOR_BRIGHT_BLUE    "\x1b[34;1m"
-#define COLOR_BRIGHT_MAGENTA "\x1b[35;1m"
-#define COLOR_BRIGHT_CYAN    "\x1b[36;1m"
-#define COLOR_BRIGHT_WHITE   "\x1b[37;1m"
 
 static void tc_strmode(mode_t mode, char *out) {
 
@@ -158,7 +143,7 @@ int main(int argc, char *argv[]) {
 	flag_l = 0;
 	flag_G = 0;
 
-	while ((ch = getopt_long(argc, argv, "1aGhlV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "1aGhlV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case '1':
 				flag_1 = 1;
@@ -197,21 +182,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # list the contents of the current directory\n");
 				fprintf(stdout, "  ls\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "ls (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "ls (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -225,7 +210,7 @@ int main(int argc, char *argv[]) {
 	rc = scandir(dir, &dentries, flag_a > 0 ? select_all : select_non_hidden, alphasort);
 	if (rc == -1) {
 		perror("scandir");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	ndentries = rc;
 
@@ -235,7 +220,7 @@ int main(int argc, char *argv[]) {
 		struct dirent *dentry;
 		dentry = dentries[i];
 
-		dentrylen = strlen(dentry->d_name);
+		dentrylen = tc_strlen(dentry->d_name);
 		maxdentrylen = dentrylen > maxdentrylen ? dentrylen : maxdentrylen;
 	}
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws); /* look up width of terminal */
@@ -253,19 +238,19 @@ int main(int argc, char *argv[]) {
 		rc = stat(path, &st);
 		if (rc == -1) {
 			perror("stat");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		passwd = getpwuid(st.st_uid);
-		if (passwd == NULL) {
+		if (passwd == TC_NULL) {
 			perror("getpwuid");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		group = getgrgid(st.st_gid);
-		if (group == NULL) {
+		if (group == TC_NULL) {
 			perror("getgrgid");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		tc_strmode(st.st_mode, modestring);
@@ -275,31 +260,31 @@ int main(int argc, char *argv[]) {
 		if (flag_G) {
 			switch (modestring[0]) {
 				case 'd': /* directory */
-					fprintf(stdout, "%s", COLOR_BRIGHT_BLUE);
+					fprintf(stdout, "%s", COLOUR_BRIGHT_BLUE);
 					break;
 				case 's': /* socket */
-					fprintf(stdout, "%s", COLOR_MAGENTA);
+					fprintf(stdout, "%s", COLOUR_MAGENTA);
 					break;
 				case 'b': /* block device */
-					fprintf(stdout, "%s", COLOR_BRIGHT_YELLOW);
+					fprintf(stdout, "%s", COLOUR_BRIGHT_YELLOW);
 					break;
 				case 'c': /* char device */
-					fprintf(stdout, "%s", COLOR_BRIGHT_YELLOW);
+					fprintf(stdout, "%s", COLOUR_BRIGHT_YELLOW);
 					break;
 				case 'l': /* link */
-					fprintf(stdout, "%s", COLOR_CYAN);
+					fprintf(stdout, "%s", COLOUR_CYAN);
 					break;
 				case 'p': /* fifo */
-					fprintf(stdout, "%s", COLOR_YELLOW);
+					fprintf(stdout, "%s", COLOUR_YELLOW);
 					break;
 				case '?': /* unknown */
-					fprintf(stdout, "%s", COLOR_BRIGHT_RED);
+					fprintf(stdout, "%s", COLOUR_BRIGHT_RED);
 					break;
 				case '-': /* regular file */
 					if (modestring[3] == 'x' || modestring[6] == 'x' || modestring[9] == 'x') {
-						fprintf(stdout, "%s", COLOR_BRIGHT_GREEN);
+						fprintf(stdout, "%s", COLOUR_BRIGHT_GREEN);
 					} else {
-						fprintf(stdout, "%s", COLOR_BRIGHT_WHITE);
+						fprintf(stdout, "%s", COLOUR_BRIGHT_WHITE);
 					}
 					break;
 			}
@@ -311,7 +296,7 @@ int main(int argc, char *argv[]) {
 			fprintf(stdout, "%s  %s\t%s\t%s  %s  %s\n", modestring, passwd->pw_name, group->gr_name, sizestring, mtimestring, dentry->d_name);
 		} else {
 			fprintf(stdout, "%s", dentry->d_name);
-			for (j = strlen(dentry->d_name); j < maxdentrylen + 1; j++) {
+			for (j = tc_strlen(dentry->d_name); j < maxdentrylen + 1; j++) {
 				fprintf(stdout, " ");
 			}
 			if (i % dentries_per_row == dentries_per_row - 1 || i + 1 == ndentries) {
@@ -320,7 +305,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (flag_G) {
-			fprintf(stdout, "%s", COLOR_RESET);
+			fprintf(stdout, "%s", COLOUR_RESET);
 		}
 
 		free(dentry);
@@ -329,5 +314,5 @@ int main(int argc, char *argv[]) {
 	free(dentries);
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

@@ -16,7 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/stdlib.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -27,7 +31,7 @@
 #define N 10
 #define NWUMPS 4
 
-static char *line = NULL;
+static char *line = TC_NULL;
 static size_t cap = 0;
 static ssize_t len = 0;
 
@@ -43,7 +47,7 @@ static point_t scan_point(char *s) {
 	point_t p;
 
 	p.x = p.y = -1;
-	for (i = 0; i < strlen(s); i++) {
+	for (i = 0; i < tc_strlen(s); i++) {
 		if (s[i] >= '0' && s[i] <= '9') {
 			if (n == 0) {
 				p.x = atoi(s+i); n++;
@@ -84,8 +88,8 @@ static void play(void) {
 
 	player.x = player.y = 0;
 	for (i = 0; i < NWUMPS; i++) {
-		mugwumps[i].x = rand() % N;
-		mugwumps[i].y = rand() % N;
+		mugwumps[i].x = tc_rand() % N;
+		mugwumps[i].y = tc_rand() % N;
 		mugwumps[i].found = 0;
 	}
 
@@ -145,9 +149,9 @@ static int done(void) {
 }
 
 static void kthxbye(void) {
-	if (line != NULL) {
+	if (line != TC_NULL) {
 		free(line);
-		line = NULL;
+		line = TC_NULL;
 	}
 }
 
@@ -161,7 +165,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "mugwump -- find all the mugwumps\n");
@@ -175,21 +179,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # play the game\n");
 				fprintf(stdout, "  mugwump\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "mugwump (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "mugwump (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -199,6 +203,8 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	atexit(kthxbye);
+
+	srand((unsigned) getpid());
 
 	do {
 		play();

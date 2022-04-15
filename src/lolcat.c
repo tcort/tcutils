@@ -16,50 +16,32 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/colours.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
-#include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#define COLOR_RESET   "\x1b[0m"
-
-#define COLOR_BLACK   "\x1b[30m"
-#define COLOR_RED     "\x1b[31m"
-#define COLOR_GREEN   "\x1b[32m"
-#define COLOR_YELLOW  "\x1b[33m"
-#define COLOR_BLUE    "\x1b[34m"
-#define COLOR_MAGENTA "\x1b[35m"
-#define COLOR_CYAN    "\x1b[36m"
-#define COLOR_WHITE   "\x1b[37m"
-
-#define COLOR_BRIGHT_BLACK   "\x1b[30;1m"
-#define COLOR_BRIGHT_RED     "\x1b[31;1m"
-#define COLOR_BRIGHT_GREEN   "\x1b[32;1m"
-#define COLOR_BRIGHT_YELLOW  "\x1b[33;1m"
-#define COLOR_BRIGHT_BLUE    "\x1b[34;1m"
-#define COLOR_BRIGHT_MAGENTA "\x1b[35;1m"
-#define COLOR_BRIGHT_CYAN    "\x1b[36;1m"
-#define COLOR_BRIGHT_WHITE   "\x1b[37;1m"
-
 char *dull_pattern[] = {
-	COLOR_MAGENTA, COLOR_RED,  COLOR_YELLOW,
-	COLOR_GREEN,   COLOR_BLUE, COLOR_CYAN,
-	COLOR_WHITE
+	COLOUR_MAGENTA, COLOUR_RED,  COLOUR_YELLOW,
+	COLOUR_GREEN,   COLOUR_BLUE, COLOUR_CYAN,
+	COLOUR_WHITE
 };
 const int ndull_pattern = sizeof(dull_pattern)/sizeof(dull_pattern[0]);
 
 char *bright_pattern[] = {
-	COLOR_BRIGHT_MAGENTA, COLOR_BRIGHT_RED,  COLOR_BRIGHT_YELLOW,
-	COLOR_BRIGHT_GREEN,   COLOR_BRIGHT_BLUE, COLOR_BRIGHT_CYAN,
-	COLOR_BRIGHT_WHITE
+	COLOUR_BRIGHT_MAGENTA, COLOUR_BRIGHT_RED,  COLOUR_BRIGHT_YELLOW,
+	COLOUR_BRIGHT_GREEN,   COLOUR_BRIGHT_BLUE, COLOUR_BRIGHT_CYAN,
+	COLOUR_BRIGHT_WHITE
 };
 const int nbright_pattern = sizeof(bright_pattern)/sizeof(bright_pattern[0]);
 
 char *usa_pattern[] = {
-	COLOR_BRIGHT_RED, COLOR_BRIGHT_WHITE, COLOR_BRIGHT_BLUE
+	COLOUR_BRIGHT_RED, COLOUR_BRIGHT_WHITE, COLOUR_BRIGHT_BLUE
 };
 const int nusa_pattern = sizeof(usa_pattern)/sizeof(usa_pattern[0]);
 
@@ -94,7 +76,7 @@ void copy(FILE *input, FILE *output, enum pattern pat) {
 		}
 		putc(ch, output);
 		if (colourize) {
-			fprintf(output, "%s", COLOR_RESET);
+			fprintf(output, "%s", COLOUR_RESET);
 		}
 	}
 }
@@ -117,7 +99,7 @@ int main(int argc, char *argv[]) {
 
 	bright = 1;
 
-	while ((ch = getopt_long(argc, argv, "bdhuV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "bdhuV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'b':
 				pat = BRIGHT_PATTERN;
@@ -143,21 +125,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # concatinate two files\n");
 				fprintf(stdout, "  lolcat foo.txt bar.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "lolcat (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "lolcat (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -168,14 +150,14 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		copy(stdin, stdout, pat);
-		exit(EXIT_SUCCESS);
+		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	for (i = 0; i < argc; i++) {
 		FILE *f = fopen(argv[i], "r");
-		if (f == NULL) {
+		if (f == TC_NULL) {
 			perror("fopen");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		copy(f, stdout, pat);
@@ -183,5 +165,5 @@ int main(int argc, char *argv[]) {
 		fclose(f);
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

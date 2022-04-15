@@ -6,17 +6,29 @@
 # this notice are preserved. This file is offered as-is, without any warranty.
 
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-project(tcutils VERSION 2022 LANGUAGES C)
+
+# project version MUST be an integer
+project(tcutils VERSION 2022 DESCRIPTION "a collection of software tools, utilities, and games" LANGUAGES C)
+
+set(PROJECT_AUTHOR "Thomas Cort")
+set(PROJECT_COPYRIGHT "Copyright (C) 2022  Thomas Cort")
+set(PROJECT_LICENSE "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.")
+
+
+include(GNUInstallDirs)
 
 configure_file (
-    "${PROJECT_SOURCE_DIR}/include/config.h.in"
-    "${PROJECT_BINARY_DIR}/include/config.h"
+    "${PROJECT_SOURCE_DIR}/include/tc/version.h.in"
+    "${PROJECT_BINARY_DIR}/include/tc/version.h"
 )
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
     "${PROJECT_BINARY_DIR}/include"
 )
+
+file(GLOB LIBTC_SRC lib/*.c)
+add_library(tc STATIC ${LIBTC_SRC})
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
@@ -129,6 +141,18 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
         target_link_libraries(${PROG} ${CURL_LIBRARY})
     endif()
 
+    target_link_libraries(${PROG} tc)
+
     install(TARGETS ${PROG} DESTINATION bin)
 endforeach()
 
+list(APPEND TESTS ctype.check)
+list(APPEND TESTS math.check)
+list(APPEND TESTS string.check)
+
+enable_testing(true)
+foreach(TESTPROG IN LISTS TESTS)
+    add_executable(${TESTPROG} test/${TESTPROG}.c)
+    target_link_libraries(${TESTPROG} tc)
+    add_test(NAME ${TESTPROG} COMMAND ${TESTPROG})
+endforeach()

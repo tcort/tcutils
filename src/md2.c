@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdint.h>
@@ -198,7 +200,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "md2 -- calculate a message-digest fingerprint for a file\n");
@@ -215,21 +217,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # print the MD2 message digest of standard input\n");
 				fprintf(stdout, "  ... | md2\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "md2 (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "md2 (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -239,17 +241,17 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	fp = argc == 0 ? stdin : fopen(argv[0], "r");
-	if (fp == NULL) {
-		exit(EXIT_FAILURE);
+	if (fp == TC_NULL) {
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	len = 0;
 	cap = 512; /* initial capacity (bytes) */
 
 	p = (byte *) malloc(cap);
-	if (p == NULL) {
+	if (p == TC_NULL) {
 		fclose(fp);
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	while ((ch = fgetc(fp)) != EOF) {
@@ -258,15 +260,15 @@ int main(int argc, char *argv[]) {
 		if (len >= cap) {
 			cap = 2 * len;
 			q = (byte *) malloc(cap);
-			if (q == NULL) {
+			if (q == TC_NULL) {
 				free(p);
 				fclose(fp);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 			memcpy(q, p, len);
 			free(p);
 			p = q;
-			q = NULL;
+			q = TC_NULL;
 		}
 	}
 
@@ -276,6 +278,6 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }
 #endif

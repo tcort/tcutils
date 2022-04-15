@@ -16,7 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/stdlib.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -34,7 +37,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "d6 -- simulates a 6-sided dice roll and prints the reults\n");
@@ -48,21 +51,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # roll the die\n");
 				fprintf(stdout, "  d6\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "d6 (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "d6 (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -71,15 +74,14 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	/* if OS randomizes PIDs, then this is a random seed */
-	srand((unsigned int) getpid());
+	tc_srand((unsigned int) getpid());
 
 	do {	/* attempt to get a uniform roll */
-		roll = rand();	/* get a random number */
-		roll &= 0x7;	/* capture lower 3 bits (value 0-7) */
-	} while (roll >= 6);	/* repeat until value between 0-5 */
+		roll = tc_rand();	/* get a random number */
+		roll &= 0x7;		/* capture lower 3 bits (value 0-7) */
+	} while (roll >= 6);		/* repeat until value between 0-5 */
 
 	fprintf(stdout, "%d\n", roll + 1); /* +1 to get value in range 1-6 */
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

@@ -9,6 +9,9 @@ intended to supplement, rather than replace, the system software. The
 installation instructions provide directions for installing the software
 alongside the system software.
 
+There is also `libtc` which implements a portion of `libc` functionality.
+It provides a portable, well defined, and consistent interface with unit tests.
+
 ## Requirements
 
 * C compiler and standard build tools (make, sh, ...).

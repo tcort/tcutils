@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -35,7 +37,7 @@ static void ts(char *fmt) {
 	struct tm *local;
 	char tstring[32];
 
-	now = time(NULL);
+	now = time(TC_NULL);
 	local = localtime(&now);
 	memset(tstring, '\0', sizeof(tstring));
 	strftime(tstring, sizeof(tstring)-1, fmt, local);
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]) {
 
 	fmt = FMT_HUMAN;
 
-	while ((ch = getopt_long(argc, argv, "chiuV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "chiuV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'c':
 				fmt = FMT_COMPACT;
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # add timestamps to lines from standard input\n");
 				fprintf(stdout, "  food | ts > foo.log\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'i':
 				fmt = FMT_ISO8601;
@@ -87,18 +89,18 @@ int main(int argc, char *argv[]) {
 				fmt = FMT_UNIX;
 				break;
 			case 'V':
-				fprintf(stdout, "ts (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "ts (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -117,5 +119,5 @@ int main(int argc, char *argv[]) {
 		pch = ch;
 	}
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

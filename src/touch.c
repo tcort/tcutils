@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <fcntl.h>
 #include <getopt.h>
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "touch -- change file timestamps\n");
@@ -53,21 +55,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # create empty file foo.txt\n");
 				fprintf(stdout, "  touch foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "touch (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "touch (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -79,7 +81,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		fprintf(stderr, "usage: touch [OPTIONS] FILE...\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	mode = 0666 & ~umask(0);
@@ -92,14 +94,14 @@ int main(int argc, char *argv[]) {
 		fd = open(argv[i], O_WRONLY | O_CREAT, mode);
 		if (fd == -1) {
 			perror("open");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		rc = futimens(fd, times);
 		if (rc == -1) {
 			perror("futimens");
 			close(fd);
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		close(fd);
@@ -107,5 +109,5 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

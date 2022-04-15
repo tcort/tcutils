@@ -16,7 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -34,7 +36,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
 				fprintf(stdout, "sponge -- soak up standard input and write to a file\n");
@@ -48,21 +50,21 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # write the results of ps to foo.txt\n");
 				fprintf(stdout, "  ps | sponge foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "sponge (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "sponge (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -73,25 +75,25 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		fprintf(stdout, "usage: sponge [OPTIONS] FILE...\n");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	fp = (FILE **) malloc(sizeof(FILE*) * argc);
-	if (fp == NULL) {
+	if (fp == TC_NULL) {
 		perror("malloc");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	for (i = 0; i < argc; i++) {
 		fp[i] = fopen(argv[i], "w");
-		if (fp[i] == NULL) {
+		if (fp[i] == TC_NULL) {
 			perror("fopen");
 			for (i = 0; i < argc; i++) {
-				if (fp[i] != NULL) {
+				if (fp[i] != TC_NULL) {
 					fclose(fp[i]);
 				}
 			}
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
 
@@ -103,7 +105,7 @@ int main(int argc, char *argv[]) {
 				for (i = 0; i < argc; i++) {
 					fclose(fp[i]);
 				}
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 		}
 	}
@@ -112,5 +114,5 @@ int main(int argc, char *argv[]) {
 		fclose(fp[i]);
 	}
 	free(fp);
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }

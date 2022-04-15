@@ -16,10 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/ctype.h"
+#include "tc/stdlib.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,12 +34,12 @@ int main(int argc, char *argv[]) {
 
 	unsigned seed;
 	unsigned long c, i, j, n;
-	FILE *dict = NULL, *f;
-	long *words = NULL;
+	FILE *dict = TC_NULL, *f;
+	long *words = TC_NULL;
 	size_t cap=0, dcap = 8192, dlen = 0, dinc = 8192, nel;
 	ssize_t len = 0;
 	int ch, d;
-	char *a, *w, *ln = NULL;
+	char *a, *w, *ln = TC_NULL;
 
 	static struct option long_options[] = {
 		{ "help", no_argument, 0, 'h' },
@@ -44,18 +48,18 @@ int main(int argc, char *argv[]) {
 	};
 
 	/* defaults */
-	a = NULL; /* acrostic */
+	a = TC_NULL; /* acrostic */
 	c = 1;   /* count */
 	d = ' '; /* delimiter */
 	n = 4; /* nwords */
 	w = strdup("/usr/share/dict/words"); /* word list */
 
-	while ((ch = getopt_long(argc, argv, "hVa:c:d:n:w:", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hVa:c:d:n:w:", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'a': a = strdup(optarg); break;
-			case 'c': c = strtoul(optarg, NULL, 10); break;
+			case 'c': c = strtoul(optarg, TC_NULL, 10); break;
 			case 'd': d = optarg[0]; break;
-			case 'n': n = strtoul(optarg, NULL, 10); break;
+			case 'n': n = strtoul(optarg, TC_NULL, 10); break;
 			case 'w': free(w); w = strdup(optarg); break;
 			case 'h':
 				fprintf(stdout, "xkcdpass -- password generator based on the xkcd (diceware) method\n");
@@ -74,60 +78,60 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # generate 10 passphrases of 5 words each\n");
 				fprintf(stdout, "  xkcdpass -c 10 -n 5\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "xkcdpass (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "xkcdpass (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 	}
 
-	if (a != NULL) { /* with acrostic, nwords must equal len of acrostic */
-		n = strlen(a);
-		for (i = 0; i < strlen(a); i++) {
-			a[i] = (char) tolower(a[i]);
+	if (a != TC_NULL) { /* with acrostic, nwords must equal len of acrostic */
+		n = tc_strlen(a);
+		for (i = 0; i < tc_strlen(a); i++) {
+			a[i] = (char) tc_tolower(a[i]);
 		}
 	}
 
 	f = fopen("/dev/urandom", "r");
-	if (f == NULL) {
+	if (f == TC_NULL) {
 		perror("fopen");
 		free(w);
-		w = NULL;
-		exit(EXIT_FAILURE);
+		w = TC_NULL;
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	nel = fread(&seed, sizeof(unsigned), 1, f);
 	if (nel != 1) {
 		perror("fread");
 		fclose(f);
 		free(w);
-		w = NULL;
-		exit(EXIT_FAILURE);
+		w = TC_NULL;
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	fclose(f);
 
-	srand(seed);
+	tc_srand(seed);
 
 	dict = fopen(w, "r");
-	if (dict == NULL) {
+	if (dict == TC_NULL) {
 		perror("fopen");
 		fprintf(stderr, "Could not open /usr/share/dict/words\n");
 		fprintf(stderr, "To use an alternative dictionary do:\n");
 		fprintf(stderr, "xkcdpass -w /path/to/dict\n");
 		free(w);
-		w = NULL;
-		exit(EXIT_FAILURE);
+		w = TC_NULL;
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	words = (long *) malloc(sizeof(long) * dcap);
@@ -136,10 +140,10 @@ int main(int argc, char *argv[]) {
 		if (dlen == dcap) {
 			dcap += dinc;
 			words = (long *) realloc(words, sizeof(long)*dcap);
-			if (words == NULL) {
+			if (words == TC_NULL) {
 				perror("realloc");
 				free(ln);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 			}
 		}
 		words[dlen++] = ftell(dict);
@@ -148,21 +152,21 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < c; i++) {
 		printf("> ");
 		for (j = 0; j < n; j++) {
-			unsigned r = (unsigned) rand() % (dlen-1);
+			unsigned r = (unsigned) tc_rand() % (dlen-1);
 			fseek(dict, words[r], SEEK_SET);
 			len = getline(&ln, &cap, dict);
 			if (len <= 0) {
 				break;
 			}
 
-			if (a != NULL && ln[0] != a[j]) {
+			if (a != TC_NULL && ln[0] != a[j]) {
 				j--;
 				continue;
 			}
 
-			if (ln[strlen(ln)-1] == '\n') ln[strlen(ln)-1]='\0';
-			if (ln[strlen(ln)-1] == '\r') ln[strlen(ln)-1]='\0';
-			if (strstr(ln, "'") != NULL) *(strstr(ln, "'")) = '\0';
+			if (ln[tc_strlen(ln)-1] == '\n') ln[tc_strlen(ln)-1]='\0';
+			if (ln[tc_strlen(ln)-1] == '\r') ln[tc_strlen(ln)-1]='\0';
+			if (strstr(ln, "'") != TC_NULL) *(strstr(ln, "'")) = '\0';
 			printf("%s", ln);
 			if (j + 1 < n) {
 				printf("%c", d);
@@ -174,7 +178,7 @@ int main(int argc, char *argv[]) {
 	free(w);
 	free(words);
 	fclose(dict);
-	if (a != NULL) free(a);
-	if (ln != NULL) free(ln);
-	exit(EXIT_SUCCESS);
+	if (a != TC_NULL) free(a);
+	if (ln != TC_NULL) free(ln);
+	tc_exit(TC_EXIT_SUCCESS);
 }

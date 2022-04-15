@@ -16,10 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#include "tc/const.h"
+#include "tc/ctype.h"
+#include "tc/string.h"
+#include "tc/sys.h"
+#include "tc/version.h"
 
 #include <getopt.h>
-#include <ctype.h>
 #include <errno.h>
 #include <regex.h>
 #include <string.h>
@@ -54,9 +57,9 @@ int match(char *subject, char *pattern, char **result);
 
 cell_t *cell_new(char ch, char terminal) {
 	cell_t *cell = malloc(sizeof(cell_t));
-	if (cell==NULL) {
+	if (cell==TC_NULL) {
 		perror("malloc");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 	cell->ch = ch;
 	cell->terminal = terminal;
@@ -66,11 +69,11 @@ cell_t *cell_new(char ch, char terminal) {
 
 void cell_define(cell_t *root, char *s) {
 	size_t i;
-	size_t len = strlen(s) - 1 /* skip newline */;
+	size_t len = tc_strlen(s) - 1 /* skip newline */;
 	cell_t *cell = root;
 
 	for (i = 0; i < len; i++) {
-		if (cell->children[(unsigned char)s[i]] == NULL) {
+		if (cell->children[(unsigned char)s[i]] == TC_NULL) {
 			cell->children[(unsigned char)s[i]] = cell_new(s[i], 0);
 		}
 		cell = cell->children[(unsigned char)s[i]];
@@ -80,11 +83,11 @@ void cell_define(cell_t *root, char *s) {
 
 int cell_defined(cell_t *root, char *s) {
 	size_t i;
-	size_t len = strlen(s);
+	size_t len = tc_strlen(s);
 	cell_t * cell = root;
 
 	for (i = 0; i < len; i++) {
-		if (cell->children[(unsigned char)s[i]] == NULL) {
+		if (cell->children[(unsigned char)s[i]] == TC_NULL) {
 			return 0;
 		}
 		cell = cell->children[(unsigned char)s[i]];
@@ -95,7 +98,7 @@ int cell_defined(cell_t *root, char *s) {
 void cell_free(cell_t *root) {
 	int i;
 	for (i = 0; i < 128;  i++) {
-		if (root->children[i] != NULL) {
+		if (root->children[i] != TC_NULL) {
 			cell_free(root->children[i]);
 		}
 	}
@@ -106,15 +109,15 @@ void cell_free(cell_t *root) {
 int check(char *file, cell_t *root, int nflag, int oflag) {
 
 	FILE *f;
-	char *s = NULL;
-	char *line = NULL;
+	char *s = TC_NULL;
+	char *line = TC_NULL;
 	size_t len = 0;
 	size_t lineno = 0;
 
-	f = file == NULL ? stdin : fopen(file, "r");
-	if (f == NULL) {
+	f = file == TC_NULL ? stdin : fopen(file, "r");
+	if (f == TC_NULL) {
 		perror("fopen");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	do {
@@ -134,7 +137,7 @@ int check(char *file, cell_t *root, int nflag, int oflag) {
 			rc = cell_defined(root, result);
 			if (rc == 0) {
 				if (oflag) {
-					fprintf(stdout, "%s:", file == NULL ? "<stdin>" : file);
+					fprintf(stdout, "%s:", file == TC_NULL ? "<stdin>" : file);
 				}
 				if (nflag) {
 					fprintf(stdout, "%lu:", lineno);
@@ -144,33 +147,33 @@ int check(char *file, cell_t *root, int nflag, int oflag) {
 				}
 				fprintf(stdout, "%s\n", result);
 			}
-			s += strlen(result) + 1;
+			s += tc_strlen(result) + 1;
 			free(result);
-			result = NULL;
+			result = TC_NULL;
 		} while (*s != '\0');
 	} while (!feof(f) && !ferror(f));
 	free(line);
 	fclose(f);
 
-	return EXIT_SUCCESS;
+	return TC_EXIT_SUCCESS;
 }
 
 cell_t *dict_load(cell_t **root, char *dict) {
 	FILE *f;
-	char *word = NULL;
+	char *word = TC_NULL;
 	size_t len = 0;
 
 	f = fopen(dict, "r");
-	if (f == NULL) {
+	if (f == TC_NULL) {
 		perror("fopen");
-		exit(EXIT_FAILURE);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	if (*root == NULL) {
+	if (*root == TC_NULL) {
 		*root = cell_new('\0', 0);
-		if (*root == NULL) {
+		if (*root == TC_NULL) {
 			perror("cell_new");
-			exit(EXIT_FAILURE);
+			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
 
@@ -181,8 +184,8 @@ cell_t *dict_load(cell_t **root, char *dict) {
 		if (rc == -1) {
 			break;
 		}
-		for (x = 0; x < strlen(word); x++) {
-			if (!isascii(word[x])) {
+		for (x = 0; x < tc_strlen(word); x++) {
+			if (!tc_isascii(word[x])) {
 				notascii = 1;
 				break;
 			}
@@ -206,7 +209,7 @@ int match(char *subject, char *pattern, char **result) {
 	regex_t		regex;
 	regmatch_t	matches[1];
 
-	if (subject == NULL || pattern == NULL) {
+	if (subject == TC_NULL || pattern == TC_NULL) {
 		return 0;
 	}
 
@@ -227,7 +230,7 @@ int match(char *subject, char *pattern, char **result) {
 
 	len = (size_t) matches[0].rm_eo - matches[0].rm_so;
 	*result = (char *)malloc(len + 1);
-	if (*result == NULL) {
+	if (*result == TC_NULL) {
 		regfree(&regex);
 		return -1;
 	}
@@ -246,7 +249,7 @@ int main(int argc, char *argv[]) {
 	char oflag = 0;
 	char *dict = DEFAULT_DICTIONARY;
 	int i = 0;
-	cell_t *root = NULL;
+	cell_t *root = TC_NULL;
 
 	dict_load(&root, dict);
 
@@ -256,7 +259,7 @@ int main(int argc, char *argv[]) {
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "d:hnoV", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "d:hnoV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'd':
 				dict_load(&root, optarg);
@@ -279,7 +282,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # spellcheck the file foo.txt with a custom dictionary\n");
 				fprintf(stdout, "  spell -d /home/jdoe/words foo.txt\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'n':
 				nflag++;
@@ -288,18 +291,18 @@ int main(int argc, char *argv[]) {
 				oflag++;
 				break;
 			case 'V':
-				fprintf(stdout, "spell (%s) v%s\n", PROJECT_NAME, PROJECT_VERSION);
+				fprintf(stdout, "spell (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "Written by Thomas Cort.\n");
-				exit(EXIT_SUCCESS);
+				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			default:
 				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				exit(EXIT_FAILURE);
+				tc_exit(TC_EXIT_FAILURE);
 				break;
 		}
 
@@ -318,11 +321,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (dostdin) {
-		check(NULL, root, nflag, oflag);
+		check(TC_NULL, root, nflag, oflag);
 	}
 
 	cell_free(root);
 
-	exit(EXIT_SUCCESS);
+	tc_exit(TC_EXIT_SUCCESS);
 }
 
