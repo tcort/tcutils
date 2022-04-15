@@ -188,5 +188,5 @@ struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]
 	tc_puts(TC_STDERR, " --help' for more information\n");
 
 	tc_exit(TC_EXIT_FAILURE);
-	return NULL; /* should not reach this line unless exit fails */
+	return TC_NULL; /* should not reach this line unless exit fails */
 }
