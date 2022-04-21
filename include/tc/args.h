@@ -50,9 +50,11 @@ struct tc_prog {
 #define TC_PROG_EXAMPLE_END { .description = TC_NULL, .command = TC_NULL }
 
 extern int argi;
+extern char *argval;
 
 struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]);
 void tc_args_show_help(struct tc_prog *prog);
 void tc_args_show_version(struct tc_prog *prog);
+void tc_args_show_usage(struct tc_prog *prog);
 
 #endif

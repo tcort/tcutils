@@ -22,6 +22,18 @@
 #include "tc/string.h"
 #include "tc/sys.h"
 
+void tc_args_show_usage(struct tc_prog *prog) {
+
+	/* usage: true [OPTIONS] */
+	tc_puts(TC_STDOUT, "usage: ");
+	tc_puts(TC_STDOUT, prog->program);
+	tc_puts(TC_STDOUT, " ");
+	tc_puts(TC_STDOUT, prog->usage);
+	tc_puts(TC_STDOUT, "\n");
+
+	tc_exit(TC_EXIT_SUCCESS);
+}
+
 void tc_args_show_help(struct tc_prog *prog) {
 	int i;
 
@@ -125,6 +137,7 @@ void tc_args_show_version(struct tc_prog *prog) {
 	tc_exit(TC_EXIT_SUCCESS);
 }
 
+char *argval = TC_NULL;
 int argi = 1;
 static int argii = 1;
 
@@ -146,6 +159,8 @@ struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]
 		return TC_NULL;
 	}
 
+	argval = TC_NULL;
+
 	if (tc_strneql(argv[argi], "--", 2) == 1) { /* longarg */
 
 		for (i = 0; prog->args[i].arg != '\0' && prog->args[i].longarg != TC_NULL; i++) {
@@ -154,6 +169,18 @@ struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]
 				res = &(prog->args[i]);
 
 				argi += 1;
+
+				/* expect a value e.g. '-n 5' */
+				if (prog->args[i].has_value == 1) {
+					if (argv[argi] != TC_NULL) {
+						argval = argv[argi];
+						argi += 1;
+						argii = 1;
+					} else {
+						break;
+					}
+				}
+
 				return res;
 			}
 		}
@@ -173,6 +200,17 @@ struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]
 					argii = 1;
 				} else {
 					argii += 1;
+				}
+
+				/* expect a value e.g. '-n 5' */
+				if (prog->args[i].has_value == 1) {
+					if (argv[argi] != TC_NULL) {
+						argval = argv[argi];
+						argi += 1;
+						argii = 1;
+					} else {
+						break;
+					}
 				}
 				return res;
 			}
