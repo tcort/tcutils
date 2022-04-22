@@ -64,6 +64,5 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-
 	tc_exit(TC_EXIT_FAILURE);
 }
