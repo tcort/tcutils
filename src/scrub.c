@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	tc_srand((unsigned int) getpid());
+	tc_srand((unsigned int) tc_getpid());
 
 	for (i = 0; i < NPASSES; i++) {
 		rewind(fp);
