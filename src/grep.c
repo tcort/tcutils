@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (colors == COLOUR_MODE_AUTO) {
-		colors = (isatty(fileno(stdout))) ? COLOUR_MODE_ALWAYS : COLOUR_MODE_NEVER;
+		colors = tc_isatty(TC_STDOUT) ? COLOUR_MODE_ALWAYS : COLOUR_MODE_NEVER;
 	}
 
 	pattern = argv[0];
