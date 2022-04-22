@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	tc_srand((unsigned)getpid());
+	tc_srand((unsigned) tc_getpid());
 
 	for (i = 0; i < 10; i++) {
 		farm[i] = '0'+(char)i;
