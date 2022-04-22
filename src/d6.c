@@ -16,72 +16,73 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/stdlib.h"
+#include "tc/stdio.h"
+#include "tc/string.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 int main(int argc, char *argv[]) {
 
-	int ch;
 	int roll;
+	char *result;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "d6", .description = "roll the die" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "d6",
+		.usage = "[OPTIONS]",
+		.description = "simulates a 6-sided dice roll and prints the reults",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "d6 -- simulates a 6-sided dice roll and prints the reults\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: d6 [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # roll the die\n");
-				fprintf(stdout, "  d6\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "d6 (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
-	tc_srand((unsigned int) getpid());
+	tc_srand((unsigned int) tc_getpid());
 
 	do {	/* attempt to get a uniform roll */
 		roll = tc_rand();	/* get a random number */
 		roll &= 0x7;		/* capture lower 3 bits (value 0-7) */
 	} while (roll >= 6);		/* repeat until value between 0-5 */
 
-	fprintf(stdout, "%d\n", roll + 1); /* +1 to get value in range 1-6 */
+	result = tc_itoa(roll + 1); /* +1 to get value in range 1-6 */
+	if (result == TC_NULL) {
+		tc_puterrln("Out of Memory");
+	} else {
+		tc_putln(TC_STDOUT, result);
+		result = tc_free(result);
+	}
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
