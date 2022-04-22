@@ -36,7 +36,7 @@
 
 static void exit_if_user_left(void) {
 	char *tty;
-	tty = ttyname(STDIN_FILENO);
+	tty = tc_ttyname(TC_STDOUT);
 	if (tty == TC_NULL) {
 		tc_exit(TC_EXIT_SUCCESS);
 	}
