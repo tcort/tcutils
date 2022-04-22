@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	inword = chars = words = lines = 0;
-	while ((c = getc(TC_STDIN)) != TC_EOF) {
+	while ((c = tc_getc(TC_STDIN)) != TC_EOF) {
 		if (c == '\n') {
 			lines++;
 		}
