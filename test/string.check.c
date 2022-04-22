@@ -90,6 +90,17 @@ static int check_strrchr_first(void) { return tc_strchr("foo", 'f') == 0; }
 static int check_strrchr_mid(void) { return tc_strchr("food", 'o') == 2; }
 static int check_strrchr_last(void) { return tc_strchr("foo", 'o') == 2; }
 
+static int check_chomp(void) {
+	char *s = "foo\n";
+	tc_chomp(s);
+	return tc_streql("foo", s) == 1;
+}
+static int check_chompd(void) {
+	char *s = "foobar";
+	tc_chompd(s, 'b');
+	return tc_streql("foo", s) == 1;
+}
+
 int main(int argc, char *argv[]) {
 
 	static struct check checks[] = {
@@ -121,6 +132,8 @@ int main(int argc, char *argv[]) {
 		{ check_strrchr_first,	"\"foo\" strrchr('f') is 0" },
 		{ check_strrchr_mid,	"\"foo\" strrchr('o') is 2" },
 		{ check_strrchr_last,	"\"food\" strrchr('d') is 3" },
+		{ check_chomp,		"\"foo\\n\" chomp is \"foo\"" },
+		{ check_chompd,		"\"foobar\\n\" chompd('b') is \"foo\"" },
 		{ TC_NULL, TC_NULL }
 	};
 

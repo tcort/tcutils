@@ -298,3 +298,21 @@ int tc_strrchr(char *s, char c) {
 
 	return -1;
 }
+
+void tc_chomp(char *s) {
+	int i;
+
+	i = tc_strchr(s, TC_NEWLINE);
+	if (i != -1) {
+		s[i] = TC_ENDSTR;
+	}
+}
+
+void tc_chompd(char *s, int delimiter) {
+	int i;
+
+	i = tc_strchr(s, delimiter);
+	if (i != -1) {
+		s[i] = TC_ENDSTR;
+	}
+}

@@ -31,5 +31,7 @@ char *tc_utoa(unsigned int n);
 int tc_atoi(char *s);
 int tc_strchr(char *s, char c);
 int tc_strrchr(char *s, char c);
+void tc_chomp(char *s);
+void tc_chompd(char *s, int delimiter);
 
 #endif

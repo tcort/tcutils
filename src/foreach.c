@@ -28,15 +28,6 @@
 #include <string.h>
 #include <unistd.h>
 
-void chomp(char *s) {
-	char *p;
-
-	p = strstr(s, "\n");
-	if (p != TC_NULL) {
-		*p = '\0';
-	}
-}
-
 void foreach(int argc, char *argv[], char *line) {
 
 	int i;
@@ -66,7 +57,7 @@ void foreach(int argc, char *argv[], char *line) {
 		}
 	}
 
-	chomp(line);
+	tc_chomp(line);
 
 	/* find instances of {} and replace with line */
 	n = 0;
