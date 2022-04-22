@@ -19,6 +19,7 @@
 #ifndef TC_H
 #define TC_H
 
+#include "args.h"
 #include "bool.h"
 #include "check.h"
 #include "const.h"
