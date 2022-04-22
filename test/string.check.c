@@ -80,6 +80,16 @@ static int check_strneql_yes_a(void) { return tc_strneql("--version", "--", 2) =
 static int check_strneql_yes_b(void) { return tc_strneql("--", "--version", 2) == 1; }
 static int check_strneql_yes_c(void) { return tc_strneql("--", "--", 2) == 1; }
 
+static int check_strchr_none(void) { return tc_strchr("foo", '-') == -1; }
+static int check_strchr_first(void) { return tc_strchr("foo", 'f') == 0; }
+static int check_strchr_mid(void) { return tc_strchr("foo", 'o') == 1; }
+static int check_strchr_last(void) { return tc_strchr("food", 'd') == 3; }
+
+static int check_strrchr_none(void) { return tc_strchr("foo", '-') == -1; }
+static int check_strrchr_first(void) { return tc_strchr("foo", 'f') == 0; }
+static int check_strrchr_mid(void) { return tc_strchr("food", 'o') == 2; }
+static int check_strrchr_last(void) { return tc_strchr("foo", 'o') == 2; }
+
 int main(int argc, char *argv[]) {
 
 	static struct check checks[] = {
@@ -103,6 +113,14 @@ int main(int argc, char *argv[]) {
 		{ check_strneql_yes_a,	"\"--version\" strneql(2) \"--\"" },
 		{ check_strneql_yes_b,	"\"--\" strneql(2) \"--version\"" },
 		{ check_strneql_yes_c,	"\"--\" strneql(2) \"--\"" },
+		{ check_strchr_none,	"\"foo\" strchr('-') is -1" },
+		{ check_strchr_first,	"\"foo\" strchr('f') is 0" },
+		{ check_strchr_mid,	"\"foo\" strchr('o') is 1" },
+		{ check_strchr_last,	"\"food\" strchr('d') is 3" },
+		{ check_strrchr_none,	"\"foo\" strrchr('-') is -1" },
+		{ check_strrchr_first,	"\"foo\" strrchr('f') is 0" },
+		{ check_strrchr_mid,	"\"foo\" strrchr('o') is 2" },
+		{ check_strrchr_last,	"\"food\" strrchr('d') is 3" },
 		{ TC_NULL, TC_NULL }
 	};
 
