@@ -27,6 +27,7 @@ int tc_strneql(char *x, char *y, int n);
 int tc_streql(char *x, char *y);
 char *tc_strdup(char *s);
 char *tc_itoa(int n);
+char *tc_utoa(unsigned int n);
 int tc_atoi(char *s);
 
 #endif
