@@ -96,16 +96,6 @@ static int duplicate(char *x, char *y, int ignore_case, size_t nskip_fields, siz
 	return 1;
 }
 
-static void chomp(char *s, int delimiter) {
-	int i;
-	for (i = 0; s[i] != '\0'; i++) {
-		if (s[i] == delimiter) {
-			s[i] = '\0';
-			break;
-		}
-	}
-}
-
 static void show(FILE *o, char *s, size_t c, int show_count, int delimiter) {
 	if (show_count) {
 		fprintf(o, "%4ld %s%c", c, s, delimiter);
@@ -121,10 +111,10 @@ static void unique(op_t *op) {
 	
 	lenlast = getdelim(&last, &sizelast, op->delimiter, op->input);
 	if (lenlast == -1) return;
-	chomp(last, op->delimiter);
+	tc_chompd(last, op->delimiter);
 
 	while ((len = getdelim(&line, &size, op->delimiter, op->input)) != -1) {
-		chomp(line, op->delimiter);
+		tc_chompd(line, op->delimiter);
 		if (duplicate(line, last, op->ignore_case, op->nskip_fields, op->nskip_chars)) {
 			c++;
 			if (first == TC_NULL) {
