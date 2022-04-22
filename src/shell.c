@@ -42,12 +42,7 @@ static void prompt(void) {
 	char *p;
 	char hostname[MAXHOSTNAMELEN+1];
 
-	fd = fileno(stdin);
-	if (fd == -1) {
-		return;
-	}
-
-	rc = isatty(fd);
+	rc = tc_isatty(TC_STDOUT);
 	if (rc != 1) {
 		return;
 	}
