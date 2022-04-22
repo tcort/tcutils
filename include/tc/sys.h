@@ -29,5 +29,9 @@ void *tc_malloc(int size);
 void *tc_free(void *m);
 void tc_exit(int exit_code);
 int tc_getpid(void);
+char *tc_ttyname(int fd);
+int tc_isatty(int fd);
+void tc_sync(void);
+unsigned int tc_sleep(unsigned int seconds);
 
 #endif
