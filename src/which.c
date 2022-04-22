@@ -1,5 +1,5 @@
  /*
-    witch -- finds an executable in $PATH
+    which -- finds an executable in $PATH
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -45,9 +45,9 @@ int main(int argc, char *argv[]) {
 	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
-				fprintf(stdout, "witch -- finds an executable in $PATH\n");
+				fprintf(stdout, "which -- finds an executable in $PATH\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: witch [OPTIONS] PROGNAME\n");
+				fprintf(stdout, "usage: which [OPTIONS] PROGNAME\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
 				fprintf(stdout, "  -V, --version  print version and copyright info\n");
@@ -55,11 +55,11 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # find the C compiler\n");
-				fprintf(stdout, "  witch cc\n");
+				fprintf(stdout, "  which cc\n");
 				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "witch (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
+				fprintf(stdout, "which (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 	argv += optind;
 
 	if (argc != 1) {
-		fprintf(stderr, "usage: witch [OPTIONS] PROGNAME\n");
+		fprintf(stderr, "usage: which [OPTIONS] PROGNAME\n");
 		tc_exit(TC_EXIT_FAILURE);
 	}
 

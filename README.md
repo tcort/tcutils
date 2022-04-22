@@ -132,9 +132,9 @@ enable -n true
 - uptime -- show how long the system has been up
 - uuidgen - COMB UUIDs (UUID v4 Variant B) generator
 - wc -- counts lines, words, and characters and prints the results
+- which -- finds an executable in $PATH
 - who -- list users currently logged in
 - whoami -- prints the current user's effective username
-- witch -- finds an executable in $PATH
 - xkcdpass -- password generator based on the xkcd (diceware) method
 - yes -- continuously outputs the same line of text over and over again
 
