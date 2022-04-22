@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	tc_srand((unsigned int) getpid());
+	tc_srand((unsigned int) tc_getpid());
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
 	my = ws.ws_row;
