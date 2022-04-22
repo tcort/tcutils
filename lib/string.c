@@ -299,16 +299,19 @@ int tc_strrchr(char *s, char c) {
 	return -1;
 }
 
-void tc_chompd(char *s, int delimiter) {
-	int i;
+int tc_chompd(char *s, int delimiter) {
+	int len;
 
-	i = tc_strchr(s, delimiter);
-	if (i != -1) {
-		s[i] = TC_ENDSTR;
+	len = tc_strlen(s);
+	if (len > 0 && s[len - 1] == delimiter) {
+		s[len - 1] = TC_ENDSTR;
+		return 1;
 	}
+
+	return 0;
 }
 
-void tc_chomp(char *s) {
+int tc_chomp(char *s) {
 	return tc_chompd(s, TC_NEWLINE);
 }
 

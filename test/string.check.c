@@ -97,8 +97,8 @@ static int check_chomp(void) {
 }
 static int check_chompd(void) {
 	char *s = "foobar";
-	tc_chompd(s, 'b');
-	return tc_streql("foo", s) == 1;
+	tc_chompd(s, 'r');
+	return tc_streql("fooba", s) == 1;
 }
 
 static int check_strlist_includes_first(void) {
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 		{ check_strrchr_mid,	"\"foo\" strrchr('o') is 2" },
 		{ check_strrchr_last,	"\"food\" strrchr('d') is 3" },
 		{ check_chomp,		"\"foo\\n\" chomp is \"foo\"" },
-		{ check_chompd,		"\"foobar\\n\" chompd('b') is \"foo\"" },
+		{ check_chompd,		"\"foobar\\n\" chompd('r') is \"fooba\"" },
 		{ check_strlist_includes_first, "finds \"foo\" in list" },
 		{ check_strlist_includes_mid, "finds \"bar\" in list" },
 		{ check_strlist_includes_last, "finds \"baz\" in list" },
