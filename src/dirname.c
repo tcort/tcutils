@@ -17,11 +17,11 @@
  */
 
 #include "tc/const.h"
+#include "tc/libgen.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
 #include <getopt.h>
-#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	dn = dirname(argv[0]);
+	dn = tc_dirname(argv[0]);
 	if (dn == TC_NULL) {
 		perror("dirname");
 		tc_exit(TC_EXIT_FAILURE);
