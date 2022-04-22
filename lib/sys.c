@@ -21,7 +21,7 @@
 
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
-#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2) */
+#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2) */
 
 /*
  * Read a character from file descriptor fd
@@ -151,4 +151,42 @@ void tc_exit(int exit_code) {
  */
 int tc_getpid(void) {
 	return (int) getpid();
+}
+
+/*
+ * Get the name of a tty from a file descriptor
+ * returns a null terminated string or TC_NULL
+ */
+char *tc_ttyname(int fd) {
+	char *s;
+	s = ttyname(fd);
+
+	if (s) {
+		return s;
+	} else {
+		return TC_NULL;
+	}
+}
+
+/*
+ * determine if fd refers to a valid tty devices
+ * returns 1 or 0
+ */
+int tc_isatty(int fd) {
+	return (tc_ttyname(fd) != TC_NULL);
+}
+
+/*
+ * flush file system buffers to disk
+ */
+void tc_sync(void) {
+	sync();
+}
+
+/*
+ * sleep for a given number of seconds
+ * return 0 or the remaining time if interrupted
+ */
+unsigned int tc_sleep(unsigned int seconds) {
+	return sleep(seconds);
 }
