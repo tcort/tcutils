@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
 
 	atexit(kthxbye);
 
-	srand((unsigned) getpid());
+	tc_srand((unsigned) tc_getpid());
 
 	do {
 		play();
