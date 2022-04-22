@@ -57,7 +57,7 @@ void copy(FILE *input, FILE *output, enum pattern pat) {
 	int i;
 	int colourize;
 
-	colourize = isatty(STDOUT_FILENO);
+	colourize = tc_isatty(TC_STDOUT);
 
 	for (i = 0; (ch = getc(input)) != EOF; i++) {
 		if (colourize) {
