@@ -148,6 +148,7 @@ endforeach()
 
 list(APPEND TESTS ctype.check)
 list(APPEND TESTS html.check)
+list(APPEND TESTS libgen.check)
 list(APPEND TESTS math.check)
 list(APPEND TESTS string.check)
 

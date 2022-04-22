@@ -26,6 +26,7 @@
 #include "colours.h"
 #include "ctype.h"
 #include "html.h"
+#include "libgen.h"
 #include "math.h"
 #include "stdint.h"
 #include "stdio.h"
