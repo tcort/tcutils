@@ -1,5 +1,5 @@
- /*
-    tc.h - one include to rule them all
+/*
+    html.h - HTML functions
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -14,23 +14,12 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
-#ifndef TC_H
-#define TC_H
+#ifndef TC_HTML_H
+#define TC_HTML_H
 
-#include "args.h"
-#include "bool.h"
-#include "check.h"
-#include "const.h"
-#include "colours.h"
-#include "ctype.h"
-#include "html.h"
-#include "math.h"
-#include "stdint.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "sys.h"
-#include "version.h"
+char *tc_html_entity(char ch);
+char *tc_html_color_rgb(char *name);
 
 #endif
