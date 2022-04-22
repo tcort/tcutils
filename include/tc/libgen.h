@@ -1,5 +1,5 @@
 /*
-    const.h - constants
+    libgen.h - general library functions
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -14,34 +14,12 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 */
 
-#ifndef TC_CONST_H
-#define TC_CONST_H
+#ifndef TC_LIBGEN_H
+#define TC_LIBGEN_H
 
-/* FILE NUMBERS */
-#define TC_STDIN  (0)
-#define TC_STDOUT (1)
-#define TC_STDERR (2)
-
-/* RETURN CODES */
-#define TC_OK (0)
-#define TC_ERR (-1)
-#define TC_EOF (-2)
-
-/* EXIT CODES */
-#define TC_EXIT_SUCCESS (0)
-#define TC_EXIT_FAILURE (1)
-
-/* CHARACTER CONSTANTS */
-#define TC_ENDSTR ('\0')
-#define TC_NEWLINE ('\n')
-
-/* MISC */
-#define TC_NULL ((void *) 0)
-
-#define TC_PATHMAX (4096)
-#define TC_PATHSEP (":")
+char *tc_basename(char *path);
+char *tc_dirname(char *path);
 
 #endif
