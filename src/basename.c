@@ -17,11 +17,11 @@
  */
 
 #include "tc/const.h"
+#include "tc/libgen.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
 #include <getopt.h>
-#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	bn = basename(argv[0]);
+	bn = tc_basename(argv[0]);
 	if (bn == TC_NULL) {
 		perror("basename");
 		tc_exit(TC_EXIT_FAILURE);
