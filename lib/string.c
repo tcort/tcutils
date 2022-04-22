@@ -274,3 +274,27 @@ int tc_atoi(char *s) {
 
 	return (neg == 0 ? 1 : -1) * r;
 }
+
+int tc_strchr(char *s, char c) {
+	int i;
+
+	for (i = 0; i < tc_strlen(s); i++) {
+		if (s[i] == c) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+int tc_strrchr(char *s, char c) {
+	int i;
+
+	for (i = tc_strlen(s) - 1; i >= 0; i--) {
+		if (s[i] == c) {
+			return i;
+		}
+	}
+
+	return -1;
+}

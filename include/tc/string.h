@@ -29,5 +29,7 @@ char *tc_strdup(char *s);
 char *tc_itoa(int n);
 char *tc_utoa(unsigned int n);
 int tc_atoi(char *s);
+int tc_strchr(char *s, char c);
+int tc_strrchr(char *s, char c);
 
 #endif
