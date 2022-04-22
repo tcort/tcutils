@@ -127,3 +127,47 @@ int tc_putln(int fd, char *s) {
 
 	return TC_OK;
 }
+
+
+/*
+ * copies a line of characters from src to dst (including the final newline)
+ * returns TC_OK, TC_EOF, or TC_ERR
+ */
+int tc_copyln(int src, int dst) {
+	int ch;
+	int rc;
+
+	rc = TC_OK;
+	while ((ch = tc_getc(src)) != TC_EOF) {
+		rc = tc_putc(dst, ch);
+		if (ch == TC_NEWLINE || rc != TC_OK) {
+			break;
+		}
+	}
+
+	if (ch == TC_EOF) {
+		rc = TC_EOF;
+	}
+
+	return rc;
+}
+
+/*
+ * copy n lines from src to dst
+ * read until EOF if n < 0
+ */
+int tc_copylns(int src, int dst, int n) {
+	int i;
+	int rc;
+
+	rc = TC_OK;
+	for (i = 0; i < n || n < 0; i++) {
+		rc = tc_copyln(src, dst);
+		if (rc != TC_OK) { /* rc is TC_EOF or TC_ERR */
+			break;
+		}
+	}
+
+	return rc;
+
+}
