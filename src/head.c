@@ -16,109 +16,86 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/stdio.h"
+#include "tc/string.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-static void copy_line(FILE *src, FILE *dst) {
-	int ch;
-	while ((ch = getc(src)) != EOF) {
-		putc(ch, dst);
-		if (ch == '\n') {
-			break;
-		}
-	}
-}
-
-static void copy_lines(FILE *src, FILE *dst, int n) {
-	int i;
-	for (i = 0; i < n; i++) {
-		copy_line(src, dst);
-	}
-}
-
 int main(int argc, char *argv[]) {
 
-	int ch;
 	int i;
 	int flag_n;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "lines", required_argument, 0, 'n' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'n', .longarg = "lines", .description = "number of lines to show (default 10)", .has_value = 1 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "head foo.txt", .description = "print the first 10 lines of foo.txt" },
+		{ .command = "head -n 2 foo.txt", .description = "print the first 2 lines of foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "head",
+		.usage = "[OPTIONS] [FILE...]",
+		.description = "prints lines at the beginning of an input text",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
 	};
 
 	/* defaults */
 	flag_n = 10;
 
-	while ((ch = getopt_long(argc, argv, "hn:V", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "head -- prints lines at the beginning of an input text\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: head [OPTIONS] [FILE]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help                   print help text\n");
-				fprintf(stdout, "  -n INTEGER, --lines=INTEGER  number of lines to show (default 10)\n");
-				fprintf(stdout, "  -V, --version                print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # print the first 10 lines of foo.txt\n");
-				fprintf(stdout, "  head foo.txt\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # print the first 2 lines of bar.txt\n");
-				fprintf(stdout, "  head -n 2 bar.txt\n");
-				fprintf(stdout, "\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'n':
-				flag_n = atoi(optarg);
+				flag_n = tc_atoi(argval);
 				flag_n = flag_n < 0 ? 10 : flag_n;
 				break;
 			case 'V':
-				fprintf(stdout, "head (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
-		copy_lines(stdin, stdout, flag_n);
+		tc_copylns(TC_STDIN, TC_STDOUT, flag_n);
 		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	for (i = 0; i < argc; i++) {
-		FILE *f = fopen(argv[i], "r");
-		if (f == TC_NULL) {
-			perror("fopen");
+		int fd;
+		fd = tc_open_reader(argv[i]);
+		if (fd == TC_ERR) {
+			tc_puterr("Failed to open file: ");
+			tc_puterr(argv[i]);
+			tc_puterr("\n");
 			tc_exit(TC_EXIT_FAILURE);
 		}
 
-		copy_lines(f, stdout, flag_n);
+		tc_copylns(fd, TC_STDOUT, flag_n);
 
-		fclose(f);
+		tc_close(fd);
 	}
 
 	tc_exit(TC_EXIT_SUCCESS);
