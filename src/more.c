@@ -1,5 +1,5 @@
  /*
-    moar -- filter for paging through text, one screen at a time
+    more -- filter for paging through text, one screen at a time
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -67,9 +67,9 @@ int main(int argc, char *argv[]) {
 	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
 		switch (ch) {
 			case 'h':
-				fprintf(stdout, "moar -- filter for paging through text, one screen at a time\n");
+				fprintf(stdout, "more -- filter for paging through text, one screen at a time\n");
 				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: moar [OPTIONS] [FILE]\n");
+				fprintf(stdout, "usage: more [OPTIONS] [FILE]\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  -h, --help     print help text\n");
 				fprintf(stdout, "  -V, --version  print version and copyright info\n");
@@ -77,11 +77,11 @@ int main(int argc, char *argv[]) {
 				fprintf(stdout, "examples:\n");
 				fprintf(stdout, "\n");
 				fprintf(stdout, "  # look at the listing of a large directory\n");
-				fprintf(stdout, "  ls | moar\n");
+				fprintf(stdout, "  ls | more\n");
 				tc_exit(TC_EXIT_SUCCESS);
 				break;
 			case 'V':
-				fprintf(stdout, "moar (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
+				fprintf(stdout, "more (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
 				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 	} else if (argc == 0) {
 		f = stdin;
 	} else {
-		fprintf(stdout, "usage: moar [OPTIONS] [FILE]\n");
+		fprintf(stdout, "usage: more [OPTIONS] [FILE]\n");
 		tc_exit(TC_EXIT_FAILURE);
 	}
 

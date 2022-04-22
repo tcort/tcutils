@@ -33,7 +33,7 @@ add_library(tc STATIC ${LIBTC_SRC})
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 list(APPEND CURSES_PROGS clear)
-list(APPEND CURSES_PROGS moar)
+list(APPEND CURSES_PROGS more)
 list(APPEND CURSES_PROGS snek)
 
 find_package(CURL REQUIRED)

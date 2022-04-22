@@ -34,7 +34,7 @@ Add the following to `${HOME}/.profile`:
 
 ```
 export PATH=${HOME}/bin:${PATH}
-export PAGER=moar
+export PAGER=more
 
 # disable internal commands (GNU bash)
 enable -n echo
@@ -97,8 +97,8 @@ enable -n true
 - mismatch -- finds lines that are in input but not in FILE
 - mkdir -- create directories
 - mktemp -- create a temporary file or directory with a unique name
-- moar -- filter for paging through text, one screen at a time
 - moo -- guess the bulls
+- more -- filter for paging through text, one screen at a time
 - mugwump -- find all the mugwumps
 - nl -- number lines of text
 - printenv -- print environment variables and their values
