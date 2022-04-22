@@ -299,15 +299,6 @@ int tc_strrchr(char *s, char c) {
 	return -1;
 }
 
-void tc_chomp(char *s) {
-	int i;
-
-	i = tc_strchr(s, TC_NEWLINE);
-	if (i != -1) {
-		s[i] = TC_ENDSTR;
-	}
-}
-
 void tc_chompd(char *s, int delimiter) {
 	int i;
 
@@ -316,3 +307,18 @@ void tc_chompd(char *s, int delimiter) {
 		s[i] = TC_ENDSTR;
 	}
 }
+
+void tc_chomp(char *s) {
+	return tc_chompd(s, TC_NEWLINE);
+}
+
+int tc_strlist_includes(char *haystack[], char *needle) {
+	int i;
+	for (i = 0; haystack[i] != TC_NULL; i++) {
+		if (tc_streql(haystack[i], needle) == 1) {
+			return 1;
+		}
+	}
+	return 0;
+}
+

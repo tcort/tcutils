@@ -101,6 +101,23 @@ static int check_chompd(void) {
 	return tc_streql("foo", s) == 1;
 }
 
+static int check_strlist_includes_first(void) {
+	char *list[] = { "foo", "bar", "baz", TC_NULL };
+	return tc_strlist_includes(list, "foo") == 1;
+}
+static int check_strlist_includes_mid(void) {
+	char *list[] = { "foo", "bar", "baz", TC_NULL };
+	return tc_strlist_includes(list, "bar") == 1;
+}
+static int check_strlist_includes_last(void) {
+	char *list[] = { "foo", "bar", "baz", TC_NULL };
+	return tc_strlist_includes(list, "baz") == 1;
+}
+static int check_strlist_includes_not_found(void) {
+	char *list[] = { "foo", "bar", "baz", TC_NULL };
+	return tc_strlist_includes(list, "quux") == 0;
+}
+
 int main(int argc, char *argv[]) {
 
 	static struct check checks[] = {
@@ -134,8 +151,13 @@ int main(int argc, char *argv[]) {
 		{ check_strrchr_last,	"\"food\" strrchr('d') is 3" },
 		{ check_chomp,		"\"foo\\n\" chomp is \"foo\"" },
 		{ check_chompd,		"\"foobar\\n\" chompd('b') is \"foo\"" },
+		{ check_strlist_includes_first, "finds \"foo\" in list" },
+		{ check_strlist_includes_mid, "finds \"bar\" in list" },
+		{ check_strlist_includes_last, "finds \"baz\" in list" },
+		{ check_strlist_includes_not_found, "does not find \"quux\" in list" },
 		{ TC_NULL, TC_NULL }
 	};
+
 
 	return tc_check(checks);
 }
