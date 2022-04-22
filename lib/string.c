@@ -163,6 +163,47 @@ char *tc_strdup(char *s) {
 	return d;
 }
 
+static int tc_utoa_rec(unsigned int n, char *s, int len, int i);
+
+/*
+ * Internal recursive portion of tc_utoa()
+ * Adds one character at a time to s.
+ */
+static int tc_utoa_rec(unsigned int n, char *s, int len, int i) {
+
+	if (i >= len - 2) { /* don't overflow s */
+		return i;
+	}
+
+	if (n >= 10) {
+		i = tc_utoa_rec(n / 10, s, len, i);
+	}
+
+	s[i] = (n % 10) + '0';
+	s[i+1] = TC_ENDSTR;
+	return i + 1;
+}
+
+/*
+ * Builds a string representation of the unsigned integer n
+ * Returns a string on the heap representing the input integer. Caller frees.
+ */
+char *tc_utoa(unsigned int n) {
+
+	char *s;
+	int len;
+
+	len = 64; /* big enough to hold 128-bit unsigned int */
+
+	s = tc_malloc(len);
+	if (s == TC_NULL) {
+		return TC_NULL;
+	}
+
+	tc_utoa_rec(n, s, len, 0);
+
+	return s;
+}
 
 static int tc_itoa_rec(int n, char *s, int len, int i);
 

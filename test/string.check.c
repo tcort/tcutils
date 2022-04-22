@@ -51,6 +51,22 @@ static int check_itoa_zero(void) {
 	return rc;
 }
 
+static int check_utoa_small(void) {
+	int rc;
+	char *s;
+	s = tc_utoa(1337);
+	rc = tc_streql(s, "1337");
+	s = tc_free(s);
+	return rc;
+}
+static int check_utoa_big(void) {
+	int rc;
+	char *s;
+	s = tc_utoa(4294967295);
+	rc = tc_streql(s, "4294967295");
+	s = tc_free(s);
+	return rc;
+}
 static int check_atoi_pos(void) { return tc_atoi("1337") == 1337; }
 static int check_atoi_neg(void) { return tc_atoi("-42") == -42; }
 static int check_atoi_zero(void) { return tc_atoi("0") == 0; }
@@ -74,6 +90,8 @@ int main(int argc, char *argv[]) {
 		{ check_itoa_neg,	"int(-42) becomes \"-42\"" },
 		{ check_itoa_pos,	"int(1337) becomes \"1337\"" },
 		{ check_itoa_zero,	"int(0) becomes \"0\"" },
+		{ check_utoa_big,       "uint(4294967295) becomes \"4294967295\"" },
+		{ check_utoa_small,	"uint(1337) becomes \"1337\"" },
 		{ check_atoi_pos,	"\"1337\" becomes int(1337)" },
 		{ check_atoi_neg,	"\"-42\" becomes int(-42)" },
 		{ check_atoi_zero,	"\"0\" becomes int(0)" },
