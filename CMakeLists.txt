@@ -147,6 +147,7 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
 endforeach()
 
 list(APPEND TESTS ctype.check)
+list(APPEND TESTS html.check)
 list(APPEND TESTS math.check)
 list(APPEND TESTS string.check)
 
