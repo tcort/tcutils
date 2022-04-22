@@ -16,93 +16,101 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/stdio.h"
+#include "tc/string.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-static void sum(FILE *fp, char *filename) {
+static void sum(int fd, char *filename) {
 
 	unsigned int r;
 	int ch;
+	char *s;
 
 	r = 0;
 
-	while ((ch = getc(fp)) != EOF) {
+	while ((ch = tc_getc(fd)) != TC_EOF) {
 		r = ((r >> 1) + ((r & 1) << 15) + ch) & 0xffff;
 	}
 
-	fprintf(stdout, "%u\t%s\n", r, filename);
+	s = tc_utoa(r);
+	if (s == TC_NULL) {
+		tc_puterrln("Out of Memory");
+		return;
+	}
+
+	tc_puts(TC_STDOUT, s);
+	s = tc_free(s);
+
+	tc_puts(TC_STDOUT, "\t");
+	tc_puts(TC_STDOUT, filename);
+	tc_puts(TC_STDOUT, "\n");
 }
 
 int main(int argc, char *argv[]) {
 
-	int ch;
 	int i;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "sum foo.txt", .description = "compute the checksum of foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "sum",
+		.usage = "[OPTIONS] [FILE...]",
+		.description = "compute a BSD checksum of the input",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "sum -- compute a BSD checksum of the input\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: sum [OPTIONS] [FILE...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # compute the checksum of foo.txt\n");
-				fprintf(stdout, "  sum foo.txt\n");
-				fprintf(stdout, "\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "sum (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
-		sum(stdin, "<stdin>");
+		sum(TC_STDIN, "<stdin>");
 		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	for (i = 0; i < argc; i++) {
-		FILE *f = fopen(argv[i], "r");
-		if (f == TC_NULL) {
-			perror("fopen");
+		int fd;
+		fd = tc_open_reader(argv[i]);
+		if (fd == TC_ERR) {
+			tc_puterr("Failed to open file: ");
+			tc_puterr(argv[i]);
+			tc_puterr("\n");
 			tc_exit(TC_EXIT_FAILURE);
 		}
 
-		sum(f, argv[i]);
+		sum(fd, argv[i]);
 
-		fclose(f);
+		tc_close(fd);
 	}
 
 	tc_exit(TC_EXIT_SUCCESS);
