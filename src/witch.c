@@ -100,11 +100,11 @@ int main(int argc, char *argv[]) {
 
 		rc = access(progpath, X_OK);
 		if (rc == 0) {
-			if (isatty(STDOUT_FILENO)) {
+			if (tc_isatty(TC_STDOUT)) {
 				fprintf(stdout, "%s", COLOUR_BRIGHT_GREEN);
 			}
 			fprintf(stdout, "%s", progpath);
-			if (isatty(STDOUT_FILENO)) {
+			if (tc_isatty(TC_STDOUT)) {
 				fprintf(stdout, "%s", COLOUR_RESET);
 			}
 			fprintf(stdout, "\n");
