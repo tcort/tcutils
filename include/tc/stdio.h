@@ -24,5 +24,7 @@ int tc_puterr(char *msg);
 int tc_puterrln(char *msg);
 int tc_puts(int fd, char *s);
 int tc_putln(int fd, char *s);
+int tc_copyln(int src, int dst);
+int tc_copylns(int src, int dst, int n);
 
 #endif
