@@ -17,6 +17,7 @@
  */
 
 #include "tc/const.h"
+#include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
@@ -41,7 +42,9 @@ static void ts(char *fmt) {
 	local = localtime(&now);
 	memset(tstring, '\0', sizeof(tstring));
 	strftime(tstring, sizeof(tstring)-1, fmt, local);
-	fprintf(stdout, "[%s] ", tstring);
+	tc_puts(TC_STDOUT, "[");
+	tc_puts(TC_STDOUT, tstring);
+	tc_puts(TC_STDOUT, "] ");
 }
 
 int main(int argc, char *argv[]) {
@@ -111,11 +114,11 @@ int main(int argc, char *argv[]) {
 
 	ts(fmt);
 	pch = 0;
-	while ((ch = getc(stdin)) != EOF) {
+	while ((ch = tc_getc(TC_STDIN)) != TC_EOF) {
 		if (pch == '\n') {
 			ts(fmt);
 		}
-		putc(ch, stdout);
+		tc_putc(TC_STDOUT, ch);
 		pch = ch;
 	}
 
