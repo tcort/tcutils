@@ -33,5 +33,6 @@ char *tc_ttyname(int fd);
 int tc_isatty(int fd);
 void tc_sync(void);
 unsigned int tc_sleep(unsigned int seconds);
+int tc_rmdir(char *dir);
 
 #endif
