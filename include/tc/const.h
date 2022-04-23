@@ -42,6 +42,7 @@
 #define TC_NULL ((void *) 0)
 
 #define TC_PATHMAX (4096)
+#define TC_LINEMAX (4096)
 #define TC_PATHSEP (":")
 
 #endif
