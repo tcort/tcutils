@@ -21,7 +21,7 @@
 
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
-#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2) */
+#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2) */
 
 /*
  * Read a character from file descriptor fd
@@ -181,6 +181,13 @@ int tc_isatty(int fd) {
  */
 void tc_sync(void) {
 	sync();
+}
+
+/*
+ * remove a directory from the file system
+ */
+int tc_rmdir(char *dir) {
+	return rmdir(dir);
 }
 
 /*
