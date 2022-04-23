@@ -29,28 +29,30 @@
 #include <unistd.h>
 
 
-
+static int fd = TC_STDIN;
 static struct termios old_termios;
 
 static void rawoff(void) {
-	 tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_termios);
+	tcsetattr(fd, TCSAFLUSH, &old_termios);
+	tc_close(fd);
 }
 
 static void rawon(void) {
 	struct termios new_termios;
 
-	tcgetattr(STDIN_FILENO, &old_termios);
+	tcgetattr(fd, &old_termios);
 	atexit(rawoff);
 
 	new_termios = old_termios;
 	new_termios.c_lflag &= ~(ECHO|ICANON);
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_termios);
+	tcsetattr(fd, TCSAFLUSH, &new_termios);
 }
 
 
 int main(int argc, char *argv[]) {
 
 	int ch;
+	char *tty;
 	size_t lineno;
 	FILE *f;
 	char *line = TC_NULL;
@@ -115,6 +117,16 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
+	tty = tc_ttyname(TC_STDOUT);
+	if (tty == NULL) {
+		fd = TC_STDIN;
+	} else {
+		fd = tc_open_reader(tty);
+		if (fd == TC_ERR) {
+			fd = TC_STDIN;
+		}
+	}
+
 	rawon();
 
 	for (lineno = 0; !feof(f) && !ferror(f); lineno++) {
@@ -130,14 +142,13 @@ int main(int argc, char *argv[]) {
 
 		if (lineno % ws.ws_row == ws.ws_row - 2) {
 			char ch;
-			ch = getc(stdin);
+			ch = tc_getc(fd);
 			if (ch == 'q' || ch == 'Q') {
 				break;
 			}
 			lineno = 0;
 		}
 	}
-
 	free(line);
 	fclose(f);
 
