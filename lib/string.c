@@ -325,3 +325,30 @@ int tc_strlist_includes(char *haystack[], char *needle) {
 	return 0;
 }
 
+char *tc_strstr(char *haystack, char *needle) {
+
+	int i;
+	int hlen;
+	int nlen;
+	char *s;
+
+	if (haystack == TC_NULL || needle == TC_NULL) {
+		return TC_NULL;
+	}
+
+	hlen = tc_strlen(haystack);
+	nlen = tc_strlen(needle);
+
+	if (hlen < nlen) {
+		return TC_NULL;
+	}
+
+	for (i = 0; i + nlen <= hlen; i++) {
+		s = &(haystack[i]);
+		if (tc_strneql(s, needle, nlen) == 1) {
+			return s;
+		}
+	}
+
+	return TC_NULL;
+}

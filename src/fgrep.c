@@ -16,117 +16,121 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/stdio.h"
+#include "tc/string.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-static void fgrep(FILE *in, char *pattern, char *filename, int flag_H) {
+static void fgrep(int in, char *pattern, char *filename, int flag_H) {
 
 	char *p;
-	char *line = TC_NULL;
-	size_t cap = 0;
-	ssize_t len = 0;
 
-	while ((len = getline(&line, &cap, in)) != EOF) {
-		p = strstr(line, pattern);
+	do {
+		char *line;
+		int status;
+
+		line = tc_getln(in, &status);
+		if (line == TC_NULL || status == TC_ERR) {
+			if (line != TC_NULL) {
+				line = tc_free(line);
+			}
+			return;
+		}
+
+		p = tc_strstr(line, pattern);
 		if (p != TC_NULL) {
 			if (flag_H == 1) {
-				fprintf(stdout, "%s:\t", filename);
+				tc_puts(TC_STDOUT, filename);
+				tc_puts(TC_STDOUT, ":\t");
 			}
-			fprintf(stdout, "%s", line);
+			tc_putln(TC_STDOUT, line);
 		}
-	}
 
-	free(line);
+		line = tc_free(line);
+
+		if (status == TC_EOF) {
+			return;
+		}
+	} while (1);
+
 }
 
 int main(int argc, char *argv[]) {
 
-	int ch;
 	int i;
-	FILE *in;
+	int in;
 	char *pattern;
 	int flag_H;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "filenames", no_argument, 0, 'H' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'H', .longarg = "filenames", .description = "print filenames with output lines", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "fgrep hello foo.txt bar.txt", .description = "search the files foo.txt and bar.txt for the fixed string hello" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "true",
+		.usage = "[OPTIONS] PATTERN [FILE...]",
+		.description = "searches for and prints lines that exactly match a given string",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
 	};
 
 	/* defaults */
-
 	flag_H = 0;
 
-	while ((ch = getopt_long(argc, argv, "hHV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "fgrep -- searches for and prints lines that exactly match a given string\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: fgrep [OPTIONS] PATTERN [FILE...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help       print help text\n");
-				fprintf(stdout, "  -H, --filenames  print filenames with output lines\n");
-				fprintf(stdout, "  -V, --version    print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # search the files foo.txt and bar.txt for the fixed string hello\n");
-				fprintf(stdout, "  fgrep hello foo.txt bar.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			case 'V':
-				fprintf(stdout, "fgrep (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'H':
 				flag_H = 1;
 				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+			case 'V':
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc < 1) {
-		fprintf(stderr, "usage: fgrep [OPTIONS] PATTERN [FILE...]\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	pattern = argv[0];
 
 	if (argc == 1) {
-		fgrep(stdin, pattern, "<stdin>", flag_H);
+		fgrep(TC_STDIN, pattern, "<stdin>", flag_H);
 	} else {
 		for (i = 1; i < argc; i++) {
-			in = fopen(argv[i], "r");
-			if (in == TC_NULL) {
-				perror("fopen");
+			in = tc_open_reader(argv[i]);
+			if (in == TC_ERR) {
+				tc_puterr("Could not open file: ");
+				tc_puterrln(argv[i]);
 				tc_exit(TC_EXIT_FAILURE);
 			}
-
 			fgrep(in, pattern, argv[i], flag_H);
-
-			fclose(in);
-
+			tc_close(in);
 		}
 	}
 
