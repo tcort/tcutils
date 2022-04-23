@@ -16,14 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 int main(int argc, char *argv[]) {
 
@@ -38,13 +36,34 @@ int main(int argc, char *argv[]) {
 	int flag_l;
 	int flag_w;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "bytes", no_argument, 0, 'c' },
-		{ "lines", no_argument, 0, 'l' },
-		{ "words", no_argument, 0, 'w' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'c', .longarg = "bytes", .description = "include character count in output", .has_value = 0 },
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'l', .longarg = "lines", .description = "include line count in output", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		{ .arg = 'w', .longarg = "words", .description = "include word count in output", .has_value = 0 },
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "wc < foo.txt", .description = "count characters, words, and lines in foo.txt" },
+		{ .command = "wc -l < foo.c", .description = "count lines in foo.c" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "wc",
+		.usage = "[OPTIONS]",
+		.description = "counts lines, words, and characters and prints the results",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
 	};
 
 	/* defaults */
@@ -53,8 +72,8 @@ int main(int argc, char *argv[]) {
 	flag_w = 0;
 	first = 0;
 
-	while ((ch = getopt_long(argc, argv, "chlwV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'c':
 				flag_c = 1;
 				break;
@@ -65,45 +84,17 @@ int main(int argc, char *argv[]) {
 				flag_w = 1;
 				break;
 			case 'h':
-				fprintf(stdout, "wc -- counts lines, words, and characters and prints the results\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: wc [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -c, --bytes    include character count in output\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -l, --lines    include line count in output\n");
-				fprintf(stdout, "  -w, --words    include word count in output\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # count characters, words, and lines in foo.txt\n");
-				fprintf(stdout, "  wc < foo.txt\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # count lines in foo.c\n");
-				fprintf(stdout, "  wc -l < foo.c\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "wc (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	inword = chars = words = lines = 0;
 	while ((c = tc_getc(TC_STDIN)) != TC_EOF) {
