@@ -34,5 +34,6 @@ int tc_strrchr(char *s, char c);
 int tc_chomp(char *s);
 int tc_chompd(char *s, int delimiter);
 int tc_strlist_includes(char *haystack[], char *needle);
+char *tc_strstr(char *haystack, char *needle);
 
 #endif
