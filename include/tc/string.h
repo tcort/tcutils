@@ -25,6 +25,8 @@ char *tc_strgrow(char *s, int newsize);
 int tc_strlen(char *s);
 int tc_strneql(char *x, char *y, int n);
 int tc_streql(char *x, char *y);
+int tc_strncaseeql(char *x, char *y, int n);
+int tc_strcaseeql(char *x, char *y);
 char *tc_strdup(char *s);
 char *tc_itoa(int n);
 char *tc_utoa(unsigned int n);
