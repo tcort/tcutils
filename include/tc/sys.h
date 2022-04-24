@@ -20,6 +20,8 @@
 #ifndef TC_SYS_H
 #define TC_SYS_H
 
+typedef int tc_mode_t;
+
 char tc_getc(int fd);
 int tc_putc(int fd, char ch);
 int tc_open_reader(char *filepath);
@@ -33,6 +35,7 @@ char *tc_ttyname(int fd);
 int tc_isatty(int fd);
 void tc_sync(void);
 unsigned int tc_sleep(unsigned int seconds);
+int tc_mkdir(char *dir, tc_mode_t mode);
 int tc_rmdir(char *dir);
 
 #endif

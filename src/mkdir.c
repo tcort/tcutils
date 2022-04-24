@@ -16,27 +16,23 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/libgen.h"
+#include "tc/stdio.h"
+#include "tc/string.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
 #include <errno.h>
-#include <fcntl.h>
-#include <getopt.h>
-#include <libgen.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
 
 static void make_directory(char *path, int ignore_exists) {
 	int rc;
 
-	rc = mkdir(path, 0777);
-	if (rc == -1 && !(ignore_exists && errno == EEXIST)) {
-		perror("mkdir");
+	rc = tc_mkdir(path, 0777);
+	if (rc == TC_ERR && !(ignore_exists && errno == EEXIST)) {
+		tc_puterr("Could not create directory: ");
+		tc_puterrln(path);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 }
@@ -45,76 +41,70 @@ static void make_parents(char *path) {
 
 	char *parent;
 
-	path = strdup(path);
-	parent = strdup(dirname(path));
-	if (strcmp(".", parent) != 0 && strcmp("/", parent) != 0 && strcmp("", parent)) {
-		make_parents(path);
+	path = tc_strdup(path);
+	parent = tc_strdup(tc_dirname(path));
+	if (tc_streql(".", parent) == 0 && tc_streql("/", parent) == 0 && tc_streql("", parent) == 0) {
+		make_parents(parent);
 		make_directory(parent, 1);
 	}
-	free(parent);
-	free(path);
-
+	parent = tc_free(parent);
+	path = tc_free(path);
 }
 
 int main(int argc, char *argv[]) {
 
-	int ch, rc, i, flag_p;
+	int rc, i, flag_p;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "parents", no_argument, 0, 'p' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'p', .longarg = "parents", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
+	static struct tc_prog_example examples[] = {
+		{ .command = "mkdir foo", .description = "create empty directory foo" },
+		{ .command = "mkdir -p foo/bar", .description = "create empty directory bar and any other path components as needed" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "mkdir",
+		.usage = "[OPTIONS] DIRNAME...",
+		.description = "make directories",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	/* defaults */
 	flag_p = 0;
 
-	while ((ch = getopt_long(argc, argv, "hpV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "mkdir -- create directories\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: mkdir [OPTIONS] DIRNAME...\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -p, --parents  make all directories in path as needed\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # create empty directory foo\n");
-				fprintf(stdout, "  mkdir foo\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # create empty directory bar and any other path components as needed\n");
-				fprintf(stdout, "  mkdir -p foo/bar\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'p':
 				flag_p = 1;
 				break;
 			case 'V':
-				fprintf(stdout, "mkdir (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
-		fprintf(stderr, "usage: mkdir [OPTIONS] DIRNAME...\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 

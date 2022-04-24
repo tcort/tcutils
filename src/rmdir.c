@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	rc = tc_rmdir(argv[0]);
-	if (rc == -1) {
+	if (rc == TC_ERR) {
 		tc_puterr("Could not remove directory: ");
 		tc_puterrln(argv[0]);
 		tc_exit(TC_EXIT_FAILURE);
