@@ -80,6 +80,11 @@ static int check_strneql_yes_a(void) { return tc_strneql("--version", "--", 2) =
 static int check_strneql_yes_b(void) { return tc_strneql("--", "--version", 2) == 1; }
 static int check_strneql_yes_c(void) { return tc_strneql("--", "--", 2) == 1; }
 
+static int check_strcaseeql_yes(void) { return tc_strcaseeql("FoO", "fOo") == 1; }
+static int check_strcaseeql_no(void) { return tc_strcaseeql("Fo0", "fOo") == 0; }
+static int check_strncaseeql_yes(void) { return tc_strncaseeql("FoOd", "fOop", 3) == 1; }
+static int check_strncaseeql_no(void) { return tc_strncaseeql("Fo0d", "fOop", 3) == 0; }
+
 static int check_strchr_none(void) { return tc_strchr("foo", '-') == -1; }
 static int check_strchr_first(void) { return tc_strchr("foo", 'f') == 0; }
 static int check_strchr_mid(void) { return tc_strchr("foo", 'o') == 1; }
@@ -141,6 +146,10 @@ int main(int argc, char *argv[]) {
 		{ check_strneql_yes_a,	"\"--version\" strneql(2) \"--\"" },
 		{ check_strneql_yes_b,	"\"--\" strneql(2) \"--version\"" },
 		{ check_strneql_yes_c,	"\"--\" strneql(2) \"--\"" },
+		{ check_strcaseeql_yes, "\"fOo\" strcaseeql() \"FoO\" is 1" },
+		{ check_strcaseeql_no,	"\"fOo\" strcaseeql() \"FoO\" is 0" },
+		{ check_strncaseeql_yes,"\"fOod\" strncaseeql(3) \"FoOp\" is 1" },
+		{ check_strncaseeql_no, "\"f0od\" strncaseeql(3) \"FoOp\" is 0" },
 		{ check_strchr_none,	"\"foo\" strchr('-') is -1" },
 		{ check_strchr_first,	"\"foo\" strchr('f') is 0" },
 		{ check_strchr_mid,	"\"foo\" strchr('o') is 1" },

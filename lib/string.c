@@ -92,6 +92,32 @@ int tc_strlen(char *s) {
 }
 
 /*
+ * Compare upto n characters of string x with string y ignoring case
+ * This is not a constant time equality check.
+ * Returns 1 if equal, 0 if not equal
+ */
+int tc_strncaseeql(char *x, char *y, int n) {
+
+	int i;
+
+	if (x == y) { /* both the same */
+		return 1;
+	} else if (x == TC_NULL || y == TC_NULL) { /* one null */
+		return 0;
+	} else if (tc_strlen(x) < n || tc_strlen(y) < n) { /* at least n */
+		return 0;
+	}
+
+	for (i = 0; i < n; i++) {
+		if (tc_tolower(x[i]) != tc_tolower(y[i])) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+/*
  * Compare upto n characters of string x with string y
  * This is not a constant time equality check.
  * Returns 1 if equal, 0 if not equal
@@ -116,6 +142,33 @@ int tc_strneql(char *x, char *y, int n) {
 
 	return 1;
 }
+
+/*
+ * Compare string x with string y ignoring case
+ * This is not a constant time equality check.
+ * Returns 1 if equal, 0 if not equal
+ */
+int tc_strcaseeql(char *x, char *y) {
+
+	int i;
+
+	if (x == y) { /* both the same */
+		return 1;
+	} else if (x == TC_NULL || y == TC_NULL) { /* one null */
+		return 0;
+	} else if (tc_strlen(x) != tc_strlen(y)) { /* different lengths */
+		return 0;
+	}
+
+	for (i = 0; i < tc_strlen(x); i++) {
+		if (tc_tolower(x[i]) != tc_tolower(y[i])) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
 
 /*
  * Compare string x with string y
