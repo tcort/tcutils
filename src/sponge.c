@@ -16,103 +16,96 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/string.h"
+#include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
-
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 int main(int argc, char *argv[]) {
 
 	int ch, i, rc;
-	FILE **fp;
+	int *fp;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "ps | sponge foo.txt bar.txt", .description = "write the results of ps to foo.txt and bar.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "sponge",
+		.usage = "[OPTIONS] FILE...",
+		.description = "soak up standard input and write to a file",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "sponge -- soak up standard input and write to a file\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: tee [OPTIONS] FILE...\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # write the results of ps to foo.txt\n");
-				fprintf(stdout, "  ps | sponge foo.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "sponge (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
-		fprintf(stdout, "usage: sponge [OPTIONS] FILE...\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	fp = (FILE **) malloc(sizeof(FILE*) * argc);
+	fp = (int *) tc_malloc(sizeof(int) * argc);
 	if (fp == TC_NULL) {
-		perror("malloc");
+		tc_puterrln("Out of Memory");
 		tc_exit(TC_EXIT_FAILURE);
+	}
+	for (i = 0; i < argc; i++) {
+		fp[i] = TC_ERR;
 	}
 
 	for (i = 0; i < argc; i++) {
-		fp[i] = fopen(argv[i], "w");
-		if (fp[i] == TC_NULL) {
-			perror("fopen");
+		fp[i] = tc_open_writer(argv[i]);
+		if (fp[i] == TC_ERR) {
+			tc_puterr("Could not open file: ");
+			tc_puterrln(argv[i]);
 			for (i = 0; i < argc; i++) {
-				if (fp[i] != TC_NULL) {
-					fclose(fp[i]);
+				if (fp[i] != TC_ERR) {
+					tc_close(fp[i]);
 				}
 			}
 			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
 
-	while ((ch = getc(stdin)) != EOF) {
+	while ((ch = tc_getc(TC_STDIN)) != TC_EOF) {
 		for (i = 0; i < argc; i++) {
-			rc = putc(ch, fp[i]);
-			if (rc == EOF) {
-				perror("putc");
-				for (i = 0; i < argc; i++) {
-					fclose(fp[i]);
-				}
-				tc_exit(TC_EXIT_FAILURE);
-			}
+			tc_putc(fp[i], ch);
 		}
 	}
 
 	for (i = 0; i < argc; i++) {
-		fclose(fp[i]);
+		tc_close(fp[i]);
 	}
-	free(fp);
+	fp = tc_free(fp);
 	tc_exit(TC_EXIT_SUCCESS);
 }
