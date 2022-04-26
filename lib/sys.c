@@ -23,7 +23,7 @@
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
 #include <sys/stat.h> /* mkdir(2) */
-#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2)/gethostid(2) */
+#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2)/gethostid(2)/getlogin(2) */
 
 /*
  * Read a character from file descriptor fd
@@ -200,6 +200,10 @@ int tc_rmdir(char *dir) {
 
 long tc_gethostid(void) {
 	return gethostid();
+}
+
+char *tc_getlogin(void) {
+	return getlogin();
 }
 
 /*
