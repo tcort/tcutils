@@ -84,13 +84,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (sflag == 1) {
-		rc = symlink(argv[0], argv[1]);
+		rc = tc_symlink(argv[0], argv[1]);
 		if (rc == -1) {
 			perror("symlink");
 			tc_exit(TC_EXIT_FAILURE);
 		}
 	} else {
-		rc = link(argv[0], argv[1]);
+		rc = tc_link(argv[0], argv[1]);
 		if (rc == -1) {
 			perror("link");
 			tc_exit(TC_EXIT_FAILURE);
