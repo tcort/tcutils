@@ -23,7 +23,7 @@
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
 #include <sys/stat.h> /* mkdir(2) */
-#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2) */
+#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2) */
 
 /*
  * Read a character from file descriptor fd
@@ -192,6 +192,32 @@ int tc_rmdir(char *dir) {
 	int rc;
 
 	rc =  rmdir(dir);
+	if (rc == -1) {
+		return TC_ERR;
+	}
+	return TC_OK;
+}
+
+/*
+ * create a symlink
+ */
+int tc_symlink(char *target, char *linkpath) {
+	int rc;
+
+	rc = symlink(target, linkpath);
+	if (rc == -1) {
+		return TC_ERR;
+	}
+	return TC_OK;
+}
+
+/*
+ * create a link
+ */
+int tc_link(char *olddir, char *newdir) {
+	int rc;
+
+	rc = link(olddir, newdir);
 	if (rc == -1) {
 		return TC_ERR;
 	}
