@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	/* defaults */
-	tag = getlogin();
+	tag = tc_getlogin();
 	logopt = 0;
 	facility = LOG_USER;
 	level = LOG_INFO;
