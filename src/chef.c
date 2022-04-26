@@ -16,12 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/string.h"
+#include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,29 +45,29 @@ static void tr(char *word) {
 
 	for (i = 0; i < tc_strlen(word); i++) {
 
-		     if (match(word,i,"an")) { printf( "un"); i++; }		
-		else if (match(word,i,"An")) { printf( "Un"); i++; }		
-		else if (match(word,i,"au")) { printf( "oo"); i++; }		
-		else if (match(word,i,"Au")) { printf( "Oo"); i++; }		
-		else if (match(word,i,"a") && where(word,i)!=LAST) { printf("e"); }
-		else if (match(word,i,"A") && where(word,i)!=LAST) { printf("E"); }
-		else if (match(word,i,"en")&& where(word,i)==LAST) { printf("ee"); i++; }
-		else if (match(word,i,"ew")&& where(word,i)!=FIRST) { printf("oo"); i++; }
-		else if (match(word,i,"e") && where(word,i)==LAST) { printf("e-a"); }
-		else if (match(word,i,"e") && where(word,i)==FIRST) { printf("i"); }
-		else if (match(word,i,"E") && where(word,i)==FIRST) { printf("I"); }
-		else if (match(word,i,"f") && where(word,i)!=FIRST) { printf("ff"); }
-		else if (match(word,i,"ir") && where(word,i)!=FIRST) { printf("ur"); i++; }
-		else if (match(word,i,"the")) { printf( "zee"); i+=2; }	
-		else if (match(word,i,"The")) { printf( "Zee"); i+=2; }	
-		else if (match(word,i,"th")&& where(word,i)==LAST) { printf("t"); i++; }
-		else if (match(word,i,"tion") && where(word,i)!=FIRST) { printf("shun"); i+=3; }
-		else if (match(word,i,"u") && where(word,i)!=FIRST) { printf("oo"); }
-		else if (match(word,i,"U") && where(word,i)!=FIRST) { printf("Oo"); }
-		else if (match(word,i,"v")) { printf( "f"); }		
-		else if (match(word,i,"V")) { printf( "F"); }		
-		else if (match(word,i,"w")) { printf( "v"); }		
-		else if (match(word,i,"W")) { printf( "V"); }		
+		     if (match(word,i,"an")) { tc_puts(TC_STDOUT, "un"); i++; }
+		else if (match(word,i,"An")) { tc_puts(TC_STDOUT, "Un"); i++; }
+		else if (match(word,i,"au")) { tc_puts(TC_STDOUT, "oo"); i++; }
+		else if (match(word,i,"Au")) { tc_puts(TC_STDOUT, "Oo"); i++; }
+		else if (match(word,i,"a") && where(word,i)!=LAST) { tc_puts(TC_STDOUT, "e"); }
+		else if (match(word,i,"A") && where(word,i)!=LAST) { tc_puts(TC_STDOUT, "E"); }
+		else if (match(word,i,"en")&& where(word,i)==LAST) { tc_puts(TC_STDOUT, "ee"); i++; }
+		else if (match(word,i,"ew")&& where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "oo"); i++; }
+		else if (match(word,i,"e") && where(word,i)==LAST) { tc_puts(TC_STDOUT, "e-a"); }
+		else if (match(word,i,"e") && where(word,i)==FIRST) { tc_puts(TC_STDOUT, "i"); }
+		else if (match(word,i,"E") && where(word,i)==FIRST) { tc_puts(TC_STDOUT, "I"); }
+		else if (match(word,i,"f") && where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "ff"); }
+		else if (match(word,i,"ir") && where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "ur"); i++; }
+		else if (match(word,i,"the")) { tc_puts(TC_STDOUT, "zee"); i+=2; }
+		else if (match(word,i,"The")) { tc_puts(TC_STDOUT, "Zee"); i+=2; }
+		else if (match(word,i,"th")&& where(word,i)==LAST) { tc_puts(TC_STDOUT, "t"); i++; }
+		else if (match(word,i,"tion") && where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "shun"); i+=3; }
+		else if (match(word,i,"u") && where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "oo"); }
+		else if (match(word,i,"U") && where(word,i)!=FIRST) { tc_puts(TC_STDOUT, "Oo"); }
+		else if (match(word,i,"v")) { tc_puts(TC_STDOUT, "f"); }
+		else if (match(word,i,"V")) { tc_puts(TC_STDOUT, "F"); }
+		else if (match(word,i,"w")) { tc_puts(TC_STDOUT, "v"); }
+		else if (match(word,i,"W")) { tc_puts(TC_STDOUT, "V"); }
 		else tc_putc(TC_STDOUT, word[i]);
 	}
 }
@@ -75,51 +76,47 @@ static void tr(char *word) {
 int main(int argc, char *argv[]) {
 
 	int ch, i;
-	char buf[2048];
+	char buf[TC_LINEMAX];
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "chef < foo.txt > bar.txt", .description = "translate foo.txt to chef-speak" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "chef",
+		.usage = "[OPTIONS]",
+		.description = "Swedish Chef translator",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "chef -- Swedish Chef translator\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: chef [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # translate foo.txt to chef-speak\n");
-				fprintf(stdout, "  chef < foo.txt > bar.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "chef (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
-
+	argc -= argi;
+	argv += argi;
 
 	for (i = 0; (ch = getc(stdin)) != EOF && i < sizeof(buf) - 1; i++) {
 		if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
@@ -136,9 +133,6 @@ int main(int argc, char *argv[]) {
 			i = -1;
 		}
 	}
-
-	return 0;
-
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
