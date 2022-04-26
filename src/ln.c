@@ -16,83 +16,76 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 int main(int argc, char *argv[]) {
 
-	int ch, rc, sflag = 0;
+	int rc, flag_s = 0;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "symbolic", no_argument, 0, 's' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 's', .longarg = "symlink", .description = "creates a symbolic link", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hsV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "ln foo.txt bar.txt", .description = "create a link name bar.txt which links to existing file foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "ln",
+		.usage = "[OPTIONS] FILE1 FILE2",
+		.description = "creates a file link",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-    				fprintf(stdout, "ln -- creates a file link\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: ln [OPTIONS] FILE1 FILE2\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -s, --symbolic creates a symbolic link\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # create a link name bar.txt which links to existing file foo.txt\n");
-				fprintf(stdout, "  ln foo.txt bar.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			case 'V':
-				fprintf(stdout, "ln (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 's':
-				sflag = 1;
+				flag_s = 1;
 				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+			case 'V':
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc != 2) {
-		fprintf(stderr, "usage: ln [OPTIONS] FILE1 FILE2\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	if (sflag == 1) {
+	if (flag_s == 1) {
 		rc = tc_symlink(argv[0], argv[1]);
 		if (rc == -1) {
-			perror("symlink");
+			tc_puterrln("Could not create symbolic link");
 			tc_exit(TC_EXIT_FAILURE);
 		}
 	} else {
 		rc = tc_link(argv[0], argv[1]);
 		if (rc == -1) {
-			perror("link");
+			tc_puterrln("Could not create link");
 			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
