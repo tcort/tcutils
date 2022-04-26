@@ -1,4 +1,4 @@
- /*
+/*
     crc32 -- output the 32-bit cyclic redundancy check value for an input
     Copyright (C) 2022  Thomas Cort
 
@@ -16,18 +16,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
+#include "tc/stdint.h"
+#include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <inttypes.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static const int32_t crc32tab[] = {
+static const tc_int32_t crc32tab[] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
 	0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
 	0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -73,15 +74,15 @@ static const int32_t crc32tab[] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-static void crc32(FILE *fp, char *filename) {
+static void crc32(int fd, char *filename) {
 
 	int ch;
-	uint32_t crc = 0 ^ 0xffffffffL;
-	uint64_t len = 0;
+	tc_uint32_t crc = 0 ^ 0xffffffffL;
+	tc_uint64_t len = 0;
 
-	while ((ch = fgetc(fp)) != EOF) {
-		uint32_t i;
-		uint32_t byte = ch;
+	while ((ch = tc_getc(fd)) != TC_EOF) {
+		tc_uint32_t i;
+		tc_uint32_t byte = ch;
 
 		crc = crc32tab[(crc ^ byte) & 0xff] ^ (crc >> 8);
 		len++;
@@ -96,65 +97,62 @@ static void crc32(FILE *fp, char *filename) {
 int main(int argc, char *argv[]) {
 
 	int i;
-	int ch;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "crc32 foo.txt", .description = "compute the check for foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "crc32",
+		.usage = "[OPTIONS] [FILE...]",
+		.description = "output the 32-bit cyclic redundancy check value for an input",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "crc32 -- output the 32-bit cyclic redundancy check value for an input\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: crc32 [OPTIONS] [FILE...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # compute the check for foo.txt \n");
-				fprintf(stdout, "  crc32 foo.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "crc32 (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
-		crc32(stdin, "<stdin>");
+		crc32(TC_STDIN, "<stdin>");
 		tc_exit(TC_EXIT_SUCCESS);
 	}
 
 	for (i = 0; i < argc; i++) {
-		FILE *f = fopen(argv[i], "r");
-		if (f == TC_NULL) {
-			perror("fopen");
+		int fd = tc_open_reader(argv[i]);
+		if (fd == TC_ERR) {
+			tc_puterr("Could not open file: ");
+			tc_puterrln(argv[i]);
 			tc_exit(TC_EXIT_FAILURE);
 		}
 
-		crc32(f, argv[i]);
-		fclose(f);
+		crc32(fd, argv[i]);
+		tc_close(fd);
 	}
 
 	tc_exit(TC_EXIT_SUCCESS);
