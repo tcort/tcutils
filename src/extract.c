@@ -16,12 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/ctype.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,61 +35,55 @@ int main(int argc, char *argv[]) {
 	regmatch_t pmatch[32];
 	size_t nmatch = sizeof(pmatch)/sizeof(pmatch[0]), nread = 0, len = 0;
 	char *pattern = TC_NULL, *format = TC_NULL, errbuf[128], *line = TC_NULL, *endnum = TC_NULL;
-	int cflags = REG_EXTENDED, eflags = 0, ch, errcode;
+	int cflags = REG_EXTENDED, eflags = 0, errcode;
 	ssize_t i;
 	long placeholder = 0;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "ignore-case", no_argument, 0, 'i' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'i', .longarg = "ignore-case", .description = "case insensitive search", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "Vhi", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "extract 'Invalid user (.*) from (.*) port' 'uid=$1 client_ip=$2' /var/log/auth.log", .description = "extract failed login attmpts (uid + ip) from auth.log" },
+
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "extract",
+		.usage = "[OPTIONS] PATTERN FORMAT [FILE]",
+		.description = "extract values from the input and print them to the output",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "extract -- extract values from the input and print them to the output\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: extract [OPTIONS] PATTERN FORMAT [FILE]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help         print help text\n");
-				fprintf(stdout, "  -i, --ignore-case  case insensitive search\n");
-				fprintf(stdout, "  -V, --version      print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # extract failed login attmpts (uid + ip) from auth.log\n");
-				fprintf(stdout, "  extract 'Invalid user (.*) from (.*) port' 'uid=$1 client_ip=$2' /var/log/auth.log\n");
-				fprintf(stdout, "\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			case 'i':
-				cflags |= REG_ICASE;
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "extract (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc != 2 && argc != 3) {
-		fprintf(stdout, "usage: extract [OPTIONS] PATTERN FORMAT [FILE]\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
