@@ -16,12 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/stdio.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,39 +51,45 @@ int main(int argc, char *argv[]) {
 
 	int ch, pch;
 	char *fmt;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "compact", no_argument, 0, 'c' },
-		{ "help", no_argument, 0, 'h' },
-		{ "iso8601", no_argument, 0, 'i' },
-		{ "unix", no_argument, 0, 'u' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'c', .longarg = "compact", .description = "filename safe format (YYYYmmddHHMMSS)", .has_value = 0 },
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'i', .longarg = "iso8601", .description = "ISO8601 format", .has_value = 0 },
+		{ .arg = 'u', .longarg = "unix", .description = "UNIX timestamp", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
+	static struct tc_prog_example examples[] = {
+		{ .command = "food | ts > foo.log", .description = "add timestamps to lines from standard input" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "ts",
+		.usage = "[OPTIONS]",
+		.description = "copy lines from standard input to standard output adding timestamps",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	/* defaults */
 	fmt = FMT_HUMAN;
 
-	while ((ch = getopt_long(argc, argv, "chiuV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'c':
 				fmt = FMT_COMPACT;
 				break;
 			case 'h':
-				fprintf(stdout, "ts -- copy lines from standard input to standard output adding timestamps\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: ts [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -c, --compact  filename safe format (YYYYmmddHHMMSS)\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -i, --iso8601  ISO8601 format\n");
-				fprintf(stdout, "  -u, --unix     UNIX timestamp\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # add timestamps to lines from standard input\n");
-				fprintf(stdout, "  food | ts > foo.log\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'i':
 				fmt = FMT_ISO8601;
@@ -92,25 +98,14 @@ int main(int argc, char *argv[]) {
 				fmt = FMT_UNIX;
 				break;
 			case 'V':
-				fprintf(stdout, "ts (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	ts(fmt);
 	pch = 0;
