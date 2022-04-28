@@ -83,59 +83,13 @@ static struct pass passes[35] = {
 
 #define NPASSES (sizeof(passes)/sizeof(passes[0]))
 
-int main(int argc, char *argv[]) {
-
+static void scrub(char *filename) {
 	int ch, fd, rc, i, pati;
 	FILE *fp;
 	struct stat st;
 	off_t pos;
-	struct tc_prog_arg *arg;
 
-	static struct tc_prog_arg args[] = {
-		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
-		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
-		TC_PROG_ARG_END
-	};
-
-	static struct tc_prog_example examples[] = {
-		{ .command = "scrub foo.txt", .description = "overwrite foo.txt" },
-		TC_PROG_EXAMPLE_END
-	};
-
-	static struct tc_prog prog = {
-		.program = "scrub",
-		.usage = "[OPTIONS] FILENAME",
-		.description = "overwrites files using the 35 pass Gutmann technique",
-		.package = TC_VERSION_NAME,
-		.version = TC_VERSION_STRING,
-		.copyright = TC_VERSION_COPYRIGHT,
-		.license = TC_VERSION_LICENSE,
-		.author =  TC_VERSION_AUTHOR,
-		.args = args,
-		.examples = examples
-	};
-
-	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
-		switch (arg->arg) {
-			case 'h':
-				tc_args_show_help(&prog);
-				break;
-			case 'V':
-				tc_args_show_version(&prog);
-				break;
-		}
-
-	}
-
-	argc -= argi;
-	argv += argi;
-
-	if (argc != 1) {
-		tc_args_show_usage(&prog);
-		tc_exit(TC_EXIT_FAILURE);
-	}
-
-	fp = fopen(argv[0], "r+");
+	fp = fopen(filename, "r+");
 	if (fp == TC_NULL) {
 		perror("fopen");
 		tc_exit(TC_EXIT_FAILURE);
@@ -154,8 +108,6 @@ int main(int argc, char *argv[]) {
 		fclose(fp);
 		tc_exit(TC_EXIT_FAILURE);
 	}
-
-	tc_srand((unsigned int) tc_getpid());
 
 	for (i = 0; i < NPASSES; i++) {
 		rewind(fp);
@@ -181,6 +133,61 @@ int main(int argc, char *argv[]) {
 	}
 
 	fclose(fp);
+}
+
+int main(int argc, char *argv[]) {
+
+	int i;
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "scrub foo.txt", .description = "overwrite foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "scrub",
+		.usage = "[OPTIONS] FILE...",
+		.description = "overwrites files using the 35 pass Gutmann technique",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
+			case 'h':
+				tc_args_show_help(&prog);
+				break;
+			case 'V':
+				tc_args_show_version(&prog);
+				break;
+		}
+
+	}
+
+	argc -= argi;
+	argv += argi;
+
+	if (argc < 1) {
+		tc_args_show_usage(&prog);
+		tc_exit(TC_EXIT_FAILURE);
+	}
+
+	tc_srand((unsigned int) tc_getpid());
+	for (i = 0; i < argc; i++) {
+		scrub(argv[i]);
+	}
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
