@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/ctype.h"
 #include "tc/math.h"
@@ -23,7 +24,6 @@
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -173,69 +173,73 @@ int main(int argc, char *argv[]) {
 		}
 	};
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'c', .longarg = "count", .description = "prefix each line with the number of occurances", .has_value = 0 },
+		{ .arg = 'd', .longarg = "repeated", .description = "only show duplicate lines (once per group)", .has_value = 0 },
+		{ .arg = 'f', .longarg = "skip-fields", .description = "skip comparison of the first N fields", .has_value = 1 },
+		TC_PROG_ARG_HELP,
+		{ .arg = 'i', .longarg = "ignore-case", .description = "disregard case when comparing lines for uniqueness", .has_value = 0 },
+		{ .arg = 's', .longarg = "skip-chars", .description = "skip comparison of the first N characters", .has_value = 1 },
+		{ .arg = 'u', .longarg = "unique", .description = "only show unique lines", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
+		{ .arg = 'z', .longarg = "zero-terminated", .description = "line delimiter is NUL rather than NEWLINE", .has_value = 0 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "cdf:hiuVs:z", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "uniq foo.txt", .description = "collapse duplicate lines from foo.txt" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "uniq",
+		.usage = "[OPTIONS] [INPUT [OUTPUT]]",
+		.description = "show or hide duplicate lines in a file",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'c':
 				op.show_count = 1;
 				break;
 			case 'd':
 				op.duplicate = 1;
 				break;
+			case 'f':
+				op.nskip_fields = (size_t) tc_abs(atoi(optarg));
+				break;
+			case 'h':
+				tc_args_show_help(&prog);
+				break;
 			case 'i':
 				op.ignore_case = 1;
-				break;
-			case 'u':
-				op.unique_only = 1;
 				break;
 			case 's':
 				op.nskip_chars = (size_t) tc_abs(atoi(optarg));
 				break;
-			case 'f':
-				op.nskip_fields = (size_t) tc_abs(atoi(optarg));
+			case 'u':
+				op.unique_only = 1;
+				break;
+			case 'V':
+				tc_args_show_version(&prog);
 				break;
 			case 'z':
 				op.delimiter = '\0';
 				break;
-			case 'h':
-				fprintf(stdout, "uniq -- show or hide duplicate lines in a file\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: uniq [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # collapse duplicate lines from foo.txt\n");
-				fprintf(stdout, "  uniq foo.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			case 'V':
-				fprintf(stdout, "uniq (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
-				break;
 		}
-
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	/* optional input file */
 	if (argc > 0) {
