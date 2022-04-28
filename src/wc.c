@@ -40,9 +40,9 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog_arg args[] = {
 		{ .arg = 'c', .longarg = "bytes", .description = "include character count in output", .has_value = 0 },
-		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		TC_PROG_ARG_HELP,
 		{ .arg = 'l', .longarg = "lines", .description = "include line count in output", .has_value = 0 },
-		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
 		{ .arg = 'w', .longarg = "words", .description = "include word count in output", .has_value = 0 },
 		TC_PROG_ARG_END
 	};

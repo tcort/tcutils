@@ -46,6 +46,8 @@ struct tc_prog {
 	struct tc_prog_example *examples;
 };
 
+#define TC_PROG_ARG_HELP { .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 }
+#define TC_PROG_ARG_VERSION { .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 }
 #define TC_PROG_ARG_END { .arg = '\0', .longarg = TC_NULL, .description = TC_NULL, .has_value = 0 }
 #define TC_PROG_EXAMPLE_END { .description = TC_NULL, .command = TC_NULL }
 

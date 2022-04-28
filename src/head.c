@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
-		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		TC_PROG_ARG_HELP,
 		{ .arg = 'n', .longarg = "lines", .description = "number of lines to show (default 10)", .has_value = 1 },
-		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
 
