@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog_arg args[] = {
 		{ .arg = 'a', .longarg = "all", .description = "print all cat facts", .has_value = 0 },
-		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
-		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
 

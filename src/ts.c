@@ -55,10 +55,10 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog_arg args[] = {
 		{ .arg = 'c', .longarg = "compact", .description = "filename safe format (YYYYmmddHHMMSS)", .has_value = 0 },
-		{ .arg = 'h', .longarg = "help", .description = "print help text", .has_value = 0 },
+		TC_PROG_ARG_HELP,
 		{ .arg = 'i', .longarg = "iso8601", .description = "ISO8601 format", .has_value = 0 },
 		{ .arg = 'u', .longarg = "unix", .description = "UNIX timestamp", .has_value = 0 },
-		{ .arg = 'V', .longarg = "version", .description = "print version and copyright info", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
 
