@@ -16,12 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
 #include <errno.h>
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,42 +43,44 @@ int main(int argc, char *argv[]) {
 	size_t cap = 0;
 	ssize_t len = 0, i = 0, col = 0;
 	char *line = TC_NULL;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "bytes", no_argument, 0, 'b' },
-		{ "width", required_argument, 0, 'w' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'b', .longarg = "bytes", .description = "count bytes rather than columns", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_VERSION,
+		{ .arg = 'w', .longarg = "width", .description = "width of the output (default 80)", .has_value = 1 },
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "bhVw:", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "fold -w 72 foo.txt", .description = "wrap contents of foo.txt at 72 characters" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "fold",
+		.usage = "[OPTIONS] [FILE]",
+		.description = "wraps long lines for fixed width viewing mediums",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
+			case 'b':
+				bflag = 1;
+				break;
 			case 'h':
-				fprintf(stdout, "fold -- wraps long lines for fixed width viewing mediums\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: fold [OPTIONS] [FILE]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -b, --bytes    count bytes rather than columns\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "  -w, --width    width of the output (default 80)\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # wrap contents of foo.txt at 72 characters\n");
-				fprintf(stdout, "  fold -w 72 foo.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "fold (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_version(&prog);
 				break;
 			case 'w':
 				width = atoi(optarg);
@@ -88,19 +90,12 @@ int main(int argc, char *argv[]) {
 					tc_exit(TC_EXIT_FAILURE);
 				}
 				break;
-			case 'b':
-				bflag = 1;
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
-				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	fp = argc == 0 ? stdin : fopen(argv[0], "r");
 	if (fp == TC_NULL) {
