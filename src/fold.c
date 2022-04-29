@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 				tc_args_show_version(&prog);
 				break;
 			case 'w':
-				width = atoi(optarg);
+				width = atoi(argval);
 				if (width <= 0) {
 					errno = EINVAL;
 					perror("width");
