@@ -16,11 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,49 +38,46 @@ int main(int argc, char *argv[]) {
 	size_t cap = 0;
 	ssize_t len = 0;
 	struct list *head = TC_NULL;
+	struct tc_prog_arg *arg;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	static struct tc_prog_arg args[] = {
+		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_VERSION,
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "hV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "tac foo.txt bar.txt > foobar.txt", .description = "concatinate and reverse two files" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "tac",
+		.usage = "[OPTIONS] [FILES...]",
+		.description = "concatenate and print files in reverse",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'h':
-				fprintf(stdout, "tac -- concatenate and print files in reverse\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: tac [OPTIONS] [FILES...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # concatinate and reverse two files\n");
-				fprintf(stdout, "  tac foo.txt bar.txt > foobar.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "cat (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
 		while ((ch = getc(stdin)) != EOF) {
