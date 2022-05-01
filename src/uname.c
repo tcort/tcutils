@@ -16,11 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
@@ -37,54 +37,43 @@
 int main(int argc, char *argv[]) {
 
 	int rc;
-	char ch;
 	unsigned char flags = 0;
 	struct utsname un;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "all", no_argument, 0, 'a' },
-		{ "machine", no_argument, 0, 'm' },
-		{ "nodename", no_argument, 0, 'n' },
-		{ "kernel-release", no_argument, 0, 'r' },
-		{ "kernel-version", no_argument, 0, 'v' },
-		{ "kernel-name", no_argument, 0, 's' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'a', .longarg = "all", .description = "print all fields", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		{ .arg = 'm', .longarg = "machine", .description = "print machine hardware name", .has_value = 0 },
+		{ .arg = 'n', .longarg = "nodename", .description = "print node name", .has_value = 0 },
+		{ .arg = 'r', .longarg = "kernel-release", .description = "print kernel release", .has_value = 0 },
+		{ .arg = 's', .longarg = "kernel-name", .description = "print kernel name", .has_value = 0 },
+		{ .arg = 'v', .longarg = "kernel-version", .description = "print kernel version", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "ahmnrsVv", long_options, TC_NULL)) != -1) {
-		switch (ch) {
-			case 'h':
-				fprintf(stdout, "uname -- print system information (name and hardware details)\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: uname [OPTIONS]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -a, --all             print all fields\n");
-				fprintf(stdout, "  -h, --help            print help text\n");
-				fprintf(stdout, "  -m, --machine         print machine hardware name\n");
-				fprintf(stdout, "  -n, --nodename        print node name\n");
-				fprintf(stdout, "  -r, --kernel-release  print kernel release\n");
-				fprintf(stdout, "  -s, --kernel-name     print kernel name\n");
-				fprintf(stdout, "  -v, --kernel-version  print kernel version\n");
-				fprintf(stdout, "  -V, --version         print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # show all details\n");
-				fprintf(stdout, "  uname -a\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			case 'V':
-				fprintf(stdout, "uname (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
+	static struct tc_prog_example examples[] = {
+		{ .command = "uname -a", .description = "show all details" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "uname",
+		.usage = "[OPTIONS]",
+		.description = "print system information (name and hardware details)",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'a':
 				flags |= AFLAG;
 				break;
@@ -103,18 +92,23 @@ int main(int argc, char *argv[]) {
 			case 'v':
 				flags |= VFLAG;
 				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+			case 'h':
+				tc_args_show_help(&prog);
+				break;
+			case 'V':
+				tc_args_show_version(&prog);
+				break;
 		}
+
 	}
 
 	if (flags == 0) { /* default when no options supplied */
 		flags |= SFLAG;
 	}
 
-	argc -= optind;
-	argv += optind;
+
+	argc -= argi;
+	argv += argi;
 
 	rc = uname(&un);
 	if (rc == -1) {
