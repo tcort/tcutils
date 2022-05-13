@@ -126,6 +126,7 @@ enable -n true
 - tty -- print the filename associated with the tty connected to stdin
 - uname -- print system information (name and hardware details)
 - unexpand -- converts spaces to tabs
+- units -- convert between units of measure
 - uniq -- show or hide duplicate lines in a file
 - unix2dos -- replaces UNIX line endings '\n' with DOS line endings '\r\n'
 - up -- universal ping, checks the status of a URL
