@@ -59,6 +59,7 @@ enable -n true
 - d6 -- simulates a 6-sided dice roll and prints the reults
 - date -- print the current date and time
 - dc -- desk calculator
+- dec2hex -- convert decimal to hexadecimal
 - dirname -- print the directory portion of a pathname
 - dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
 - du -- show disk usage
