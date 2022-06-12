@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tc/args.h"
 #include "tc/const.h"
 #include "tc/colours.h"
 #include "tc/ctype.h"
@@ -23,7 +24,6 @@
 #include "tc/sys.h"
 #include "tc/version.h"
 
-#include <getopt.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,28 +73,49 @@ int main(int argc, char *argv[]) {
 	size_t nmatch = 1, lineno = 0, count = 0;
 	enum color_mode colors = COLOUR_MODE_AUTO;
 
-	static struct option long_options[] = {
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ "extended-regexp", no_argument, 0, 'E' },
-		{ "fixed-strings", no_argument, 0, 'F' },
-		{ "basic-regexp", no_argument, 0, 'G' },
-		{ "count", no_argument, 0, 'c' },
-		{ "ignore-case", no_argument, 0, 'i' },
-		{ "line-number", no_argument, 0, 'n' },
-		{ "color", required_argument, 0, 'C' },
-		{ "colour", required_argument, 0, 'C' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'C', .longarg = "color", .description = "set color output to never, always, or auto", .has_value = 1 },
+		{ .arg = 'E', .longarg = "extended-regexp", .description = "use POSIX extended regular expression syntax", .has_value = 0 },
+		{ .arg = 'F', .longarg = "fixed-strings", .description = "performed fixed string search (similar to fgrep)", .has_value = 0 },
+		{ .arg = 'G', .longarg = "basic-regexp", .description = "use POSIX basic regular expression syntax", .has_value = 0 },
+		{ .arg = 'c', .longarg = "count", .description = "just count matchiing lines", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		{ .arg = 'i', .longarg = "ignore-case", .description = "case insensitive search", .has_value = 0 },
+		{ .arg = 'n', .longarg = "line-number", .description = "prepend line numbers to output", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
+		TC_PROG_ARG_END
 	};
 
-	while ((ch = getopt_long(argc, argv, "CEFGVchin", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	static struct tc_prog_example examples[] = {
+		{ .command = "grep -n bar foo.txt", .description = "print all lines in foo.txt containing 'bar' with line numbers" },
+		{ .command = "grep -c bar foo.txt", .description = "print the count of lines in foo.txt that contain bar" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "grep",
+		.usage = "[OPTIONS] PATTERN [FILE...]",
+		.description = "searches for and prints lines that match a given pattern",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'C':
-				if (strcmp(optarg, "auto") == 0) {
+				if (strcmp(argval, "auto") == 0) {
 					colors = COLOUR_MODE_AUTO;
-				} else if (strcmp(optarg, "never") == 0) {
+				} else if (strcmp(argval, "never") == 0) {
 					colors = COLOUR_MODE_NEVER;
-				} else if (strcmp(optarg, "always") == 0) {
+				} else if (strcmp(argval, "always") == 0) {
 					colors = COLOUR_MODE_ALWAYS;
 				} else {
 					fprintf(stderr, "grep: invalid colour options. must be one of auto, never, always\n");
@@ -106,29 +127,7 @@ int main(int argc, char *argv[]) {
 				just_count = 1;
 				break;
 			case 'h':
-				fprintf(stdout, "grep -- searches for and prints lines that match a given pattern\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: grep [OPTIONS] PATTERN [FILE...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -C, --color=WHEN, --colour=WHEN  set color output to never, always, or auto\n");
-				fprintf(stdout, "  -E, --extended-regexp            use POSIX extended regular expression syntax\n");
-				fprintf(stdout, "  -F, --fixed-strings              performed fixed string search (similar to fgrep)\n");
-				fprintf(stdout, "  -G, --basic-regexp               use POSIX basic regular expression syntax\n");
-				fprintf(stdout, "  -c, --count                      just count matchiing lines\n");
-				fprintf(stdout, "  -h, --help                       print help text\n");
-				fprintf(stdout, "  -i, --ignore-case                case insensitive search\n");
-				fprintf(stdout, "  -n, --line-number                prepend line numbers to output\n");
-				fprintf(stdout, "  -V, --version                    print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # print all lines in foo.txt containing 'bar' with line numbers\n");
-				fprintf(stdout, "  grep -n bar foo.txt\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # print the count of lines in foo.txt that contain bar\n");
-				fprintf(stdout, "  grep -c bar foo.txt\n");
-				fprintf(stdout, "\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'i':
 				cflags |= REG_ICASE;
@@ -147,28 +146,17 @@ int main(int argc, char *argv[]) {
 				cflags &= ~(REG_EXTENDED);
 				break;
 			case 'V':
-				fprintf(stdout, "grep (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc != 1 && argc != 2) {
-		fprintf(stderr, "usage: grep [OPTIONS] PATTERN [FILE]\n");
+		tc_args_show_usage(&prog);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
