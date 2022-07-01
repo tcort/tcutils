@@ -116,6 +116,7 @@ int main(int argc, char *argv[]) {
 	static struct tc_prog_example examples[] = {
 		{ .command = "ls -1 ../src | extract '(.*)\\.c$' '$1' | foreach -- '{} --help | ./head -n 1'", .description = "find all source files and remove the .c at the end to get the program names. execute each program with the `--help` argument and grab the first line of output. {} is the placeholder for standard input" },
 		{ .command = "ls -1 *.dat | foreach mv {} {}.done", .description = "rename files *.dat to *.dat.done {} is the placeholder for standard input" },
+		{ .command = "seq 1 10 | foreach d6", .description = "simulate 10 rolls of a 6 sided die" },
 		TC_PROG_EXAMPLE_END
 	};
 
