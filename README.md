@@ -104,6 +104,7 @@ enable -n true
 - nl -- number lines of text
 - printenv -- print environment variables and their values
 - pwd -- print the current working directory
+- pwgen -- password generator
 - rest -- tool for making rest requests with JSON
 - rev -- reverse text, line by line
 - rmdir -- remove a directory from the file system
