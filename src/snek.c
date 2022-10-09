@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdlib.h"
 #include "tc/sys.h"
 #include "tc/version.h"
@@ -101,8 +102,8 @@ int main(int argc, char *argv[]) {
 	}
 	sk[0].y = my/2;
 	sk[0].x = mx/2;
-	a.y = (tc_rand() % (my-2)) + 1;
-	a.x = (tc_rand() % (mx-2)) + 1;
+	a.y = (tc_abs(tc_rand()) % (my-2)) + 1;
+	a.x = (tc_abs(tc_rand()) % (mx-2)) + 1;
 
 	initscr();
 	raw();
@@ -162,8 +163,8 @@ int main(int argc, char *argv[]) {
 
 		if (sk[0].y == a.y && sk[0].x == a.x) {
 			l++;
-			a.y = (tc_rand() % (my-2)) + 1;
-			a.x = (tc_rand() % (mx-2)) + 1;
+			a.y = (tc_abs(tc_rand()) % (my-2)) + 1;
+			a.x = (tc_abs(tc_rand()) % (mx-2)) + 1;
 		}
 
 		refresh();

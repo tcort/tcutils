@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdio.h"
 #include "tc/stdlib.h"
 #include "tc/sys.h"
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
 
 	tc_srand((unsigned int) tc_getpid());
 
-	if (tc_rand() % 2 == 0) {
+	if (tc_abs(tc_rand()) % 2 == 0) {
 		tc_putln(TC_STDOUT, "heads");
 	} else {
 		tc_putln(TC_STDOUT, "tails");

@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdio.h"
 #include "tc/stdlib.h"
 #include "tc/string.h"
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
 
 
 	for (i = 0; i < 8; i++) {
-		int n = tc_rand() & (alphabet_size - 1);
+		int n = tc_abs(tc_rand()) & (alphabet_size - 1);
 		tc_putc(TC_STDOUT, alphabet[n]);
 	}
 	tc_putc(TC_STDOUT, TC_NEWLINE);

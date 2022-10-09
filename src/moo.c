@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdlib.h"
 #include "tc/sys.h"
 #include "tc/version.h"
@@ -78,7 +79,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	for (i = 9; i >= 1; i--) {
-		b = tc_rand() % (i+1);
+		b = tc_abs(tc_rand()) % (i+1);
 		if (b == 0 && farm[i] == '0') {
 			i++;
 			continue;
