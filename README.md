@@ -101,6 +101,7 @@ enable -n true
 - moo -- guess the bulls
 - more -- filter for paging through text, one screen at a time
 - mugwump -- find all the mugwumps
+- nanoid - generate URL friendly unique ID strings
 - nl -- number lines of text
 - printenv -- print environment variables and their values
 - pwd -- print the current working directory
