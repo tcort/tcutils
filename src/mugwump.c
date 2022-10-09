@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdlib.h"
 #include "tc/string.h"
 #include "tc/sys.h"
@@ -88,8 +89,8 @@ static void play(void) {
 
 	player.x = player.y = 0;
 	for (i = 0; i < NWUMPS; i++) {
-		mugwumps[i].x = tc_rand() % N;
-		mugwumps[i].y = tc_rand() % N;
+		mugwumps[i].x = tc_abs(tc_rand()) % N;
+		mugwumps[i].y = tc_abs(tc_rand()) % N;
 		mugwumps[i].found = 0;
 	}
 

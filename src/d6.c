@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdlib.h"
 #include "tc/stdio.h"
 #include "tc/string.h"
@@ -72,9 +73,9 @@ int main(int argc, char *argv[]) {
 	tc_srand((unsigned int) tc_getpid());
 
 	do {	/* attempt to get a uniform roll */
-		roll = tc_rand();	/* get a random number */
-		roll &= 0x7;		/* capture lower 3 bits (value 0-7) */
-	} while (roll >= 6);		/* repeat until value between 0-5 */
+		roll = tc_abs(tc_rand());	/* get a random number */
+		roll &= 0x7;			/* capture lower 3 bits (value 0-7) */
+	} while (roll >= 6);			/* repeat until value between 0-5 */
 
 	result = tc_itoa(roll + 1); /* +1 to get value in range 1-6 */
 	if (result == TC_NULL) {

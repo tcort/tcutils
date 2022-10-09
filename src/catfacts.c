@@ -18,6 +18,7 @@
 
 #include "tc/args.h"
 #include "tc/const.h"
+#include "tc/math.h"
 #include "tc/stdio.h"
 #include "tc/stdlib.h"
 #include "tc/sys.h"
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
 			tc_puts(TC_STDOUT, "\n");
 		}
 	} else {
-		tc_puts(TC_STDOUT, catfacts[tc_rand() % ncatfacts]);
+		tc_puts(TC_STDOUT, catfacts[tc_abs(tc_rand()) % ncatfacts]);
 		tc_puts(TC_STDOUT, "\n");
 	}
 
