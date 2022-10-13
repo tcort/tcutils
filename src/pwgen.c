@@ -26,7 +26,7 @@
 #include "tc/version.h"
 
 static const int alphabet_size = 0x40;
-static const char const *alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+static const char *alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
 int main(int argc, char *argv[]) {
 
