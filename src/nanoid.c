@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	for (i = 0; i < length; i++) {
-		fprintf(stdout, "%c", alphabet[random_bytes[i] % 64]);
+		fprintf(stdout, "%c", alphabet[random_bytes[i] & 0x3F]);
 	}
 
 	/* done */
