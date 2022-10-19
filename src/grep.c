@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 		{ .arg = 'E', .longarg = "extended-regexp", .description = "use POSIX extended regular expression syntax", .has_value = 0 },
 		{ .arg = 'F', .longarg = "fixed-strings", .description = "performed fixed string search (similar to fgrep)", .has_value = 0 },
 		{ .arg = 'G', .longarg = "basic-regexp", .description = "use POSIX basic regular expression syntax", .has_value = 0 },
-		{ .arg = 'c', .longarg = "count", .description = "just count matchiing lines", .has_value = 0 },
+		{ .arg = 'c', .longarg = "count", .description = "just count matching lines", .has_value = 0 },
 		TC_PROG_ARG_HELP,
 		{ .arg = 'i', .longarg = "ignore-case", .description = "case insensitive search", .has_value = 0 },
 		{ .arg = 'n', .longarg = "line-number", .description = "prepend line numbers to output", .has_value = 0 },
