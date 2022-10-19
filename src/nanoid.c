@@ -16,29 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tc/args.h"
-#include "tc/const.h"
-#include "tc/sys.h"
-#include "tc/version.h"
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-const int length = 21;
-char *alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+#include <tc/tc.h>
 
 int main(int argc, char *argv[]) {
 
-	int i;
-	int rc;
-
-	FILE *fp;
-	uint8_t random_bytes[length];
-	size_t len;
-
+	char *nanoid;
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
@@ -81,25 +63,15 @@ int main(int argc, char *argv[]) {
 	argv += argi;
 
 
-	fp = fopen("/dev/urandom", "r");
-	if (fp == TC_NULL) {
-		tc_exit(TC_EXIT_FAILURE);
-	}
-	len = fread(random_bytes, sizeof(random_bytes[0]), sizeof(random_bytes)/sizeof(random_bytes[0]), fp);
-	if (len != sizeof(random_bytes)/sizeof(random_bytes[0])) {
-		tc_exit(TC_EXIT_FAILURE);
-	}
-	rc = fclose(fp);
-	if (rc == -1) {
+	nanoid = tc_nanoid();
+	if (nanoid == TC_NULL) {
+		tc_puterrln("tc_nanoid() failed");
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	for (i = 0; i < length; i++) {
-		fprintf(stdout, "%c", alphabet[random_bytes[i] & 0x3F]);
-	}
+	tc_putln(TC_STDOUT, nanoid);
 
-	/* done */
-	fprintf(stdout, "\n");
+	nanoid = tc_free(nanoid);
 
 	tc_exit(TC_EXIT_SUCCESS);
 }

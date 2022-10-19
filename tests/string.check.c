@@ -16,15 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
-#include "tc/check.h"
-#include "tc/string.h"
-#include "tc/sys.h"
+#include <tc/tc.h>
 
-static int check_strlen_null(void) { return tc_strlen(TC_NULL) == 0; }
-static int check_strlen_empty(void) { return tc_strlen("") == 0; }
-static int check_strlen_one(void) { return tc_strlen("X") == 1; }
-static int check_strlen_many(void) { return tc_strlen("foo") == 3; }
+static int check_strlen_null(void) { return tc_strlen(TC_NULL) == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strlen_empty(void) { return tc_strlen("") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strlen_one(void) { return tc_strlen("X") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strlen_many(void) { return tc_strlen("foo") == 3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
 static int check_itoa_neg(void) {
 	int rc;
@@ -32,7 +29,7 @@ static int check_itoa_neg(void) {
 	s = tc_itoa(-42);
 	rc = tc_streql(s, "-42");
 	s = tc_free(s);
-	return rc;
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_itoa_pos(void) {
 	int rc;
@@ -40,7 +37,7 @@ static int check_itoa_pos(void) {
 	s = tc_itoa(1337);
 	rc = tc_streql(s, "1337");
 	s = tc_free(s);
-	return rc;
+	return rc == 1? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_itoa_zero(void) {
 	int rc;
@@ -48,7 +45,7 @@ static int check_itoa_zero(void) {
 	s = tc_itoa(0);
 	rc = tc_streql(s, "0");
 	s = tc_free(s);
-	return rc;
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_utoa_small(void) {
@@ -57,7 +54,7 @@ static int check_utoa_small(void) {
 	s = tc_utoa(1337);
 	rc = tc_streql(s, "1337");
 	s = tc_free(s);
-	return rc;
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_utoa_big(void) {
 	int rc;
@@ -65,62 +62,68 @@ static int check_utoa_big(void) {
 	s = tc_utoa(4294967295);
 	rc = tc_streql(s, "4294967295");
 	s = tc_free(s);
-	return rc;
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
-static int check_atoi_pos(void) { return tc_atoi("1337") == 1337; }
-static int check_atoi_neg(void) { return tc_atoi("-42") == -42; }
-static int check_atoi_zero(void) { return tc_atoi("0") == 0; }
-static int check_atoi_short(void) { return tc_atoi("1") == 1; }
-static int check_atoi_long(void) { return tc_atoi("12345678") == 12345678; }
-static int check_atoi_mix(void) { return tc_atoi("123XYZ") == 123; }
-static int check_atoi_empty(void) { return tc_atoi("") == 0; }
-static int check_atoi_char(void) { return tc_atoi("X") == 0; }
+static int check_atoi_pos(void) { return tc_atoi("1337") == 1337 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_neg(void) { return tc_atoi("-42") == -42 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_zero(void) { return tc_atoi("0") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_short(void) { return tc_atoi("1") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_long(void) { return tc_atoi("12345678") == 12345678 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_mix(void) { return tc_atoi("123XYZ") == 123 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_empty(void) { return tc_atoi("") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_atoi_char(void) { return tc_atoi("X") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_strneql_yes_a(void) { return tc_strneql("--version", "--", 2) == 1; }
-static int check_strneql_yes_b(void) { return tc_strneql("--", "--version", 2) == 1; }
-static int check_strneql_yes_c(void) { return tc_strneql("--", "--", 2) == 1; }
+static int check_strneql_yes_a(void) { return tc_strneql("--version", "--", 2) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strneql_yes_b(void) { return tc_strneql("--", "--version", 2) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strneql_yes_c(void) { return tc_strneql("--", "--", 2) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_strcaseeql_yes(void) { return tc_strcaseeql("FoO", "fOo") == 1; }
-static int check_strcaseeql_no(void) { return tc_strcaseeql("Fo0", "fOo") == 0; }
-static int check_strncaseeql_yes(void) { return tc_strncaseeql("FoOd", "fOop", 3) == 1; }
-static int check_strncaseeql_no(void) { return tc_strncaseeql("Fo0d", "fOop", 3) == 0; }
+static int check_strcaseeql_yes(void) { return tc_strcaseeql("FoO", "fOo") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strcaseeql_no(void) { return tc_strcaseeql("Fo0", "fOo") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strncaseeql_yes(void) { return tc_strncaseeql("FoOd", "fOop", 3) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strncaseeql_no(void) { return tc_strncaseeql("Fo0d", "fOop", 3) == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_strchr_none(void) { return tc_strchr("foo", '-') == -1; }
-static int check_strchr_first(void) { return tc_strchr("foo", 'f') == 0; }
-static int check_strchr_mid(void) { return tc_strchr("foo", 'o') == 1; }
-static int check_strchr_last(void) { return tc_strchr("food", 'd') == 3; }
+static int check_strchr_none(void) { return tc_strchr("foo", '-') == -1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strchr_first(void) { return tc_strchr("foo", 'f') == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strchr_mid(void) { return tc_strchr("foo", 'o') == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strchr_last(void) { return tc_strchr("food", 'd') == 3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_strrchr_none(void) { return tc_strchr("foo", '-') == -1; }
-static int check_strrchr_first(void) { return tc_strchr("foo", 'f') == 0; }
-static int check_strrchr_mid(void) { return tc_strchr("food", 'o') == 2; }
-static int check_strrchr_last(void) { return tc_strchr("foo", 'o') == 2; }
+static int check_strrchr_none(void) { return tc_strchr("foo", '-') == -1 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strrchr_first(void) { return tc_strchr("foo", 'f') == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strrchr_mid(void) { return tc_strrchr("food", 'o') == 2 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_strrchr_last(void) { return tc_strrchr("foo", 'o') == 2 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
 static int check_chomp(void) {
-	char *s = "foo\n";
+	int rc;
+	char *s = tc_strdup("foo\n");
 	tc_chomp(s);
-	return tc_streql("foo", s) == 1;
+	rc = tc_streql("foo", s) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
+	s = tc_free(s);
+	return rc;
 }
 static int check_chompd(void) {
-	char *s = "foobar";
+	int rc;
+	char *s = tc_strdup("foobar");
 	tc_chompd(s, 'r');
-	return tc_streql("fooba", s) == 1;
+	rc = tc_streql("fooba", s) == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
+	s = tc_free(s);
+	return rc;
 }
 
 static int check_strlist_includes_first(void) {
 	char *list[] = { "foo", "bar", "baz", TC_NULL };
-	return tc_strlist_includes(list, "foo") == 1;
+	return tc_strlist_includes(list, "foo") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_strlist_includes_mid(void) {
 	char *list[] = { "foo", "bar", "baz", TC_NULL };
-	return tc_strlist_includes(list, "bar") == 1;
+	return tc_strlist_includes(list, "bar") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_strlist_includes_last(void) {
 	char *list[] = { "foo", "bar", "baz", TC_NULL };
-	return tc_strlist_includes(list, "baz") == 1;
+	return tc_strlist_includes(list, "baz") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 static int check_strlist_includes_not_found(void) {
 	char *list[] = { "foo", "bar", "baz", TC_NULL };
-	return tc_strlist_includes(list, "quux") == 0;
+	return tc_strlist_includes(list, "quux") == 0 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 int main(int argc, char *argv[]) {

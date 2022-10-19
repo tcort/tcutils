@@ -14,7 +14,6 @@ set(PROJECT_AUTHOR "Thomas Cort")
 set(PROJECT_COPYRIGHT "Copyright (C) 2022  Thomas Cort")
 set(PROJECT_LICENSE "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.")
 
-
 include(GNUInstallDirs)
 
 configure_file (
@@ -151,14 +150,18 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
 endforeach()
 
 list(APPEND TESTS ctype.check)
+list(APPEND TESTS errno.check)
 list(APPEND TESTS html.check)
 list(APPEND TESTS libgen.check)
+list(APPEND TESTS luhn.check)
 list(APPEND TESTS math.check)
+list(APPEND TESTS md2.check)
+list(APPEND TESTS mtrand.check)
 list(APPEND TESTS string.check)
 
 enable_testing(true)
 foreach(TESTPROG IN LISTS TESTS)
-    add_executable(${TESTPROG} test/${TESTPROG}.c)
+    add_executable(${TESTPROG} tests/${TESTPROG}.c)
     target_link_libraries(${TESTPROG} tc)
     add_test(NAME ${TESTPROG} COMMAND ${TESTPROG})
 endforeach()

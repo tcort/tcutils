@@ -18,6 +18,7 @@
 
 #include "tc/stdint.h"
 #include "tc/stdlib.h"
+#include "tc/sys.h"
 
 #define A_INITIAL (0xf1ea5eed)
 #define B_INITIAL (0xb4c0ffee)
@@ -54,11 +55,34 @@ void tc_srand(unsigned seed) {
 int tc_rand(void) {
 	tc_uint32_t tmp;
 
-	tmp 	 = (rng_state[0] - rotate(rng_state[1], 27));
+	tmp          = (rng_state[0] - rotate(rng_state[1], 27));
 	rng_state[0] = (rng_state[1] ^ rotate(rng_state[2], 17));
 	rng_state[1] = (rng_state[2] + rng_state[3]);
 	rng_state[2] = (rng_state[3] + tmp);
 	rng_state[3] = (rng_state[0] + tmp);
 
 	return (int) tmp;
+}
+
+tc_uint32_t tc_seed(void) {
+	int fd;
+	tc_uint32_t seed;
+
+	fd = tc_open_reader("/dev/urandom");
+	if (fd == TC_ERR) {
+		fd = tc_open_reader("/dev/random");
+		if (fd == TC_ERR) {
+			tc_srand((tc_getpid() << 1) & 0x1);
+			return (tc_uint32_t) tc_rand();
+		}
+	}
+
+	((char*) &seed)[0] = tc_getc(fd);
+	((char*) &seed)[1] = tc_getc(fd);
+	((char*) &seed)[2] = tc_getc(fd);
+	((char*) &seed)[3] = tc_getc(fd);
+
+	tc_close(fd);
+
+	return seed;
 }

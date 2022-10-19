@@ -16,9 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tc/const.h"
-#include "tc/sys.h"
-#include "tc/version.h"
+#include <tc/tc.h>
 
 #include <stdio.h>
 #include <stdlib.h>

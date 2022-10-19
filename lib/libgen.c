@@ -16,11 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
 #include "tc/libgen.h"
+#include "tc/limits.h"
+#include "tc/stdlib.h"
 #include "tc/string.h"
 #include "tc/sys.h"
-
 
 char *tc_basename(char *path) {
 
@@ -115,8 +115,11 @@ char *tc_dirname(char *path) {
 	}
 
 	i = tc_strrchr(result, '/');
-	if (i >= 0) {
+	if (i > 0) {
 		result[i] = TC_ENDSTR;
+	} else {
+		result[0] = '/';
+		result[1] = TC_ENDSTR;
 	}
 
 	return result;

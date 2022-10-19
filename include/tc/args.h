@@ -1,25 +1,27 @@
 /*
-    args.h - functions for processing command line arguments
-    Copyright (C) 2022  Thomas Cort
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  tcbasic - an interpreter for the programming language BASIC
+  Copyright (C) 2022 Thomas Cort
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 */
 
 #ifndef TC_ARGS_H
 #define TC_ARGS_H
 
-#include "tc/const.h"
+#include "sys.h"
 
 struct tc_prog_arg {
 	char arg;
@@ -34,9 +36,9 @@ struct tc_prog_example {
 };
 
 struct tc_prog {
-	char *package;
 	char *program;
 	char *version;
+	char *package;
 	char *description;
 	char *copyright;
 	char *license;

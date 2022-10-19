@@ -17,14 +17,20 @@
 */
 
 #include "tc/args.h"
-#include "tc/const.h"
 #include "tc/stdio.h"
+#include "tc/stdlib.h"
 #include "tc/string.h"
 #include "tc/sys.h"
 
+/*
+ * Show usage and exit
+ *
+ * Parameters:
+ *  prog - program info
+ */
 void tc_args_show_usage(struct tc_prog *prog) {
 
-	/* usage: true [OPTIONS] */
+	/* usage: tcbasic [OPTIONS] FILENAME */
 	tc_puts(TC_STDOUT, "usage: ");
 	tc_puts(TC_STDOUT, prog->program);
 	tc_puts(TC_STDOUT, " ");
@@ -34,10 +40,16 @@ void tc_args_show_usage(struct tc_prog *prog) {
 	tc_exit(TC_EXIT_SUCCESS);
 }
 
+/*
+ * Show help message and exit
+ *
+ * Parameters:
+ *  prog - program info
+ */
 void tc_args_show_help(struct tc_prog *prog) {
 	int i;
 
-	/* true -- exits with a success return code */
+	/* tcbasic -- an interpreter for the programming language BASIC */
 	tc_puts(TC_STDOUT, prog->program);
 	tc_puts(TC_STDOUT, " -- ");
 	tc_puts(TC_STDOUT, prog->description);
@@ -46,7 +58,7 @@ void tc_args_show_help(struct tc_prog *prog) {
 	/* <br> */
 	tc_puts(TC_STDOUT, "\n");
 
-	/* usage: true [OPTIONS] */
+	/* usage: tcbasic [OPTIONS] FILENAME */
 	tc_puts(TC_STDOUT, "usage: ");
 	tc_puts(TC_STDOUT, prog->program);
 	tc_puts(TC_STDOUT, " ");
@@ -85,18 +97,21 @@ void tc_args_show_help(struct tc_prog *prog) {
 	/* <br> */
 	tc_puts(TC_STDOUT, "\n");
 
+	/* examples */
 	tc_puts(TC_STDOUT, "examples:\n");
 	for (i = 0; prog->examples[i].command != TC_NULL && prog->examples[i].description != TC_NULL; i++) {
 
 		/* <br> */
 		tc_puts(TC_STDOUT, "\n");
 
+		/* example commentary */
 		if (prog->examples[i].description != TC_NULL) {
 			tc_puts(TC_STDOUT, "  # ");
 			tc_puts(TC_STDOUT, prog->examples[i].description);
 			tc_puts(TC_STDOUT, "\n");
 		}
 
+		/* example command */
 		if (prog->examples[i].command != TC_NULL) {
 			tc_puts(TC_STDOUT, "  ");
 			tc_puts(TC_STDOUT, prog->examples[i].command);
@@ -111,15 +126,21 @@ void tc_args_show_help(struct tc_prog *prog) {
 	tc_exit(TC_EXIT_SUCCESS);
 }
 
+/*
+ * Show version message and exit
+ *
+ * Parameters:
+ *  prog - program info
+ */
 void tc_args_show_version(struct tc_prog *prog) {
 
-	/* true (tcutils) v2022 */
+	/* tcbasic v1.2.3 (tcutils) */
 	tc_puts(TC_STDOUT, prog->program);
+	tc_puts(TC_STDOUT, " v");
+	tc_puts(TC_STDOUT, prog->version);
 	tc_puts(TC_STDOUT, " (");
 	tc_puts(TC_STDOUT, prog->package);
-	tc_puts(TC_STDOUT, ") v");
-	tc_puts(TC_STDOUT, prog->version);
-	tc_puts(TC_STDOUT, "\n");
+	tc_puts(TC_STDOUT, ")\n");
 
 	tc_puts(TC_STDOUT, prog->copyright);
 	tc_puts(TC_STDOUT, "\n");
@@ -141,6 +162,16 @@ char *argval = TC_NULL;
 int argi = 1;
 static int argii = 1;
 
+/*
+ * Process an array of arguments, one at a time.
+ *
+ * Parameters:
+ *  prog - description of the program
+ *  argc - number of arguments in argv
+ *  argv - array of command line arguments
+ *
+ * Returns a parsed command line argument or TC_NULL
+ */
 struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]) {
 
 	int i;

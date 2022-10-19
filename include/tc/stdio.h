@@ -19,6 +19,11 @@
 #ifndef TC_STDIO_H
 #define TC_STDIO_H
 
+/* FILE NUMBERS */
+#define TC_STDIN  (0)
+#define TC_STDOUT (1)
+#define TC_STDERR (2)
+
 char *tc_getln(int fd, int *status);
 int tc_puterr(char *msg);
 int tc_puterrln(char *msg);

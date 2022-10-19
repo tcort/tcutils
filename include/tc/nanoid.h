@@ -1,5 +1,5 @@
 /*
-    bool.h - boolean type
+    nanoid - generate URL friendly unique ID strings
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef TC_BOOL_H
-#define TC_BOOL_H
+#ifndef TC_NANOID_H
+#define TC_NANOID_H
 
-enum tc_bool {
-	TC_TRUE = 1,
-	TC_FALSE = 0
-};
-
-typedef enum tc_bool tc_bool_t;
+char *tc_nanoid(void);
 
 #endif

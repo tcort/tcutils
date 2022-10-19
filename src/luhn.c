@@ -16,73 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tc/args.h"
-#include "tc/const.h"
-#include "tc/ctype.h"
-#include "tc/string.h"
-#include "tc/sys.h"
-#include "tc/version.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-static int doubles[] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
-
-static int ctoi(int ch) {
-	switch (ch) {
-		case '0': return 0;
-		case '1': return 1;
-		case '2': return 2;
-		case '3': return 3;
-		case '4': return 4;
-		case '5': return 5;
-		case '6': return 6;
-		case '7': return 7;
-		case '8': return 8;
-		case '9': return 9;
-		default:  return 0;
-	}
-}
-
-static int luhn(char *s) {
-
-	int i;
-	int dub;
-	int check_digit;
-	int computed_check_digit;
-
-	/* must be at least 2 digits (1 digit + check digit) */
-	if (tc_strlen(s) < 2) {
-		return -1;
-	}
-
-	/* all characters in string must be digits */
-	for (i = 0; i < tc_strlen(s); i++) {
-		if (!tc_isdigit(s[i])) {
-			return -1;
-		}
-	}
-
-	dub = 1;
-	check_digit = ctoi(s[tc_strlen(s) - 1]);
-	computed_check_digit = 0;
-	for (i = tc_strlen(s) - 2; i >= 0; i--) {
-		computed_check_digit += dub ? doubles[ctoi(s[i])] : ctoi(s[i]);
-		dub = !dub;
-	}
-
-	computed_check_digit = (10 - (computed_check_digit % 10)) % 10;
-
-	return computed_check_digit == check_digit ? 0 : -1;
-}
+#include <tc/tc.h>
 
 int main(int argc, char *argv[]) {
 
-	int ch;
 	int i;
-	int rc;
 	int failure;
 	struct tc_prog_arg *arg;
 
@@ -128,11 +66,13 @@ int main(int argc, char *argv[]) {
 
 	failure = 0;
 	for (i = 0; i < argc; i++) {
-		rc = luhn(argv[i]);
-		if (rc == 0) {
-			fprintf(stdout, "%s\tOK\n", argv[i]);
+		tc_puts(TC_STDOUT, argv[i]);
+		tc_puts(TC_STDOUT, "\t");
+
+		if (tc_luhn_check(argv[i])) {
+			tc_puts(TC_STDOUT, "OK\n");
 		} else {
-			fprintf(stdout, "%s\tBAD\n", argv[i]);
+			tc_puts(TC_STDOUT, "BAD\n");
 			failure = 1;
 
 		}
