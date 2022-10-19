@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	static struct tc_prog prog = {
-		.program = "true",
+		.program = "fgrep",
 		.usage = "[OPTIONS] PATTERN [FILE...]",
 		.description = "searches for and prints lines that exactly match a given string",
 		.package = TC_VERSION_NAME,
