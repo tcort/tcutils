@@ -73,10 +73,10 @@ int main(int argc, char *argv[]) {
 	result = tc_itoa(roll + 1); /* +1 to get value in range 1-6 */
 	if (result == TC_NULL) {
 		tc_puterrln("Out of Memory");
-	} else {
-		tc_putln(TC_STDOUT, result);
-		result = tc_free(result);
+		tc_exit(TC_EXIT_FAILURE);
 	}
 
+	tc_putln(TC_STDOUT, result);
+	result = tc_free(result);
 	tc_exit(TC_EXIT_SUCCESS);
 }
