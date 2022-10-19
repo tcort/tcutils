@@ -16,12 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tc/args.h"
-#include "tc/const.h"
-#include "tc/stdio.h"
-#include "tc/string.h"
-#include "tc/sys.h"
-#include "tc/version.h"
+#include <tc/tc.h>
 
 static void sum(int fd, char *filename) {
 

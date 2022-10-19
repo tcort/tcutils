@@ -18,14 +18,38 @@
 
 #include "tc/ctype.h"
 
+/*
+ * Check if character ch is an ASCII character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isascii(int ch) {
 	return !(ch & (1<<8));
 }
 
+/*
+ * Check if character ch is a digit character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isdigit(int ch) {
 	return ('0' <= ch && ch <= '9');
 }
 
+/*
+ * Check if character ch is a hexadecimal digit character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isxdigit(int ch) {
 	return (
 		tc_isdigit(ch) ||
@@ -34,22 +58,63 @@ int tc_isxdigit(int ch) {
 	);
 }
 
+/*
+ * Check if character ch is an upper case character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isupper(int ch) {
 	return ('A' <= ch && ch <= 'Z');
 }
 
+/*
+ * Check if character ch is a lower case character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_islower(int ch) {
 	return ('a' <= ch && ch <= 'z');
 }
 
+/*
+ * Check if character ch is a lower case or upercase character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isalpha(int ch) {
 	return (tc_isupper(ch) || tc_islower(ch));
 }
 
+/*
+ * Check if character ch is a digit, a lower case or an upercase character or
+ * not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isalnum(int ch) {
 	return tc_isalpha(ch) || tc_isdigit(ch);
 }
 
+/*
+ * Check if character ch is a whitespace character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isspace(int ch) {
 	return (
 		ch == '\t' || ch == '\n' || ch == '\v' ||
@@ -57,10 +122,26 @@ int tc_isspace(int ch) {
 	);
 }
 
+/*
+ * Check if character ch is a blank character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isblank(int ch) {
 	return (ch == '\t' || ch == ' ');
 }
 
+/*
+ * Check if character ch is a punctuation character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_ispunct(int ch) {
 	return (
 		ch == '!' || ch == '"' || ch == '#' || ch == '$' || ch == '%' ||
@@ -73,6 +154,14 @@ int tc_ispunct(int ch) {
 	);
 }
 
+/*
+ * Check if character ch is a control character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_iscntrl(int ch) {
 	return (
 		ch == 000 /* NUL */ || ch == 001 /* SOH */ ||
@@ -96,14 +185,38 @@ int tc_iscntrl(int ch) {
 
 }
 
+/*
+ * Check if character ch is a graphic character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isgraph(int ch) {
 	return tc_isalnum(ch) || tc_ispunct(ch);
 }
 
+/*
+ * Check if character ch is a printable character or not
+ *
+ * Parameters:
+ *   ch - character to check
+ *
+ * Returns: true (non-zero) or false (zero)
+ */
 int tc_isprint(int ch) {
 	return tc_isgraph(ch) || ch == ' ';
 }
 
+/*
+ * Convert character ch from upper case to lower case.
+ *
+ * Parameters:
+ *   ch - character to convert
+ *
+ * Returns: lower case character if ch was upper case, otherwise ch unchanged
+ */
 int tc_tolower(int ch) {
 	switch (ch) {
 		case 'A': return 'a';
@@ -137,6 +250,14 @@ int tc_tolower(int ch) {
 	return ch;
 }
 
+/*
+ * Convert character ch from lower case to upper case.
+ *
+ * Parameters:
+ *   ch - character to convert
+ *
+ * Returns: upper case character if ch was lower case, otherwise ch unchanged
+ */
 int tc_toupper(int ch) {
 	switch (ch) {
 		case 'a': return 'A';

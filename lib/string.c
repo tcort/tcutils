@@ -16,10 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
 #include "tc/ctype.h"
 #include "tc/math.h"
 #include "tc/string.h"
+#include "tc/stdlib.h"
 #include "tc/sys.h"
 
 /*
@@ -327,6 +327,45 @@ int tc_atoi(char *s) {
 
 	return (neg == 0 ? 1 : -1) * r;
 }
+
+char tc_itox(int i) {
+	switch (i & 0xf) {
+		case  0: return '0';
+		case  1: return '1';
+		case  2: return '2';
+		case  3: return '3';
+		case  4: return '4';
+		case  5: return '5';
+		case  6: return '6';
+		case  7: return '7';
+		case  8: return '8';
+		case  9: return '9';
+		case 10: return 'a';
+		case 11: return 'b';
+		case 12: return 'c';
+		case 13: return 'd';
+		case 14: return 'e';
+		case 15: return 'f';
+		default: return '0';
+	}
+}
+
+int tc_ctoi(int ch) {
+	switch (ch) {
+		case '0': return 0;
+		case '1': return 1;
+		case '2': return 2;
+		case '3': return 3;
+		case '4': return 4;
+		case '5': return 5;
+		case '6': return 6;
+		case '7': return 7;
+		case '8': return 8;
+		case '9': return 9;
+		default:  return 0;
+	}
+}
+
 
 int tc_strchr(char *s, char c) {
 	int i;

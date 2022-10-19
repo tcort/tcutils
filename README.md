@@ -24,7 +24,7 @@ It provides a portable, well defined, and consistent interface with unit tests.
 Installing in your home directory:
 
 ```
-cd bin
+cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${HOME} ..
 make
 make install

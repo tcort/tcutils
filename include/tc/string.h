@@ -19,6 +19,10 @@
 #ifndef TC_STRING_H
 #define TC_STRING_H
 
+/* CHARACTER CONSTANTS */
+#define TC_ENDSTR ('\0')
+#define TC_NEWLINE ('\n')
+
 void tc_memset(char *s, char ch, int len);
 void tc_strcpy(char *dst, char *src);
 char *tc_strgrow(char *s, int newsize);
@@ -30,6 +34,8 @@ int tc_strcaseeql(char *x, char *y);
 char *tc_strdup(char *s);
 char *tc_itoa(int n);
 char *tc_utoa(unsigned int n);
+int tc_ctoi(int ch);
+char tc_itox(int i);
 int tc_atoi(char *s);
 int tc_strchr(char *s, char c);
 int tc_strrchr(char *s, char c);

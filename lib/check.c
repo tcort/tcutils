@@ -17,26 +17,34 @@
 */
 
 #include "tc/check.h"
-#include "tc/const.h"
 #include "tc/stdio.h"
+#include "tc/stdlib.h"
 
 /*
  * Execute a series of checks in 'checks'
- * Returns TC_CHECK_PASS if all return it, otherwise return on first fail/skip
+ *
+ * Parameters:
+ *  checks - a set of checks to execute
+ *
+ * Returns TC_CHECK_PASS if all pass, otherwise TC_CHECK_FAIL on first fail
  */
 int tc_check(struct check *checks) {
 	int i;
+
+	if (checks == TC_NULL) {
+		tc_puterr("list of checks is NULL\n");
+		return TC_CHECK_FAIL;
+	}
 
 	for (i = 0; checks[i].message != TC_NULL; i++) {
 		int rc;
 
 		rc = checks[i].fn();
-		if (rc == 0) {
+		if (rc == TC_CHECK_FAIL) {
 			tc_puterr("check \"");
 			tc_puterr(checks[i].message);
-			tc_puterr("\" failed");
-			tc_puterrln("");
-			return rc;
+			tc_puterr("\" failed\n");
+			return TC_CHECK_FAIL;
 		}
 	}
 

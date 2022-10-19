@@ -16,9 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/check.h"
-#include "tc/const.h"
-#include "tc/ctype.h"
+#include <tc/tc.h>
 
 static int check_isdigit_positive(void) {
 	return
@@ -31,52 +29,52 @@ static int check_isdigit_positive(void) {
 		tc_isdigit('6') &&
 		tc_isdigit('7') &&
 		tc_isdigit('8') &&
-		tc_isdigit('9');
+		tc_isdigit('9') ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_isdigit_count(void) {
 	int i;
 	int cnt;
-	for (i = 0; i < 128; i++) {
+	for (i = cnt = 0; i < 128; i++) {
 		cnt += tc_isdigit(i);
 	}
-	return cnt == 10;
+	return cnt == 10 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_isupper_count(void) {
 	int i;
 	int cnt;
-	for (i = 0; i < 128; i++) {
+	for (i = cnt = 0; i < 128; i++) {
 		cnt += tc_isupper(i);
 	}
-	return cnt == 26;
+	return cnt == 26 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_islower_count(void) {
 	int i;
 	int cnt;
-	for (i = 0; i < 128; i++) {
+	for (i = cnt = 0; i < 128; i++) {
 		cnt += tc_islower(i);
 	}
-	return cnt == 26;
+	return cnt == 26 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_isalpha_count(void) {
 	int i;
 	int cnt;
-	for (i = 0; i < 128; i++) {
+	for (i = cnt = 0; i < 128; i++) {
 		cnt += tc_isalpha(i);
 	}
-	return cnt == 52;
+	return cnt == 52 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_isspace_count(void) {
 	int i;
 	int cnt;
-	for (i = 0; i < 128; i++) {
+	for (i = cnt = 0; i < 128; i++) {
 		cnt += tc_isspace(i);
 	}
-	return cnt == 2;
+	return cnt == 6 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 int main(int argc, char *argv[]) {
@@ -87,7 +85,7 @@ int main(int argc, char *argv[]) {
 		{ check_isupper_count, "26 characters are upper" },
 		{ check_islower_count, "26 characters are lower" },
 		{ check_isalpha_count, "52 characters are alpha" },
-		{ check_isspace_count, "2 characters are space" },
+		{ check_isspace_count, "6 characters are space" },
 		{ TC_NULL, TC_NULL }
 	};
 

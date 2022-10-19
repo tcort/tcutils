@@ -16,9 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
 #include "tc/html.h"
 #include "tc/string.h"
+#include "tc/stdlib.h"
 
 struct html_entity {
 	char ch;

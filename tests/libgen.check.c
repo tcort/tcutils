@@ -16,58 +16,54 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
-#include "tc/check.h"
-#include "tc/libgen.h"
-#include "tc/string.h"
-#include "tc/sys.h"
+#include <tc/tc.h>
 
 static int check_basename_path(void) {
-	return tc_streql(tc_basename("/usr/lib"), "lib") == 1;
+	return tc_streql(tc_basename("/usr/lib"), "lib") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_path(void) {
-	return tc_streql(tc_basename("/usr/lib"), "/usr") == 1;
+	return tc_streql(tc_dirname("/usr/lib"), "/usr") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_basename_trail(void) {
-	return tc_streql(tc_basename("/usr/"), "usr") == 1;
+	return tc_streql(tc_basename("/usr/"), "usr") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_trail(void) {
-	return tc_streql(tc_basename("/usr/"), "/") == 1;
+	return tc_streql(tc_dirname("/usr/"), "/") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_basename_single(void) {
-	return tc_streql(tc_basename("usr"), "usr") == 1;
+	return tc_streql(tc_basename("usr"), "usr") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_single(void) {
-	return tc_streql(tc_basename("usr"), ".") == 1;
+	return tc_streql(tc_dirname("usr"), ".") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_basename_slash(void) {
-	return tc_streql(tc_basename("/"), "/") == 1;
+	return tc_streql(tc_basename("/"), "/") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_slash(void) {
-	return tc_streql(tc_basename("/"), "/") == 1;
+	return tc_streql(tc_dirname("/"), "/") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_basename_dot(void) {
-	return tc_streql(tc_basename("."), ".") == 1;
+	return tc_streql(tc_basename("."), ".") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_dot(void) {
-	return tc_streql(tc_basename("."), ".") == 1;
+	return tc_streql(tc_dirname("."), ".") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_basename_dotdot(void) {
-	return tc_streql(tc_basename(".."), "..") == 1;
+	return tc_streql(tc_basename(".."), "..") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 static int check_dirname_dotdot(void) {
-	return tc_streql(tc_basename(".."), ".") == 1;
+	return tc_streql(tc_dirname(".."), ".") == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
 int main(int argc, char *argv[]) {

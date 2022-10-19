@@ -19,6 +19,11 @@
 #include "tc/math.h"
 
 /*
+ * Absolute value
+ *
+ * Parameters:
+ *  x - integer
+ *
  * Returns the absolute value of input integer x
  */
 int tc_abs(int x) {
@@ -26,6 +31,12 @@ int tc_abs(int x) {
 }
 
 /*
+ * Max of two values
+ *
+ * Parameters:
+ *  x - integer
+ *  y - integer
+ *
  * Returns the larger value of the two inputs integer x and integer y
  */
 int tc_max(int x, int y) {
@@ -33,6 +44,12 @@ int tc_max(int x, int y) {
 }
 
 /*
+ * Min of two values
+ *
+ * Parameters:
+ *  x - integer
+ *  y - integer
+ *
  * Returns the smaller value of the two inputs integer x and integer y
  */
 int tc_min(int x, int y) {

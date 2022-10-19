@@ -1,5 +1,5 @@
 /*
-    string.c - string functions
+    md2.c -- calculate a message-digest fingerprint for a file
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -16,35 +16,42 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/const.h"
-#include "tc/check.h"
-#include "tc/html.h"
-#include "tc/string.h"
-#include "tc/sys.h"
+#include <tc/tc.h>
 
-static int check_html_entity_not_found(void) {
-	return tc_html_entity('X') == TC_NULL;
-}
+struct testcase {
+	char *input;
+	char *expected;
+};
 
-static int check_html_entity_found(void) {
-	return tc_streql(tc_html_entity('"'), "&quot;") == 1;
-}
+static int check_md2(void) {
+	int i;
+	char *md2;
 
-static int check_html_color_not_found(void) {
-	return tc_html_color_rgb("lemonchiffon") == TC_NULL;
-}
+	struct testcase cases[] = {
+		{ "", "8350e5a3e24c153df2275c9f80692773" }
+	}; 
 
-static int check_html_color_found(void) {
-	return tc_streql(tc_html_color_rgb("purple"), "#800080") == 1;
+	for (i = 0; i < sizeof(cases)/sizeof(cases[0]); i++) {
+
+		md2 = tc_md2((tc_uint8_t *) cases[i].input, tc_strlen(cases[i].input));
+
+		if (md2 == TC_NULL) {
+			return TC_CHECK_FAIL;
+		} else if (tc_streql(md2, cases[i].expected) == 0) {
+			md2 = tc_free(md2);
+			return TC_CHECK_FAIL;
+		}
+
+		md2 = tc_free(md2);
+	}
+
+	return TC_CHECK_PASS;
 }
 
 int main(int argc, char *argv[]) {
 
 	static struct check checks[] = {
-		{ check_html_entity_not_found,	"returns TC_NULL when no entity" },
-		{ check_html_entity_found,	"\" returns \"&quot;\"" },
-		{ check_html_color_not_found,	"returns TC_NULL when no color" },
-		{ check_html_color_found,	"\"purple\" returns \"#800080\"" },
+		{ check_md2,	"Test Suite (RFC1319)" },
 		{ TC_NULL, TC_NULL }
 	};
 

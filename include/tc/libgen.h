@@ -19,6 +19,8 @@
 #ifndef TC_LIBGEN_H
 #define TC_LIBGEN_H
 
+#define TC_PATHSEP (":")
+
 char *tc_basename(char *path);
 char *tc_dirname(char *path);
 

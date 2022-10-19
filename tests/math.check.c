@@ -16,22 +16,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tc/check.h"
-#include "tc/const.h"
-#include "tc/math.h"
+#include <tc/tc.h>
 
-static int check_min_pos_neg(void) { return tc_min( 4, -3) == -3; }
-static int check_min_neg_neg(void) { return tc_min(-4, -3) == -4; }
-static int check_min_pos_pos(void) { return tc_min( 4,  3) ==  3; }
-static int check_min_neg_pos(void) { return tc_min(-4,  3) == -4; }
+static int check_min_pos_neg(void) { return tc_min( 4, -3) == -3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_min_neg_neg(void) { return tc_min(-4, -3) == -4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_min_pos_pos(void) { return tc_min( 4,  3) ==  3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_min_neg_pos(void) { return tc_min(-4,  3) == -4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_max_pos_neg(void) { return tc_max( 4, -3) ==  4; }
-static int check_max_neg_neg(void) { return tc_max(-4, -3) == -3; }
-static int check_max_pos_pos(void) { return tc_max( 4,  3) ==  4; }
-static int check_max_neg_pos(void) { return tc_max(-4,  3) ==  3; }
+static int check_max_pos_neg(void) { return tc_max( 4, -3) ==  4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_max_neg_neg(void) { return tc_max(-4, -3) == -3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_max_pos_pos(void) { return tc_max( 4,  3) ==  4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_max_neg_pos(void) { return tc_max(-4,  3) ==  3 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
-static int check_abs_pos(void) { return tc_abs( 4) ==  4; }
-static int check_abs_neg(void) { return tc_abs(-4) ==  4; }
+static int check_abs_pos(void) { return tc_abs( 4) ==  4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
+static int check_abs_neg(void) { return tc_abs(-4) ==  4 ? TC_CHECK_PASS : TC_CHECK_FAIL; }
 
 int main(int argc, char *argv[]) {
 

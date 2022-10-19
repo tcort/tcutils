@@ -1,5 +1,5 @@
 /*
-    const.h - constants
+    mtrand.h - MT19937 Random Number Generator Algorithm
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -14,35 +14,20 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 */
 
-#ifndef TC_CONST_H
-#define TC_CONST_H
+#ifndef TC_MTRAND_H
+#define TC_MTRAND_H
 
-/* FILE NUMBERS */
-#define TC_STDIN  (0)
-#define TC_STDOUT (1)
-#define TC_STDERR (2)
+#include "stdint.h"
 
-/* RETURN CODES */
-#define TC_OK (0)
-#define TC_ERR (-1)
-#define TC_EOF (-2)
+struct tc_mtrand_t {
+	tc_uint32_t index;
+	tc_uint32_t mt[624];
+};
 
-/* EXIT CODES */
-#define TC_EXIT_SUCCESS (0)
-#define TC_EXIT_FAILURE (1)
-
-/* CHARACTER CONSTANTS */
-#define TC_ENDSTR ('\0')
-#define TC_NEWLINE ('\n')
-
-/* MISC */
-#define TC_NULL ((void *) 0)
-
-#define TC_PATHMAX (4096)
-#define TC_LINEMAX (4096)
-#define TC_PATHSEP (":")
+struct tc_mtrand_t *tc_mtrand_alloc(tc_uint32_t seed);
+tc_uint32_t tc_mtrand_next(struct tc_mtrand_t *mtrand);
+struct tc_mtrand_t *tc_mtrand_free(struct tc_mtrand_t *mtrand);
 
 #endif

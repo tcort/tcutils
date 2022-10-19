@@ -16,13 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tc/args.h"
-#include "tc/const.h"
-#include "tc/math.h"
-#include "tc/stdio.h"
-#include "tc/stdlib.h"
-#include "tc/sys.h"
-#include "tc/version.h"
+#include <tc/tc.h>
 
 static char *catfacts[] = {
 	"Kittens have 26 teeth while adult cats have 30 teeth",

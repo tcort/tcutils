@@ -1,5 +1,5 @@
  /*
-    version.h - version details for tcutils/libtc
+    version.h - version details for libtc
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -20,19 +20,29 @@
 #define TC_VERSION_H
 
 /*
- * name of the umbrella project (e.g. "tcutils")
+ * name of the project (e.g. "libtc")
  */
 #define TC_VERSION_NAME "@PROJECT_NAME@"
 
 /*
- * version string of the umbrella project (e.g. "2022")
+ * version string of the project (e.g. "2022")
  */
 #define TC_VERSION_STRING "@PROJECT_VERSION@"
 
 /*
- * numeric version of the umbrella project (e.g. 2022)
+ * numeric version of the project (e.g. 2022)
  */
-#define TC_VERSION_NUMBE @PROJECT_VERSION@
+#define TC_VERSION_NUMBER @PROJECT_VERSION@
+
+/*
+ * build number string of the project (e.g. "32")
+ */
+#define TC_BUILD_STRING "@PROJECT_BUILD@"
+
+/*
+ * numeric build number of the project (e.g. 32)
+ */
+#define TC_BUILD_NUMBER @PROJECT_BUILD@
 
 /*
  * name of the author (e.g. "Thomas Cort")

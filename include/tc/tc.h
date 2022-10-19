@@ -1,5 +1,5 @@
- /*
-    tc.h - one include to rule them all
+/*
+    tc.h - includes all headers
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -14,24 +14,30 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
-#ifndef TC_H
-#define TC_H
+*/
 
-#include "args.h"
-#include "bool.h"
-#include "check.h"
-#include "const.h"
-#include "colours.h"
-#include "ctype.h"
-#include "html.h"
-#include "libgen.h"
-#include "math.h"
-#include "stdint.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "sys.h"
-#include "version.h"
+#ifndef TC_TC_H
+#define TC_TC_H
+
+#include <tc/args.h>
+#include <tc/check.h>
+#include <tc/colours.h>
+#include <tc/ctype.h>
+#include <tc/errno.h>
+#include <tc/html.h>
+#include <tc/libgen.h>
+#include <tc/limits.h>
+#include <tc/luhn.h>
+#include <tc/math.h>
+#include <tc/md2.h>
+#include <tc/mtrand.h>
+#include <tc/nanoid.h>
+#include <tc/stdint.h>
+#include <tc/stdio.h>
+#include <tc/stdlib.h>
+#include <tc/string.h>
+#include <tc/sys.h>
+#include <tc/version.h>
 
 #endif

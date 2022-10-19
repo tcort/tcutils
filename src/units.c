@@ -20,12 +20,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "tc/args.h"
-#include "tc/const.h"
-#include "tc/stdio.h"
-#include "tc/string.h"
-#include "tc/sys.h"
-#include "tc/version.h"
+#include <tc/tc.h>
 
 double C_to_F(double value) { return (((value / 5.0) * 9.0) + 32.0); }
 double F_to_C(double value) { return (((value - 32.0) * 5.0) / 9.0); }
