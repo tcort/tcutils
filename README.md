@@ -79,6 +79,7 @@ enable -n true
 - host -- DNS lookup utility
 - hostid -- prints the current hostid of the system
 - hostname -- prints the current hostname of the system
+- hr -- horizontal rule generator
 - kill -- kill a process
 - leave -- kindly reminds the user to leave
 - line -- read a line of input
