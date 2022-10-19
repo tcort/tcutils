@@ -20,18 +20,87 @@
 
 #include <stdio.h>
 
+struct counts {
+	int bytes;
+	int lines;
+	int words;
+};
+
+static void count(int fd, struct counts *count, struct counts *total) {
+
+	int c;
+	int inword;
+
+	inword = count->bytes = count->words = count->lines = 0;
+	while ((c = tc_getc(fd)) != TC_EOF) {
+		if (c == '\n') {
+			count->lines++;
+		}
+		if (c == '\n' || c == '\t' || c == ' ') {
+			inword = 0;
+		} else if (inword == 0) {
+			inword = 1;
+			count->words++;
+		}
+		count->bytes++;
+	}
+
+	total->bytes += count->bytes;
+	total->lines += count->lines;
+	total->words += count->words;
+}
+
+static void show(FILE *fp, char *filename, struct counts *count, int flag_c, int flag_l, int flag_w) {
+	int first;
+
+	if (flag_c == 0 && flag_l == 0 && flag_w == 0) {
+		flag_c = 1;
+		flag_l = 1;
+		flag_w = 1;
+	}
+
+	if (flag_l == 1) {
+		fprintf(fp, "%7d", count->lines);
+		first = 1;
+	}
+
+	if (first == 1) {
+		fprintf(fp, " ");
+	}
+
+	if (flag_w == 1) {
+		fprintf(fp, "%7d", count->words);
+		first = 1;
+	}
+
+	if (first == 1) {
+		fprintf(fp, " ");
+	}
+
+	if (flag_c == 1) {
+		fprintf(fp, "%7d", count->bytes);
+		first = 1;
+	}
+
+	if (filename != TC_NULL) {
+		fprintf(fp, " %s", filename);
+		first = 1;
+	}
+
+	fprintf(fp, "\n");
+
+}
+
 int main(int argc, char *argv[]) {
 
 	int ch;
-	int c;
-	int inword;
-	int chars;
-	int words;
-	int lines;
-	int first;
 	int flag_c;
 	int flag_l;
 	int flag_w;
+	int i;
+
+	struct counts current;
+	struct counts total;
 
 	struct tc_prog_arg *arg;
 
@@ -67,7 +136,8 @@ int main(int argc, char *argv[]) {
 	flag_c = 0;
 	flag_l = 0;
 	flag_w = 0;
-	first = 0;
+	tc_memset((char *) &current, '\0', sizeof(struct counts));
+	tc_memset((char *) &total, '\0', sizeof(struct counts));
 
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
@@ -93,51 +163,28 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	inword = chars = words = lines = 0;
-	while ((c = tc_getc(TC_STDIN)) != TC_EOF) {
-		if (c == '\n') {
-			lines++;
+	if (argc == 0) {
+		count(TC_STDIN, &current, &total);
+		show(stdout, TC_NULL, &current, flag_c, flag_l, flag_w);
+	} else {
+		for (i = 0; i < argc; i++) {
+			int fd;
+
+			fd = tc_open_reader(argv[i]);
+			if (fd == -1) {
+				tc_puterr("Could not open file: ");
+				tc_puterrln(argv[i]);
+				tc_exit(TC_EXIT_FAILURE);
+			}
+			count(fd, &current, &total);
+			tc_close(fd);
+
+			show(stdout, argv[i], &current, flag_c, flag_l, flag_w);
 		}
-		if (c == '\n' || c == '\t' || c == ' ') {
-			inword = 0;
-		} else if (inword == 0) {
-			inword = 1;
-			words++;
+		if (argc > 1) {
+			show(stdout, "total", &total, flag_c, flag_l, flag_w);
 		}
-		chars++;
-
 	}
-
-	if (flag_c == 0 && flag_l == 0 && flag_w == 0) {
-		flag_c = 1;
-		flag_l = 1;
-		flag_w = 1;
-	}
-
-	if (flag_l == 1) {
-		fprintf(stdout, "%7d", lines);
-		first = 1;
-	}
-
-	if (first == 1) {
-		fprintf(stdout, " ");
-	}
-
-	if (flag_w == 1) {
-		fprintf(stdout, "%7d", words);
-		first = 1;
-	}
-
-	if (first == 1) {
-		fprintf(stdout, " ");
-	}
-
-	if (flag_c == 1) {
-		fprintf(stdout, "%7d", chars);
-		first = 1;
-	}
-
-	fprintf(stdout, "\n");
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
