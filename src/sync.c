@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	static struct tc_prog prog = {
-		.program = "sycn",
+		.program = "sync",
 		.usage = "[OPTIONS]",
 		.description = "sync file system contents to persistent storage",
 		.package = TC_VERSION_NAME,
