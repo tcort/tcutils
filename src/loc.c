@@ -174,7 +174,7 @@ static void visit(char *pathname, struct counts *totals) {
 
 int main(int argc, char *argv[]) {
 
-	char *pathname;
+	int i;
 	struct counts totals;
 	struct tc_prog_arg *arg;
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog prog = {
 		.program = "loc",
-		.usage = "[OPTIONS] [PATHNAME]",
+		.usage = "[OPTIONS] [PATHNAME...]",
 		.description = "counts lines of code",
 		.package = TC_VERSION_NAME,
 		.version = TC_VERSION_STRING,
@@ -218,12 +218,17 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	pathname = argc == 0 ? "." : argv[0];
-
 	memset(&totals, '\0', sizeof(struct counts));
-	visit(pathname, &totals);
 
-	fprintf(stdout, "%d line%s in %d file%s\n", totals.lines, totals.lines == 1 ? "" : "s", totals.files, totals.files == 1 ? "" : "s");
+	if (argc == 0) {
+		visit(".", &totals);
+	} else {
+		for (i = 0; i < argc; i++) {
+			visit(argv[i], &totals);
+		}
+	}
+
+	fprintf(stdout, "%d line%s of code in %d file%s\n", totals.lines, totals.lines == 1 ? "" : "s", totals.files, totals.files == 1 ? "" : "s");
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
