@@ -50,8 +50,8 @@ enable -n true
 - basename -- print the filename portion of a pathname
 - cat -- concatenate and print files
 - catfacts -- writes a random cat fact to standard output
-- clear -- clear the terminal screen
 - chef -- Swedish Chef translator
+- clear -- clear the terminal screen
 - cmp -- compare two files
 - coinflip -- simulates a coinflip and prints the result
 - copy -- copy characters from standard input to standard output
@@ -97,12 +97,12 @@ enable -n true
 - makewords -- split the lines into words and print each on its own line
 - md2 -- calculate a message-digest fingerprint for a file
 - mismatch -- finds lines that are in input but not in FILE
-- mkdir -- create directories
+- mkdir -- make directories
 - mktemp -- create a temporary file or directory with a unique name
 - moo -- guess the bulls
 - more -- filter for paging through text, one screen at a time
 - mugwump -- find all the mugwumps
-- nanoid - generate URL friendly unique ID strings
+- nanoid -- generate URL friendly unique ID strings
 - nl -- number lines of text
 - printenv -- print environment variables and their values
 - pwd -- print the current working directory
@@ -119,7 +119,7 @@ enable -n true
 - sponge -- soak up standard input and write to a file
 - stat -- print file statistics
 - sum -- compute a BSD checksum of the input
-- sync -- sync file system contents to persistent storage
+- sycn -- sync file system contents to persistent storage
 - tac -- concatenate and print files in reverse
 - tail -- prints lines at the end of an input text
 - tee -- copy characters from standard input to standard output and a file
@@ -130,12 +130,12 @@ enable -n true
 - tty -- print the filename associated with the tty connected to stdin
 - uname -- print system information (name and hardware details)
 - unexpand -- converts spaces to tabs
-- units -- convert between units of measure
 - uniq -- show or hide duplicate lines in a file
+- units -- convert between units of measure
 - unix2dos -- replaces UNIX line endings '\n' with DOS line endings '\r\n'
 - up -- universal ping, checks the status of a URL
 - uptime -- show how long the system has been up
-- uuidgen - COMB UUIDs (UUID v4 Variant B) generator
+- uuidgen -- COMB UUIDs (UUID v4 Variant B) generator
 - wc -- counts lines, words, and characters and prints the results
 - which -- finds an executable in $PATH
 - who -- list users currently logged in
