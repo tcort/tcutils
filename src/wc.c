@@ -176,10 +176,13 @@ int main(int argc, char *argv[]) {
 				tc_puterrln(argv[i]);
 				tc_exit(TC_EXIT_FAILURE);
 			}
-			count(fd, &current, &total);
+			/* only count regular files */
+			if (tc_is_file(fd)) {
+				count(fd, &current, &total);
+				show(stdout, argv[i], &current, flag_c, flag_l, flag_w);
+			}
 			tc_close(fd);
 
-			show(stdout, argv[i], &current, flag_c, flag_l, flag_w);
 		}
 		if (argc > 1) {
 			show(stdout, "total", &total, flag_c, flag_l, flag_w);
