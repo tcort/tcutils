@@ -22,7 +22,7 @@
 
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
-#include <sys/stat.h> /* mkdir(2) */
+#include <sys/stat.h> /* mkdir(2)/fstat(2) */
 #include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2)/gethostid(2)/getlogin(2) */
 
 /*
@@ -251,4 +251,38 @@ int tc_mkdir(char *dir, tc_mode_t mode) {
  */
 unsigned int tc_sleep(unsigned int seconds) {
 	return sleep(seconds);
+}
+
+/*
+ * check if file descriptor points to a directory
+ * returns 1 if directory or 0 if not or -1 if error
+ */
+int tc_is_directory(int fd) {
+	int rc;
+	struct stat stats;
+
+	rc = fstat(fd, &stats);
+	if (rc == -1) {
+		return -1;
+	}
+
+	return S_ISDIR(stats.st_mode);
+
+}
+
+/*
+ * check if file descriptor points to a regular file
+ * returns 1 if file or 0 if not or -1 if error
+ */
+int tc_is_file(int fd) {
+	int rc;
+	struct stat stats;
+
+	rc = fstat(fd, &stats);
+	if (rc == -1) {
+		return -1;
+	}
+
+	return S_ISREG(stats.st_mode);
+
 }

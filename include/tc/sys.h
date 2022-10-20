@@ -41,5 +41,7 @@ int tc_link(char *olddir, char *newdir);
 int tc_symlink(char *target, char *linkpath);
 long tc_gethostid(void);
 char *tc_getlogin(void);
+int tc_is_directory(int fd);
+int tc_is_file(int fd);
 
 #endif
