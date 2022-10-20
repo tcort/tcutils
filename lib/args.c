@@ -194,26 +194,56 @@ struct tc_prog_arg *tc_args_process(struct tc_prog *prog, int argc, char *argv[]
 
 	if (tc_strneql(argv[argi], "--", 2) == 1) { /* longarg */
 
-		for (i = 0; prog->args[i].arg != '\0' && prog->args[i].longarg != TC_NULL; i++) {
-			if (tc_streql(prog->args[i].longarg, &(argv[argi][tc_strlen("--")])) == 1) {
-				struct tc_prog_arg *res;
-				res = &(prog->args[i]);
+		int eql_sign = tc_strchr(argv[argi], '=');
 
-				argi += 1;
+		/* --longarg [value] */
+		if (eql_sign == -1) {
 
-				/* expect a value e.g. '-n 5' */
-				if (prog->args[i].has_value == 1) {
-					if (argv[argi] != TC_NULL) {
-						argval = argv[argi];
+			for (i = 0; prog->args[i].arg != '\0' && prog->args[i].longarg != TC_NULL; i++) {
+				if (tc_streql(prog->args[i].longarg, &(argv[argi][tc_strlen("--")])) == 1) {
+					struct tc_prog_arg *res;
+					res = &(prog->args[i]);
+
+					argi += 1;
+
+					/* expect a value e.g. '-n 5' */
+					if (prog->args[i].has_value == 1) {
+						if (argv[argi] != TC_NULL) {
+							argval = argv[argi];
+							argi += 1;
+							argii = 1;
+						} else {
+							break;
+						}
+					}
+
+					return res;
+				}
+			}
+
+		/* --longarg=value */
+		} else if (eql_sign > 2) {
+
+			int longarg_len = eql_sign - 2; /* --foo=barbaz -> 3 */
+
+			for (i = 0; prog->args[i].arg != '\0' && prog->args[i].longarg != TC_NULL; i++) {
+				if (tc_strneql(prog->args[i].longarg, &(argv[argi][tc_strlen("--")]), longarg_len) == 1) {
+					struct tc_prog_arg *res;
+
+					res = &(prog->args[i]);
+
+					/* expect a value e.g. '--foo=barbaz' */
+					if (prog->args[i].has_value == 1) {
+						argval = &(argv[argi][eql_sign + 1]);
 						argi += 1;
 						argii = 1;
-					} else {
-						break;
 					}
-				}
 
-				return res;
+
+					return res;
+				}
 			}
+
 		}
 
 	} else { /* short arg */
