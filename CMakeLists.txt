@@ -42,6 +42,7 @@ list(APPEND CURL_PROGS up)
 
 list(APPEND PROGS arch)
 list(APPEND PROGS basename)
+list(APPEND PROGS bfi)
 list(APPEND PROGS cat)
 list(APPEND PROGS catfacts)
 list(APPEND PROGS chef)
