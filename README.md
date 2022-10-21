@@ -48,6 +48,7 @@ enable -n true
 
 - arch -- print architecture type of this machine
 - basename -- print the filename portion of a pathname
+- bfi -- interpreter for the brainfuck programming language
 - cat -- concatenate and print files
 - catfacts -- writes a random cat fact to standard output
 - chef -- Swedish Chef translator
