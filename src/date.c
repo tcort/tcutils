@@ -28,6 +28,7 @@
 #define FMT_ISO8601 "%FT%T%z"
 #define FMT_FILE "%Y%m%d%H%M%S"
 #define FMT_UNIX "%s"
+#define FMT_ZEN "now"
 
 int main(int argc, char *argv[]) {
 
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
 		TC_PROG_ARG_HELP,
 		{ .arg = 'i', .longarg = "iso8601", .description = "ISO8601 format", .has_value = 0 },
 		{ .arg = 'u', .longarg = "unix", .description = "UNIX timestamp", .has_value = 0 },
+		{ .arg = 'z', .longarg = "zen", .description = "Zen format (always 'now')", .has_value = 0 },
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
@@ -86,6 +88,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
+				break;
+			case 'z':
+				fmt = FMT_ZEN;
 				break;
 		}
 
