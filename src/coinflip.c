@@ -20,16 +20,21 @@
 
 int main(int argc, char *argv[]) {
 
+	char *heads = "heads";
+	char *tails = "tails";
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
+		{ .arg = 'H', .longarg = "heads", .description = "alternative label for heads face", .has_value = 1 },
 		TC_PROG_ARG_HELP,
+		{ .arg = 'T', .longarg = "tails", .description = "alternative label for tails face", .has_value = 1 },
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
 
 	static struct tc_prog_example examples[] = {
 		{ .command = "coinflip", .description = "flip a coin" },
+		{ .command = "coinflip -H true -T false", .description = "random boolean" },
 		TC_PROG_EXAMPLE_END
 	};
 
@@ -48,8 +53,14 @@ int main(int argc, char *argv[]) {
 
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
+			case 'H':
+				heads = argval;
+				break;
 			case 'h':
 				tc_args_show_help(&prog);
+				break;
+			case 'T':
+				tails = argval;
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
@@ -64,9 +75,9 @@ int main(int argc, char *argv[]) {
 	tc_srand((unsigned int) tc_getpid());
 
 	if (tc_abs(tc_rand()) % 2 == 0) {
-		tc_putln(TC_STDOUT, "heads");
+		tc_putln(TC_STDOUT, heads);
 	} else {
-		tc_putln(TC_STDOUT, "tails");
+		tc_putln(TC_STDOUT, tails);
 	}
 
 	tc_exit(TC_EXIT_SUCCESS);
