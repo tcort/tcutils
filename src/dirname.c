@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	static struct tc_prog_example examples[] = {
-		{ .command = "dirname", .description = "get the '/bin' portion of '/bin/ls'" },
+		{ .command = "dirname /bin/ls", .description = "get the '/bin' portion of '/bin/ls'" },
 		TC_PROG_EXAMPLE_END
 	};
 
