@@ -18,7 +18,6 @@
 
 #include <tc/tc.h>
 
-#include <getopt.h>
 #include <errno.h>
 #include <dirent.h>
 #include <grp.h>
@@ -123,14 +122,37 @@ int main(int argc, char *argv[]) {
 	char sizestring[16];
 	char mtimestring[32];
 
-	static struct option long_options[] = {
-		{ "one", no_argument, 0, '1' },
-		{ "all", no_argument, 0, 'a' },
-		{ "colourize", no_argument, 0, 'G' },
-		{ "list", no_argument, 0, 'l' },
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = '1', .longarg = "one", .description = "print 1 filename per line", .has_value = 0 },
+		{ .arg = 'a', .longarg = "all", .description = "print all files (including hidden files)", .has_value = 0 },
+		{ .arg = 'G', .longarg = "colourize", .description = "colourize output", .has_value = 0 },
+		{ .arg = 'l', .longarg = "list", .description = "list files attributes (mode, owner, group, etc)", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_VERSION,
+		TC_PROG_ARG_END
+	};
+
+	static struct tc_prog_example examples[] = {
+		{ .command = "ls -a ${HOME}", .description = "list all files in the user's home directory" },
+		{ .command = "ls -al /tmp", .description = "ist detailed file attributes for all files in /tmp" },
+		{ .command = "ls -1 /etc", .description = "list the contents of /etc, one filename per line" },
+		{ .command = "ls", .description = "list the contents of the current directory" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "ls",
+		.usage = "[OPTIONS]",
+		.description = "list the contents of a directory",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
 	};
 
 	/* defaults */
@@ -139,8 +161,8 @@ int main(int argc, char *argv[]) {
 	flag_l = 0;
 	flag_G = 0;
 
-	while ((ch = getopt_long(argc, argv, "1aGhlV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case '1':
 				flag_1 = 1;
 				break;
@@ -154,52 +176,17 @@ int main(int argc, char *argv[]) {
 				flag_G = 1;
 				break;
 			case 'h':
-				fprintf(stdout, "ls -- list the contents of a directory\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: ls [OPTIONS] [DIR]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -1, --one        print 1 filename per line\n");
-				fprintf(stdout, "  -a, --all        print all files (including hidden files)\n");
-				fprintf(stdout, "  -G, --colourize  colourize output\n");
-				fprintf(stdout, "  -l, --list       list files attributes (mode, owner, group, etc)\n");
-				fprintf(stdout, "  -h, --help       print help text\n");
-				fprintf(stdout, "  -V, --version    print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # list all files in the user's home directory\n");
-				fprintf(stdout, "  ls -a ${HOME}\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # list detailed file attributes for all files in /tmp\n");
-				fprintf(stdout, "  ls -al /tmp\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # list the contents of /etc, one filename per line\n");
-				fprintf(stdout, "  ls -1 /etc\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # list the contents of the current directory\n");
-				fprintf(stdout, "  ls\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "ls (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	dir = (argc > 0) ? argv[0] : ".";
 
