@@ -62,9 +62,7 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	while ((ch = tc_getc(TC_STDIN)) != TC_EOF) {
-		tc_putc(TC_STDOUT, ch);
-	}
+	tc_copylns(TC_STDIN, TC_STDOUT, -1);
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
