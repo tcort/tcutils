@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "tc/ctype.h"
+#include "tc/math.h"
 #include "tc/stdio.h"
 #include "tc/stdlib.h"
 #include "tc/string.h"
@@ -170,4 +172,80 @@ int tc_copylns(int src, int dst, int n) {
 
 	return rc;
 
+}
+
+static void tc_putrep(int fd, int n, char ch) {
+
+	const char WARNING = TC_TILDE;
+	const int MAXREP = 26;
+	const int THRESH = 4;
+
+	while (n >= THRESH || (ch == WARNING && n > 0)) {
+		tc_putc(fd, WARNING);
+		tc_putc(fd, tc_min(n, MAXREP) - 1 + 'A');
+		tc_putc(fd, ch);
+		n = n - MAXREP;
+	}
+	for (n = n; n > 0; n--) {
+		tc_putc(fd, ch);
+	}
+}
+
+void tc_compress(int fd_in, int fd_out) {
+
+	const char WARNING = TC_TILDE;
+	char ch;
+	char lastch;
+	int n;
+
+	n = 1;
+	lastch = tc_getc(fd_in);
+	while (lastch != TC_EOF) {
+		if ((ch = tc_getc(fd_in)) == TC_EOF) {
+			if (n > 1 || lastch == WARNING) {
+				tc_putrep(fd_out, n, lastch);
+			} else {
+				tc_putc(fd_out, lastch);
+			}
+		} else if (ch == lastch) {
+			n++;
+		} else if (n > 1 || lastch == WARNING) {
+			tc_putrep(fd_out, n, lastch);
+			n = 1;
+		} else {
+			tc_putc(fd_out, lastch);
+		}
+		lastch = ch;
+	}
+}
+
+void tc_decompress(int fd_in, int fd_out) {
+
+	const char WARNING = TC_TILDE;
+	char ch;
+	int n;
+
+
+	while ((ch = tc_getc(fd_in)) != TC_EOF) {
+
+		if (ch != WARNING) {
+			tc_putc(fd_out, ch);
+		} else if (tc_isupper((ch = tc_getc(fd_in)))) {
+			n = ch - 'A' + 1;
+			if ((ch = tc_getc(fd_in)) != TC_EOF) {
+				for (n = n; n > 0; n--) {
+					tc_putc(fd_out, ch);
+				}
+			} else {
+				tc_putc(fd_out, WARNING);
+				tc_putc(fd_out, n - 1 + 'A');
+			}
+		} else {
+			tc_putc(fd_out, WARNING);
+			if (ch != TC_EOF) {
+				tc_putc(fd_out, ch);
+			}
+		}
+
+	}
 }

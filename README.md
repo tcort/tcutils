@@ -55,12 +55,14 @@ enable -n true
 - clear -- clear the terminal screen
 - cmp -- compare two files
 - coinflip -- simulates a coinflip and prints the result
+- compress -- run-length encoding compression
 - copy -- copy characters from standard input to standard output
 - crc32 -- output the 32-bit cyclic redundancy check value for an input
 - d6 -- simulates a 6-sided dice roll and prints the reults
 - date -- print the current date and time
 - dc -- desk calculator
 - dec2hex -- convert decimal to hexadecimal
+- decompress -- run-length encoding decompression
 - dirname -- print the directory portion of a pathname
 - dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
 - du -- show disk usage
