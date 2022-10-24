@@ -22,9 +22,11 @@ int main(int argc, char *argv[]) {
 
 	char *tty;
 	struct tc_prog_arg *arg;
+	int flag_s;
 
 	static struct tc_prog_arg args[] = {
 		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_SILENT,
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
@@ -48,10 +50,16 @@ int main(int argc, char *argv[]) {
 		.examples = examples
 	};
 
+	/* defaults */
+	flag_s = 0;
+
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
 			case 'h':
 				tc_args_show_help(&prog);
+				break;
+			case 's':
+				flag_s = 1;
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
@@ -65,10 +73,15 @@ int main(int argc, char *argv[]) {
 
 	tty = tc_ttyname(TC_STDIN);
 	if (tty == TC_NULL) {
-		tc_putln(TC_STDOUT, "not a tty");
+		if (!flag_s) {
+			tc_putln(TC_STDOUT, "not a tty");
+		}
+		tc_exit(TC_EXIT_FAILURE);
 	} else {
-		tc_putln(TC_STDOUT, tty);
+		if (!flag_s) {
+			tc_putln(TC_STDOUT, tty);
+		}
+		tc_exit(TC_EXIT_SUCCESS);
 	}
 
-	tc_exit(TC_EXIT_SUCCESS);
 }
