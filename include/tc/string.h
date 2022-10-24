@@ -24,14 +24,14 @@
 #define TC_NEWLINE ('\n')
 
 void tc_memset(char *s, char ch, int len);
-void tc_strcpy(char *dst, char *src);
+void tc_strcpy(char *dst, const char *src);
 char *tc_strgrow(char *s, int newsize);
-int tc_strlen(char *s);
-int tc_strneql(char *x, char *y, int n);
-int tc_streql(char *x, char *y);
-int tc_strncaseeql(char *x, char *y, int n);
-int tc_strcaseeql(char *x, char *y);
-char *tc_strdup(char *s);
+int tc_strlen(const char *s);
+int tc_strneql(const char *x, const char *y, int n);
+int tc_streql(const char *x, const char *y);
+int tc_strncaseeql(const char *x, const char *y, int n);
+int tc_strcaseeql(const char *x, const char *y);
+char *tc_strdup(const char *s);
 char *tc_itoa(int n);
 char *tc_utoa(unsigned int n);
 int tc_ctoi(int ch);
