@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 		{ .arg = 'p', .longarg = "password", .description = "set password", .has_value = 1 },
 		{ .arg = 'u', .longarg = "username", .description = "set username", .has_value = 1 },
 		TC_PROG_ARG_VERSION,
-		{ .arg = 'v', .longarg = "verbose", .description = "print verbose debugging details", .has_value = 0 },
+		TC_PROG_ARG_VERBOSE,
 		TC_PROG_ARG_END
 	};
 
