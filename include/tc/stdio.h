@@ -32,4 +32,6 @@ int tc_putln(int fd, char *s);
 int tc_copyln(int src, int dst);
 int tc_copylns(int src, int dst, int n);
 
+void tc_compress(int fd_in, int fd_out);
+void tc_decompress(int fd_in, int fd_out);
 #endif

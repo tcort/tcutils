@@ -26,6 +26,9 @@
 #define TC_ERR (-1)
 #define TC_EOF (-2)
 
+/* SPECIAL CHARS */
+#define TC_TILDE ('~')
+
 /* EXIT CODES */
 #define TC_EXIT_SUCCESS (0)
 #define TC_EXIT_FAILURE (1)
