@@ -95,9 +95,18 @@ static int select_all(const struct dirent *dentry) {
 	return 1;
 }
 
+static int select_almost_all(const struct dirent *dentry) {
+	return (
+		!tc_streql(dentry->d_name, ".")
+	&& 
+		!tc_streql(dentry->d_name, "..")
+	);
+}
+
 static int select_non_hidden(const struct dirent *dentry) {
 	return (dentry->d_name[0] != '.');
 }
+
 
 int main(int argc, char *argv[]) {
 
@@ -108,7 +117,6 @@ int main(int argc, char *argv[]) {
 	int ndentries;
 	int maxdentrylen;
 	int dentries_per_row;
-	int flag_a;
 	int flag_1;
 	int flag_l;
 	int flag_G;
@@ -121,12 +129,14 @@ int main(int argc, char *argv[]) {
 	char modestring[16];
 	char sizestring[16];
 	char mtimestring[32];
+	int (*selector)(const struct dirent *dentry);
 
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
 		{ .arg = '1', .longarg = "one", .description = "print 1 filename per line", .has_value = 0 },
 		{ .arg = 'a', .longarg = "all", .description = "print all files (including hidden files)", .has_value = 0 },
+		{ .arg = 'A', .longarg = "almost-all", .description = "print all files (including hidden files) except '.' and '..'", .has_value = 0 },
 		{ .arg = 'G', .longarg = "colourize", .description = "colourize output", .has_value = 0 },
 		{ .arg = 'l', .longarg = "list", .description = "list files attributes (mode, owner, group, etc)", .has_value = 0 },
 		TC_PROG_ARG_HELP,
@@ -156,8 +166,8 @@ int main(int argc, char *argv[]) {
 	};
 
 	/* defaults */
+	selector = select_non_hidden;
 	flag_1 = 0;
-	flag_a = 0;
 	flag_l = 0;
 	flag_G = 0;
 
@@ -167,7 +177,10 @@ int main(int argc, char *argv[]) {
 				flag_1 = 1;
 				break;
 			case 'a':
-				flag_a = 1;
+				selector = select_all;
+				break;
+			case 'A':
+				selector = select_almost_all;
 				break;
 			case 'l':
 				flag_l = 1;
@@ -190,7 +203,7 @@ int main(int argc, char *argv[]) {
 
 	dir = (argc > 0) ? argv[0] : ".";
 
-	rc = scandir(dir, &dentries, flag_a > 0 ? select_all : select_non_hidden, alphasort);
+	rc = scandir(dir, &dentries, selector, alphasort);
 	if (rc == -1) {
 		perror("scandir");
 		tc_exit(TC_EXIT_FAILURE);

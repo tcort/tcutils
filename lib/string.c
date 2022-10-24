@@ -36,7 +36,7 @@ void tc_memset(char *s, char ch, int len) {
 /*
  * Copies a string. Destination must be equal to or longer than source.
  */
-void tc_strcpy(char *dst, char *src) {
+void tc_strcpy(char *dst, const char *src) {
 	int i;
 
 	for (i = 0; i < tc_strlen(src); i++) {
@@ -76,7 +76,7 @@ char *tc_strgrow(char *s, int newsize) {
  * Computes the length of a string.
  * Return the length of string s.
  */
-int tc_strlen(char *s) {
+int tc_strlen(const char *s) {
 	int n;
 
 	if (s == TC_NULL) {
@@ -96,7 +96,7 @@ int tc_strlen(char *s) {
  * This is not a constant time equality check.
  * Returns 1 if equal, 0 if not equal
  */
-int tc_strncaseeql(char *x, char *y, int n) {
+int tc_strncaseeql(const char *x, const char *y, int n) {
 
 	int i;
 
@@ -122,7 +122,7 @@ int tc_strncaseeql(char *x, char *y, int n) {
  * This is not a constant time equality check.
  * Returns 1 if equal, 0 if not equal
  */
-int tc_strneql(char *x, char *y, int n) {
+int tc_strneql(const char *x, const char *y, int n) {
 
 	int i;
 
@@ -148,7 +148,7 @@ int tc_strneql(char *x, char *y, int n) {
  * This is not a constant time equality check.
  * Returns 1 if equal, 0 if not equal
  */
-int tc_strcaseeql(char *x, char *y) {
+int tc_strcaseeql(const char *x, const char *y) {
 
 	int i;
 
@@ -175,7 +175,7 @@ int tc_strcaseeql(char *x, char *y) {
  * This is not a constant time equality check.
  * Returns 1 if equal, 0 if not equal
  */
-int tc_streql(char *x, char *y) {
+int tc_streql(const char *x, const char *y) {
 
 	int i;
 
@@ -200,7 +200,7 @@ int tc_streql(char *x, char *y) {
  * Duplicate string s
  * Return a new string which is a clone of the input
  */
-char *tc_strdup(char *s) {
+char *tc_strdup(const char *s) {
 
 	int len;
 	char *d;
