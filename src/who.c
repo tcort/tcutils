@@ -42,9 +42,11 @@
 int main(int argc, char *argv[]) {
 
 	int ch, rc;
+	int flag_H;
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
+		{ .arg = 'H', .longarg = "heading", .description = "print column headings", .has_value = 0 },
 		TC_PROG_ARG_HELP,
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
@@ -68,8 +70,14 @@ int main(int argc, char *argv[]) {
 		.examples = examples
 	};
 
+	/* defaults */
+	flag_H = 0;
+
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
+			case 'H':
+				flag_H = 1;
+				break;
 			case 'h':
 				tc_args_show_help(&prog);
 				break;
@@ -86,6 +94,11 @@ int main(int argc, char *argv[]) {
 #if defined(utmpxname)
 	utmpxname(TCUTMPX_FILE);
 #endif
+
+	if (flag_H) {
+		fprintf(stdout, "NAME\tLINE\tTIME\tCOMMENT\n");
+	}
+
 	do {
 		struct utmpx *ut;
 		ut = getutxent();
