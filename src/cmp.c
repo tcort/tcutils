@@ -25,7 +25,7 @@
 
 int main(int argc, char *argv[]) {
 
-	int ch;
+	int flag_s;
 	long byte;
 	long line;
 	FILE *f1;
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog_arg args[] = {
 		TC_PROG_ARG_HELP,
+		TC_PROG_ARG_SILENT,
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
@@ -57,10 +58,16 @@ int main(int argc, char *argv[]) {
 		.examples = examples
 	};
 
+	/* defaults */
+	flag_s = 0;
+
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
 			case 'h':
 				tc_args_show_help(&prog);
+				break;
+			case 's':
+				flag_s = 1;
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
@@ -98,7 +105,9 @@ int main(int argc, char *argv[]) {
 		c2 = getc(f2);
 
 		if (c1 != c2) {
-			fprintf(stdout, "%s %s differ: byte %ld, line %ld\n", argv[0], argv[1], byte, line);
+			if (!flag_s) {
+				fprintf(stdout, "%s %s differ: byte %ld, line %ld\n", argv[0], argv[1], byte, line);
+			}
 			tc_exit(TC_EXIT_FAILURE);
 		}
 
