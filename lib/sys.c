@@ -286,3 +286,7 @@ int tc_is_file(int fd) {
 	return S_ISREG(stats.st_mode);
 
 }
+
+int tc_unlink(const char *path) {
+	return unlink(path) == 0 ? TC_OK : TC_ERR;
+}
