@@ -136,6 +136,7 @@ enable -n true
 - uniq -- show or hide duplicate lines in a file
 - units -- convert between units of measure
 - unix2dos -- replaces UNIX line endings '\n' with DOS line endings '\r\n'
+- unlink -- remove directory entry
 - up -- universal ping, checks the status of a URL
 - uptime -- show how long the system has been up
 - uuidgen -- COMB UUIDs (UUID v4 Variant B) generator
