@@ -186,16 +186,7 @@ Feel free to report bugs or suggest new features.
 
 ## License
 
-SPDX: `GPL-3.0-or-later`
+SPDX-License-Identifier: GPL-3.0-or-later
 
 See the file `COPYING` for the full license. Each file in the repository should
 include its own license information.
-
-<!--
-  README.md
-  Copyright 2022  Thomas Cort
-
-  Copying and distribution of this file, with or without modification, are
-  permitted in any medium without royalty, provided the copyright notice and
-  this notice are preserved. This file is offered as-is, without any warranty.
--->
