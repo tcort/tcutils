@@ -33,8 +33,8 @@
 #include <unistd.h>
 
 static int select_all_but_self_parent(const struct dirent *dentry) {
-	return strcmp(dentry->d_name, "..") != 0 &&
-		strcmp(dentry->d_name, ".") != 0;
+	return tc_streql(dentry->d_name, "..") != 1 &&
+		tc_streql(dentry->d_name, ".") != 1;
 }
 
 
@@ -82,26 +82,25 @@ static void forage(char *pattern, char *pathname) {
 			struct dirent *dentry;
 			dentry = dentries[i];
 
-			subpathname = (char *) malloc(PATH_MAX+1);
+			subpathname = (char *) tc_malloc(PATH_MAX+1);
 			if (subpathname == TC_NULL) {
 				perror("malloc");
-				free(dentry);
+				dentry = tc_free(dentry);
 				continue;
 			}
-			memset(subpathname, '\0', PATH_MAX+1);
+			tc_memset(subpathname, '\0', PATH_MAX+1);
 			snprintf(subpathname, PATH_MAX, "%s/%s", pathname, dentry->d_name);
-			free(dentry);
+			dentry = tc_free(dentry);
 			forage(pattern, subpathname);
-			free(subpathname);
-			subpathname = TC_NULL;
+			subpathname = tc_free(subpathname);
 
 		}
 
-		free(dentries);
+		dentries = tc_free(dentries);
 	}
 
 	if (tc_match(basename(pathname), pattern)) {
-		fprintf(stdout, "%s\n", pathname);
+		tc_putln(TC_STDOUT, pathname);
 	}
 }
 
