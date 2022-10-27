@@ -25,7 +25,6 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <limits.h>
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,30 +37,6 @@ static int select_all_but_self_parent(const struct dirent *dentry) {
 		strcmp(dentry->d_name, ".") != 0;
 }
 
-
-static int matches(char *subject, char *pattern) {
-
-	regex_t preg;
-	regmatch_t pmatch[1];
-	char errbuf[128];
-	int cflags, eflags, errcode;
-	size_t nmatch = 1;
-
-	cflags = REG_EXTENDED;
-	eflags = 0;
-
-        errcode = regcomp(&preg, pattern, cflags);
-        if (errcode != 0) {
-		regerror(errcode, &preg, errbuf, sizeof(errbuf));
-		fprintf(stdout, "Bad Pattern: %s", errbuf);
-		regfree(&preg);
-		tc_exit(TC_EXIT_FAILURE);
-        }
-
-	errcode = regexec(&preg, subject, nmatch, pmatch, eflags);
-	regfree(&preg);
-	return errcode == 0;
-}
 
 static void forage(char *pattern, char *pathname) {
 
@@ -125,7 +100,7 @@ static void forage(char *pattern, char *pathname) {
 		free(dentries);
 	}
 
-	if (matches(basename(pathname), pattern)) {
+	if (tc_match(basename(pathname), pattern)) {
 		fprintf(stdout, "%s\n", pathname);
 	}
 }
