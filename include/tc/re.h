@@ -1,5 +1,5 @@
 /*
-    tc.h - includes all headers
+    re.h -- regular expressions
     Copyright (C) 2022  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
@@ -18,28 +18,9 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#ifndef TC_TC_H
-#define TC_TC_H
+#ifndef TC_RE_H
+#define TC_RE_H
 
-#include <tc/args.h>
-#include <tc/check.h>
-#include <tc/colours.h>
-#include <tc/ctype.h>
-#include <tc/errno.h>
-#include <tc/html.h>
-#include <tc/libgen.h>
-#include <tc/limits.h>
-#include <tc/luhn.h>
-#include <tc/math.h>
-#include <tc/md2.h>
-#include <tc/mtrand.h>
-#include <tc/nanoid.h>
-#include <tc/re.h>
-#include <tc/stdint.h>
-#include <tc/stdio.h>
-#include <tc/stdlib.h>
-#include <tc/string.h>
-#include <tc/sys.h>
-#include <tc/version.h>
+int tc_match(char *subject, char *pattern);
 
 #endif
