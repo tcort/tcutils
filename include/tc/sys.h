@@ -23,7 +23,7 @@
 
 typedef int tc_mode_t;
 
-char tc_getc(int fd);
+int tc_getc(int fd);
 int tc_putc(int fd, char ch);
 int tc_open_reader(char *filepath);
 int tc_open_writer(char *filepath);
