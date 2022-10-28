@@ -19,6 +19,7 @@
 */
 
 #include "tc/string.h"
+#include "tc/stdint.h"
 #include "tc/stdlib.h"
 #include "tc/sys.h"
 
@@ -31,7 +32,7 @@
  * Read a character from file descriptor fd
  * returns the character or TC_EOF or TC_ERR
  */
-char tc_getc(int fd) {
+int tc_getc(int fd) {
 
 	int rc;
 	char s[1];
@@ -43,7 +44,7 @@ char tc_getc(int fd) {
 		return TC_ERR;
 	}
 
-	return s[0];
+	return (tc_uint8_t) s[0];
 }
 
 /*
