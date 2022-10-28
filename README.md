@@ -77,6 +77,7 @@ enable -n true
 - forage -- find files, directories and more using regular expressions
 - foreach -- executes a command for every line of standard input
 - grep -- searches for and prints lines that match a given pattern
+- gzinfo -- provide information about a gzip file
 - head -- prints lines at the beginning of an input text
 - hexdump -- prints the contents of a file in hexadecimal
 - host -- DNS lookup utility
