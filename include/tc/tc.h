@@ -40,6 +40,7 @@
 #include <tc/stdlib.h>
 #include <tc/string.h>
 #include <tc/sys.h>
+#include <tc/tar.h>
 #include <tc/version.h>
 
 #endif
