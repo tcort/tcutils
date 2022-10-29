@@ -24,8 +24,6 @@
 #define ID1 (0x1f)
 #define ID2 (0x8b)
 
-#include <stdio.h>
-
 int main(int argc, char *argv[]) {
 
 	int i;
@@ -34,8 +32,10 @@ int main(int argc, char *argv[]) {
 	int id2;
 	int cm;
 	int flg;
+	int xfl;
+	int os;
 	tc_uint32_t mtime;
-	char *filename;
+	char *mtimes;
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	filename = argc == 0 ? "<STDIN>" : argv[0];
+	/* gather info */
 
 	fd = (argc == 0) ? TC_STDIN : tc_open_reader(argv[0]);
 	if (fd == -1) {
@@ -120,58 +120,102 @@ int main(int argc, char *argv[]) {
 
 		mtime = ((mtime >> 8) | (tmp << 24));
 	}
+	mtimes = tc_itoa(mtime);
+	if (mtimes == TC_NULL) {
+		tc_puterrln("Out of Memory");
+		tc_exit(TC_EXIT_FAILURE);
+	}
+
+	xfl = tc_getc(fd);
+	if (xfl == TC_EOF || xfl == TC_ERR) {
+		tc_puterrln("unexpected error");
+		tc_exit(TC_EXIT_FAILURE);
+	}
+
+	os = tc_getc(fd);
+	if (os == TC_EOF || os == TC_ERR) {
+		tc_puterrln("unexpected error");
+		tc_exit(TC_EXIT_FAILURE);
+	}
+
 
 	tc_close(fd);
 
-	tc_puts(TC_STDOUT, "Filename: ");
-	tc_putln(TC_STDOUT, filename);
+	/* show info */
 
-	tc_putln(TC_STDOUT, "Magic Number: 0x1f 0x8b");
+	tc_putln(TC_STDOUT, "ID1 (IDentification 1): 0x1f");
+	tc_putln(TC_STDOUT, "ID2 (IDentification 2): 0x8b");
 
+	tc_puts(TC_STDOUT, "CM (Compression Method): ");
 	switch (cm) {
-		case 0x00: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x01: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x02: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x03: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x04: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x05: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x06: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x07: tc_putln(TC_STDOUT, "Compression Method: reserved"); break;
-		case 0x08: tc_putln(TC_STDOUT, "Compression Method: deflate"); break;
-		default  : tc_putln(TC_STDOUT, "Compression Method: unknown"); break;
+		case 0x00: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x01: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x02: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x03: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x04: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x05: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x06: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x07: tc_putln(TC_STDOUT, "reserved"); break;
+		case 0x08: tc_putln(TC_STDOUT, "deflate"); break;
+		default  : tc_putln(TC_STDOUT, "unknown"); break;
 	}
 
-	tc_putln(TC_STDOUT, "Flags: ");
+	tc_puts(TC_STDOUT, "FLG (FLaGs):");
 	if (flg == 0) {
-		tc_puts(TC_STDOUT, "  NONE");
+		tc_puts(TC_STDOUT, " NONE");
 	} else {
 		if ((flg & (1<<0))) {
-			tc_putln(TC_STDOUT, "  FTEXT");
+			tc_puts(TC_STDOUT, " FTEXT");
 		}
 		if ((flg & (1<<1))) {
-			tc_putln(TC_STDOUT, "  FHCRC");
+			tc_puts(TC_STDOUT, " FHCRC");
 		}
 		if ((flg & (1<<2))) {
-			tc_putln(TC_STDOUT, "  FEXTRA");
+			tc_puts(TC_STDOUT, " FEXTRA");
 		}
 		if ((flg & (1<<3))) {
-			tc_putln(TC_STDOUT, "  FNAME");
+			tc_puts(TC_STDOUT, " FNAME");
 		}
 		if ((flg & (1<<4))) {
-			tc_putln(TC_STDOUT, "  FCOMMENT");
+			tc_puts(TC_STDOUT, " FCOMMENT");
 		}
 		if ((flg & (1<<5))) {
-			tc_putln(TC_STDOUT, "  reserved");
+			tc_puts(TC_STDOUT, " reserved");
 		}
 		if ((flg & (1<<6))) {
-			tc_putln(TC_STDOUT, "  reserved");
+			tc_puts(TC_STDOUT, " reserved");
 		}
 		if ((flg & (1<<7))) {
-			tc_putln(TC_STDOUT, "  reserved");
+			tc_puts(TC_STDOUT, " reserved");
 		}
 	}
+	tc_putln(TC_STDOUT, "");
 
-	printf("Modification TIME: %u\n", mtime);
+	tc_puts(TC_STDOUT, "MTIME (Modification TIME): ");
+	tc_putln(TC_STDOUT, mtimes);
+
+	tc_puts(TC_STDOUT, "OS (Operating System): ");
+	switch (os) {
+		case 0: tc_putln(TC_STDOUT, "FAT filesystem (MS-DOS, OS/2, NT/Win32)"); break;
+		case 1: tc_putln(TC_STDOUT, "Amiga"); break;
+		case 2: tc_putln(TC_STDOUT, "VMS (or OpenVMS)"); break;
+		case 3: tc_putln(TC_STDOUT, "Unix"); break;
+		case 4: tc_putln(TC_STDOUT, "VM/CMS"); break;
+		case 5: tc_putln(TC_STDOUT, "Atari TOS"); break;
+		case 6: tc_putln(TC_STDOUT, "HPFS filesystem (OS/2, NT)"); break;
+		case 7: tc_putln(TC_STDOUT, "Macintosh"); break;
+		case 8: tc_putln(TC_STDOUT, "Z-System"); break;
+		case 9: tc_putln(TC_STDOUT, "CP/M"); break;
+		case 10: tc_putln(TC_STDOUT, "TOPS-20"); break;
+		case 11: tc_putln(TC_STDOUT, "NTFS filesystem (NT)"); break;
+		case 12: tc_putln(TC_STDOUT, "QDOS"); break;
+		case 13: tc_putln(TC_STDOUT, "Acorn RISCOS"); break;
+		case 255: tc_putln(TC_STDOUT, "unknown"); break;
+		default: tc_putln(TC_STDOUT, "unknown"); break;
+	}
+
+	/* cleanup */
+	mtimes = tc_free(mtimes);
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
