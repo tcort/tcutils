@@ -68,9 +68,9 @@ static const byte S[] = {
 	0xDB, 0x99, 0x8D, 0x33, 0x9F, 0x11, 0x83, 0x14
 };
 
-char *tc_md2(tc_uint8_t *buf, tc_uint64_t len) {
+tc_uint8_t *tc_md2(tc_uint8_t *buf, tc_uint64_t len) {
 
-	char *result;
+	tc_uint8_t *result;
 	byte digest[DIGEST_SIZE];
 	byte checksum[CHECKSUM_SIZE];
 	byte block[BLOCK_SIZE];
