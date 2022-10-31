@@ -20,17 +20,13 @@
 
 #include <tc/tc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 int main(int argc, char *argv[]) {
 
-	FILE *fp;
 	tc_uint64_t len, cap;
 	int ch;
 	int i;
+	int fd;
+	char *digest;
 	tc_uint8_t *p, *q;
 	tc_uint8_t b;
 
@@ -76,42 +72,45 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	fp = argc == 0 ? stdin : fopen(argv[0], "r");
-	if (fp == TC_NULL) {
+	fd = argc == 0 ? TC_STDIN : tc_open_reader(argv[0]);
+	if (fd == TC_ERR) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	len = 0;
 	cap = 512; /* initial capacity (tc_uint8_ts) */
 
-	p = (tc_uint8_t *) malloc(cap);
+	p = (tc_uint8_t *) tc_malloc(cap);
 	if (p == TC_NULL) {
-		fclose(fp);
+		tc_close(fd);
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	while ((ch = fgetc(fp)) != EOF) {
+	while ((ch = tc_getc(fd)) != TC_EOF) {
 		p[len] = (tc_uint8_t) ch;
 		len++;
 		if (len >= cap) {
 			cap = 2 * len;
-			q = (tc_uint8_t *) malloc(cap);
+			q = (tc_uint8_t *) tc_malloc(cap);
 			if (q == TC_NULL) {
-				free(p);
-				fclose(fp);
+				p = tc_free(p);
+				tc_close(fd);
 				tc_exit(TC_EXIT_FAILURE);
 			}
-			memcpy(q, p, len);
-			free(p);
+			tc_memcpy(q, p, len);
+			p = tc_free(p);
 			p = q;
 			q = TC_NULL;
 		}
 	}
 
-	tc_md2(p, len);
-	free(p);
+	digest = tc_md2(p, len);
 
-	fclose(fp);
+	tc_putln(TC_STDOUT, digest);
+
+	digest = tc_free(digest);
+	p = tc_free(p);
+	tc_close(fd);
 
 	tc_exit(TC_EXIT_SUCCESS);
 }

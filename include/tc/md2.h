@@ -23,6 +23,8 @@
 
 #include "stdint.h"
 
+#define TC_MD2_DIGEST_LEN (16)
+
 char *tc_md2(tc_uint8_t *buf, tc_uint64_t len);
 
 #endif
