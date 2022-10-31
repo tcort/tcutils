@@ -94,14 +94,14 @@ int main(int argc, char *argv[]) {
 		}
 
 		while (1) {
-			cur = (struct list *) malloc(sizeof(struct list));
+			cur = (struct list *) tc_malloc(sizeof(struct list));
 			if (cur == TC_NULL) {
 				perror("malloc");
 				while (head != TC_NULL) {
-					free(head->line);
+					head->line = tc_free(head->line);
 					cur = head;
 					head = head->next;
-					free(cur);
+					cur = tc_free(cur);
 				}
 				tc_exit(TC_EXIT_FAILURE);
 			}
@@ -111,9 +111,9 @@ int main(int argc, char *argv[]) {
 			len = getline(&cur->line, &cap, f);
 			if (len < 0) {
 				if (cur->line != TC_NULL) {
-					free(cur->line);
+					cur->line = tc_free(cur->line);
 				}
-				free(cur);
+				cur = tc_free(cur);
 				break;
 			}
 
@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
 
 		while (head != TC_NULL) {
 			fprintf(stdout, "%s", head->line);
-			free(head->line);
+			head->line = tc_free(head->line);
 			cur = head;
 			head = head->next;
-			free(cur);
+			cur = tc_free(cur);
 		}
 
 		fclose(f);
