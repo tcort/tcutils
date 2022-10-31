@@ -20,10 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/param.h>
 #include <unistd.h>
 
@@ -73,13 +69,13 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	memset(buf, '\0', sizeof(char) * (MAXPATHLEN+1));
+	tc_memset(buf, '\0', sizeof(char) * (MAXPATHLEN+1));
 	p = getcwd(buf, MAXPATHLEN);
 	if (p == TC_NULL) {
-		perror("getcwd");
+		tc_puterrln("Could not get current working directory");
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	fprintf(stdout, "%s\n", buf);
+	tc_putln(TC_STDOUT, buf);
 	tc_exit(TC_EXIT_SUCCESS);
 }
