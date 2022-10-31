@@ -35,6 +35,18 @@ void tc_memset(char *s, char ch, int len) {
 	}
 }
 
+void *tc_memcpy(void *dst, const void *src, int len) {
+	char *d = dst;
+	const char *s = src;
+	int i;
+
+	for (i = 0; i < len; i++) {
+		d[i] = s[i];
+	}
+
+	return dst;
+}
+
 /*
  * Copies a string. Destination must be equal to or longer than source.
  */

@@ -26,6 +26,7 @@
 #define TC_NEWLINE ('\n')
 
 void tc_memset(char *s, char ch, int len);
+void *tc_memcpy(void *dst, const void *src, int len);
 void tc_strcpy(char *dst, const char *src);
 char *tc_strgrow(char *s, int newsize);
 int tc_strlen(const char *s);
