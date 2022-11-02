@@ -20,8 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <stdio.h>
-
 struct counts {
 	int bytes;
 	int lines;
@@ -52,7 +50,7 @@ static void count(int fd, struct counts *count, struct counts *total) {
 	total->words += count->words;
 }
 
-static void show(FILE *fp, char *filename, struct counts *count, int flag_c, int flag_l, int flag_w) {
+static void show(int fd, char *filename, struct counts *count, int flag_c, int flag_l, int flag_w) {
 	int first;
 
 	if (flag_c == 0 && flag_l == 0 && flag_w == 0) {
@@ -62,35 +60,35 @@ static void show(FILE *fp, char *filename, struct counts *count, int flag_c, int
 	}
 
 	if (flag_l == 1) {
-		fprintf(fp, "%7d", count->lines);
+		tc_putdec(fd, count->lines, 8);
 		first = 1;
 	}
 
 	if (first == 1) {
-		fprintf(fp, " ");
+		tc_putc(fd, TC_BLANK);
 	}
 
 	if (flag_w == 1) {
-		fprintf(fp, "%7d", count->words);
+		tc_putdec(fd, count->words, 8);
 		first = 1;
 	}
 
 	if (first == 1) {
-		fprintf(fp, " ");
+		tc_putc(fd, TC_BLANK);
 	}
 
 	if (flag_c == 1) {
-		fprintf(fp, "%7d", count->bytes);
+		tc_putdec(fd, count->bytes, 8);
 		first = 1;
 	}
 
 	if (filename != TC_NULL) {
-		fprintf(fp, " %s", filename);
+		tc_putc(fd, TC_BLANK);
+		tc_puts(fd, filename);
 		first = 1;
 	}
 
-	fprintf(fp, "\n");
-
+	tc_putc(fd, TC_NEWLINE);
 }
 
 int main(int argc, char *argv[]) {
@@ -167,7 +165,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 0) {
 		count(TC_STDIN, &current, &total);
-		show(stdout, TC_NULL, &current, flag_c, flag_l, flag_w);
+		show(TC_STDOUT, TC_NULL, &current, flag_c, flag_l, flag_w);
 	} else {
 		for (i = 0; i < argc; i++) {
 			int fd;
@@ -181,13 +179,13 @@ int main(int argc, char *argv[]) {
 			/* only count regular files */
 			if (tc_is_file(fd)) {
 				count(fd, &current, &total);
-				show(stdout, argv[i], &current, flag_c, flag_l, flag_w);
+				show(TC_STDOUT, argv[i], &current, flag_c, flag_l, flag_w);
 			}
 			tc_close(fd);
 
 		}
 		if (argc > 1) {
-			show(stdout, "total", &total, flag_c, flag_l, flag_w);
+			show(TC_STDOUT, "total", &total, flag_c, flag_l, flag_w);
 		}
 	}
 

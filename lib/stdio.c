@@ -251,3 +251,19 @@ void tc_decompress(int fd_in, int fd_out) {
 
 	}
 }
+
+void tc_putdec(int fd, int n, int w) {
+	int i;
+	int nd;
+	char s[16];
+
+	tc_memset(s, '\0', sizeof(16));
+
+	nd = tc_itoc(n, s, 1);
+	for (i = nd; i < w; i++) {
+		tc_putc(fd, TC_BLANK);
+	}
+	for (i = 0; i < nd; i++) {
+		tc_putc(fd, s[i]);
+	}
+}
