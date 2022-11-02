@@ -97,7 +97,7 @@ static void show_stats(char *pathname) {
 	char human_size[16];
 	char human_mode[32];
 
-	memset(&statbuf, '\0', sizeof(struct stat));
+	tc_memset(&statbuf, '\0', sizeof(struct stat));
 
 	rc = stat(pathname, &statbuf);
 	if (rc == -1) {

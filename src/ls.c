@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
 		struct dirent *dentry;
 		dentry = dentries[i];
 
-		memset(path, '\0', sizeof(char) * (PATH_MAX+1));
+		tc_memset(path, '\0', sizeof(char) * (PATH_MAX+1));
 
 		snprintf(path, PATH_MAX, "%s/%s", dir, dentry->d_name);
 

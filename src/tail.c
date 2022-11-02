@@ -41,7 +41,7 @@ static void tail(FILE *fin, FILE *fout, int n) {
 		perror("malloc");
 		tc_exit(TC_EXIT_FAILURE);
 	}
-	memset(buf, '\0', sizeof(struct line*) * n);
+	tc_memset(buf, '\0', sizeof(struct line*) * n);
 
 	for (i = 0; i < n; i++) {
 		buf[i] = (struct line *) malloc(sizeof(struct line));
@@ -56,7 +56,7 @@ static void tail(FILE *fin, FILE *fout, int n) {
 			free(buf);
 			tc_exit(TC_EXIT_FAILURE);
 		}
-		memset(buf[i], '\0', sizeof(struct line));
+		tc_memset(buf[i], '\0', sizeof(struct line));
 	}
 
 	i = 0;

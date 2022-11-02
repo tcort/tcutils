@@ -22,7 +22,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/param.h>
 #include <unistd.h>
 
@@ -72,7 +71,7 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	memset(hostname, '\0', sizeof(char) * (MAXHOSTNAMELEN+1));
+	tc_memset(hostname, '\0', sizeof(char) * (MAXHOSTNAMELEN+1));
 	rc = gethostname(hostname, MAXHOSTNAMELEN);
 	if (rc == -1) {
 		perror("gethostname");

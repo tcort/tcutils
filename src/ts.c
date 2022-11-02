@@ -38,7 +38,7 @@ static void ts(char *fmt) {
 
 	now = time(TC_NULL);
 	local = localtime(&now);
-	memset(tstring, '\0', sizeof(tstring));
+	tc_memset(tstring, '\0', sizeof(tstring));
 	strftime(tstring, sizeof(tstring)-1, fmt, local);
 	tc_puts(TC_STDOUT, "[");
 	tc_puts(TC_STDOUT, tstring);

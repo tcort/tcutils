@@ -45,7 +45,7 @@ void foreach(int argc, char *argv[], char *line) {
 		perror("malloc");
 		tc_exit(TC_EXIT_FAILURE);
 	}
-	memset(cmd, '\0', len + 1);
+	tc_memset(cmd, '\0', len + 1);
 
 	for (i = 0; i < argc; i++) {
 		strncat(cmd, argv[i], len);
@@ -70,7 +70,7 @@ void foreach(int argc, char *argv[], char *line) {
 		perror("malloc");
 		tc_exit(TC_EXIT_FAILURE);
 	}
-	memset(result, '\0', len + 1);
+	tc_memset(result, '\0', len + 1);
 
 	/* i is index in cmd, j is index in result, k is index in line */
 	for (i = j = 0; i < tc_strlen(cmd); i++) {

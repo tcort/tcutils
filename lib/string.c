@@ -27,8 +27,9 @@
 /*
  * Sets len bytes of string s to character ch
  */
-void tc_memset(char *s, char ch, int len) {
+void tc_memset(void *p, char ch, int len) {
 	int i;
+	char *s = (char *) p;
 
 	for (i = 0; i < len; i++) {
 		s[i] = ch;

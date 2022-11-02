@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 	now = time(TC_NULL);
 	local = localtime(&now);
-	memset(tstring, '\0', sizeof(tstring));
+	tc_memset(tstring, '\0', sizeof(tstring));
 	strftime(tstring, sizeof(tstring)-1, fmt, local);
 	fprintf(stdout, "%s\n", tstring);
 

@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 		perror("fork");
 		tc_exit(TC_EXIT_FAILURE);
 	} else if (pid > 0) {
-		memset(buf, '\0', BUFSZ);
+		tc_memset(buf, '\0', BUFSZ);
 		strftime(buf, BUFSZ-1, "%Y-%m-%d %H:%M:%S", t);
 		fprintf(stdout, "Alarm set for %s (pid %d)\n", buf, pid);
 		tc_exit(TC_EXIT_SUCCESS);

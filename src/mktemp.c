@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	memset(path, '\0', PATH_MAX);
+	tc_memset(path, '\0', PATH_MAX);
 	snprintf(path, PATH_MAX - 1, "%s/%s", tmpdir, template);
 
 	if (dflag == 1) {

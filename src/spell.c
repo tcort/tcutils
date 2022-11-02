@@ -61,7 +61,7 @@ cell_t *cell_new(char ch, char terminal) {
 	}
 	cell->ch = ch;
 	cell->terminal = terminal;
-	memset(cell->children, '\0', sizeof(cell_t *) * 128);
+	tc_memset(cell->children, '\0', sizeof(cell_t *) * 128);
 	return cell;
 }
 

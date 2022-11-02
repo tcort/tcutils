@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	memset(message, '\0', MSGSZ);
+	tc_memset(message, '\0', MSGSZ);
 	msgsize = 1 /* NUL byte */;
 	for (i = 0; i < argc; i++) {
 		msgsize += tc_strlen(argv[i]);
