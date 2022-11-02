@@ -20,7 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -87,19 +86,40 @@ int main(int argc, char *argv[]) {
 	int i;
 	enum pattern pat;
 
-	static struct option long_options[] = {
-		{ "bright", no_argument, 0, 'b' },
-		{ "dull", no_argument, 0, 'd' },
-		{ "usa", no_argument, 0, 'u' },
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
-		{ 0, 0, 0, 0 }
+	struct tc_prog_arg *arg;
+
+	static struct tc_prog_arg args[] = {
+		{ .arg = 'b', .longarg = "bright", .description = "bright colours (default)", .has_value = 0 },
+		{ .arg = 'd', .longarg = "dull", .description = "dull colours", .has_value = 0 },
+		TC_PROG_ARG_HELP,
+		{ .arg = 'u', .longarg = "usa", .description = "USA colours", .has_value = 0 },
+		TC_PROG_ARG_VERSION,
+		TC_PROG_ARG_END
 	};
 
+	static struct tc_prog_example examples[] = {
+		{ .command = "lolcat foo.txt bar.txt", .description = "concatinate two files" },
+		TC_PROG_EXAMPLE_END
+	};
+
+	static struct tc_prog prog = {
+		.program = "lolcat",
+		.usage = "[OPTIONS] [FILES...]",
+		.description = "concatenate and print files with funky colours",
+		.package = TC_VERSION_NAME,
+		.version = TC_VERSION_STRING,
+		.copyright = TC_VERSION_COPYRIGHT,
+		.license = TC_VERSION_LICENSE,
+		.author =  TC_VERSION_AUTHOR,
+		.args = args,
+		.examples = examples
+	};
+
+	/* defaults */
 	bright = 1;
 
-	while ((ch = getopt_long(argc, argv, "bdhuV", long_options, TC_NULL)) != -1) {
-		switch (ch) {
+	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
+		switch (arg->arg) {
 			case 'b':
 				pat = BRIGHT_PATTERN;
 				break;
@@ -110,42 +130,17 @@ int main(int argc, char *argv[]) {
 				pat = USA_PATTERN;
 				break;
 			case 'h':
-				fprintf(stdout, "lolcat -- concatenate and print files with funky colours\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "usage: lolcat [OPTIONS] [FILES...]\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  -b, --bright   bright colours (default)\n");
-				fprintf(stdout, "  -d, --dull     dull colours\n");
-				fprintf(stdout, "  -h, --help     print help text\n");
-				fprintf(stdout, "  -u, --usa      USA colours\n");
-				fprintf(stdout, "  -V, --version  print version and copyright info\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "examples:\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "  # concatinate two files\n");
-				fprintf(stdout, "  lolcat foo.txt bar.txt\n");
-				tc_exit(TC_EXIT_SUCCESS);
+				tc_args_show_help(&prog);
 				break;
 			case 'V':
-				fprintf(stdout, "lolcat (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
-				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
-				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
-				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
-				fprintf(stdout, "\n");
-				fprintf(stdout, "Written by Thomas Cort.\n");
-				tc_exit(TC_EXIT_SUCCESS);
-				break;
-			default:
-				fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
-				tc_exit(TC_EXIT_FAILURE);
+				tc_args_show_version(&prog);
 				break;
 		}
 
 	}
 
-	argc -= optind;
-	argv += optind;
+	argc -= argi;
+	argv += argi;
 
 	if (argc == 0) {
 		copy(stdin, stdout, pat);
