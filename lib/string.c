@@ -459,3 +459,17 @@ char *tc_strstr(char *haystack, char *needle) {
 
 	return TC_NULL;
 }
+
+int tc_itoc(int n, char *s, int i) {
+	if (n < 0) {
+		s[i] = '-';
+		return tc_itoc(-n, s, i + 1);
+	}
+
+	if (n >= 10) {
+		i = tc_itoc(n / 10, s, i);
+	}
+	s[i] = (n % 10) + '0';
+	s[i + 1] = TC_ENDSTR;
+	return i + 1;
+}
