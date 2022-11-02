@@ -20,14 +20,10 @@
 
 #include <tc/tc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 int main(int argc, char *argv[]) {
 
 	int ch, i, rc;
-	FILE **fp;
+	int *fd;
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
@@ -74,42 +70,50 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	fp = (FILE **) malloc(sizeof(FILE*) * argc);
-	if (fp == TC_NULL) {
-		perror("malloc");
+	fd = (int *) tc_malloc(sizeof(int) * argc);
+	if (fd == TC_NULL) {
+		tc_puterrln("Out of Memory");
 		tc_exit(TC_EXIT_FAILURE);
 	}
+	tc_memset(fd, TC_ERR, sizeof(int) * argc);
 
 	for (i = 0; i < argc; i++) {
-		fp[i] = fopen(argv[i], "w");
-		if (fp[i] == TC_NULL) {
-			perror("fopen");
+		fd[i] = tc_open_writer(argv[i]);
+		if (fd[i] == TC_ERR) {
+			tc_puterrln("File I/O Error");
 			for (i = 0; i < argc; i++) {
-				if (fp[i] != TC_NULL) {
-					fclose(fp[i]);
+				if (fd[i] != TC_ERR) {
+					tc_close(fd[i]);
+					fd[i] = TC_ERR;
 				}
 			}
 			tc_exit(TC_EXIT_FAILURE);
 		}
 	}
 
-	while ((ch = getc(stdin)) != EOF) {
+	while ((ch = tc_getc(TC_STDIN)) != TC_EOF) {
 		for (i = 0; i < argc; i++) {
-			rc = putc(ch, fp[i]);
-			if (rc == EOF) {
-				perror("putc");
+			rc = tc_putc(fd[i], ch);
+			if (rc == TC_EOF) {
+				tc_puterrln("Write Error");
 				for (i = 0; i < argc; i++) {
-					fclose(fp[i]);
+					if (fd[i] != TC_ERR) {
+						tc_close(fd[i]);
+						fd[i] = TC_ERR;
+					}
 				}
 				tc_exit(TC_EXIT_FAILURE);
 			}
 		}
-		putc(ch, stdout);
+		tc_putc(TC_STDOUT, ch);
 	}
 
 	for (i = 0; i < argc; i++) {
-		fclose(fp[i]);
+		if (fd[i] != TC_ERR) {
+			tc_close(fd[i]);
+			fd[i] = TC_ERR;
+		}
 	}
-	free(fp);
+	fd = tc_free(fd);
 	tc_exit(TC_EXIT_SUCCESS);
 }
