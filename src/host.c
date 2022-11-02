@@ -32,7 +32,7 @@
 static char *sa2s(struct sockaddr *sa) {
 
 	static char s[64+1];
-	memset(s, '\0', 64+1);
+	tc_memset(s, '\0', 64+1);
 
 	switch (sa->sa_family) {
 		case AF_INET:
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	memset(&hints, 0, sizeof(struct addrinfo));
+	tc_memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_CANONNAME;

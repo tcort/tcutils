@@ -59,8 +59,8 @@ static void prompt(void) {
 		return;
 	}
 
-	if (strlen(passwd->pw_dir) > 1 && !strncmp(path, passwd->pw_dir, strlen(passwd->pw_dir))) {
-		p = path + strlen(passwd->pw_dir) - 1;
+	if (tc_strlen(passwd->pw_dir) > 1 && !strncmp(path, passwd->pw_dir, tc_strlen(passwd->pw_dir))) {
+		p = path + tc_strlen(passwd->pw_dir) - 1;
 		*p = '~';
 	}
 
@@ -80,7 +80,7 @@ static char **argvify(char *cmdline) {
 	int n, len;
 	char **argv;
 
-	len = strlen(cmdline);
+	len = tc_strlen(cmdline);
 	for (i = 0, n = 0; i < len; i++) {
 		if (cmdline[i] == ' ') {
 			n++;

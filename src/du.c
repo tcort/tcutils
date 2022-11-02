@@ -106,7 +106,7 @@ static off_t visit(char *pathname) {
 				free(dentry);
 				continue;
 			}
-			memset(subpathname, '\0', PATH_MAX+1);
+			tc_memset(subpathname, '\0', PATH_MAX+1);
 			snprintf(subpathname, PATH_MAX, "%s/%s", pathname, dentry->d_name);
 			free(dentry);
 

@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 				}
 				tc_exit(TC_EXIT_FAILURE);
 			}
-			memset(cur, '\0', sizeof(struct list));
+			tc_memset(cur, '\0', sizeof(struct list));
 
 			cap = 0;
 			len = getline(&cur->line, &cap, f);

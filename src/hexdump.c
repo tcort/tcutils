@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
 	addr = 0;
 	do {
-		memset(bytes, '\0', sizeof(char) * 16);
+		tc_memset(bytes, '\0', sizeof(char) * 16);
 		n = fread(bytes, sizeof(char), 16, f);
 		if (n == 0) {
 			break;

@@ -21,10 +21,8 @@
 #include <tc/tc.h>
 
 #include <curses.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <term.h>
-#include <unistd.h>
 
 int main(int argc, char *argv[]) {
 

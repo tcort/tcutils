@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
 		errcode = regexec(&preg, line, nmatch, pmatch, eflags); 
 		if (errcode == 0) {
-			for (i = 0; i < strlen(format); i++) {
+			for (i = 0; i < tc_strlen(format); i++) {
 				if (format[i] == '$' && format[i+1] == '$') {
 					fputc(format[i], stdout);
 					i++;
