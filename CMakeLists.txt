@@ -1,5 +1,5 @@
 # CMakeLists.txt
-# Copyright 2022  Thomas Cort
+# Copyright 2022, 2023  Thomas Cort
 #
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty, provided the copyright notice and
@@ -8,10 +8,10 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # project version MUST be an integer
-project(tcutils VERSION 2022 DESCRIPTION "a collection of software tools, utilities, and games" LANGUAGES C)
+project(tcutils VERSION 2022, 2023 DESCRIPTION "a collection of software tools, utilities, and games" LANGUAGES C)
 
 set(PROJECT_AUTHOR "Thomas Cort")
-set(PROJECT_COPYRIGHT "Copyright (C) 2022  Thomas Cort")
+set(PROJECT_COPYRIGHT "Copyright (C) 2022, 2023  Thomas Cort")
 set(PROJECT_LICENSE "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.")
 
 include(GNUInstallDirs)

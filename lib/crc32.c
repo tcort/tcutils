@@ -1,6 +1,6 @@
 /*
     crc32.c -- output the 32-bit cyclic redundancy check value for an input
-    Copyright (C) 2022  Thomas Cort
+    Copyright (C) 2022, 2023  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
