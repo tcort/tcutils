@@ -26,7 +26,7 @@
 #include <fcntl.h> /* open(2)/O_RDONLY/O_WRONLY */
 #include <stdlib.h> /* malloc(2)/free(2)/exit(2) */
 #include <sys/stat.h> /* mkdir(2)/fstat(2) */
-#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2)/gethostid(2)/getlogin(2) */
+#include <unistd.h> /* getpid(2)/read(2)/write(2)/close(2)/ttyname(2)/sync(2)/sleep(2)/rmdir(2)/link(2)/symlink(2)/gethostid(2)/getlogin(2)/lseek(2) */
 
 /*
  * Read a character from file descriptor fd
@@ -308,4 +308,30 @@ int tc_is_file(int fd) {
 
 int tc_unlink(const char *path) {
 	return unlink(path) == 0 ? TC_OK : TC_ERR;
+}
+
+tc_int32_t tc_lseek(int fd, tc_int32_t pos, int whence) {
+
+	tc_int32_t offset;
+
+	switch (whence) {
+		case TC_SEEK_SET:
+			whence = SEEK_SET;
+			break;
+		case TC_SEEK_CUR:
+			whence = SEEK_CUR;
+			break;
+		case TC_SEEK_END:
+			whence = SEEK_END;
+			break;
+		default:
+			break;
+	}
+
+	offset = lseek(fd, pos, whence);
+	if (offset = -1) {
+		return TC_ERR;
+	}
+
+	return offset;
 }
