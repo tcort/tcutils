@@ -1,6 +1,6 @@
  /*
     version.h - version details for libtc
-    Copyright (C) 2022  Thomas Cort
+    Copyright (C) 2022, 2023  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 #define TC_VERSION_NAME "@PROJECT_NAME@"
 
 /*
- * version string of the project (e.g. "2022")
+ * version string of the project (e.g. "2022, 2023")
  */
 #define TC_VERSION_STRING "@PROJECT_VERSION@"
 
 /*
- * numeric version of the project (e.g. 2022)
+ * numeric version of the project (e.g. 2022, 2023)
  */
 #define TC_VERSION_NUMBER @PROJECT_VERSION@
 
@@ -52,7 +52,7 @@
 #define TC_VERSION_AUTHOR "@PROJECT_AUTHOR@"
 
 /*
- * copyright line (e.g. "Copyright (C) 2022  Thomas Cort")
+ * copyright line (e.g. "Copyright (C) 2022, 2023  Thomas Cort")
  */
 #define TC_VERSION_COPYRIGHT "@PROJECT_COPYRIGHT@"
 

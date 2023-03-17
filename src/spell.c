@@ -1,6 +1,6 @@
  /*
     spell -- checks the spelling of words
-    Copyright (C) 2022  Thomas Cort
+    Copyright (C) 2022, 2023  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -290,7 +290,7 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'V':
 				fprintf(stdout, "spell (%s) v%s\n", TC_VERSION_NAME, TC_VERSION_STRING);
-				fprintf(stdout, "Copyright (C) 2022  Thomas Cort\n");
+				fprintf(stdout, "Copyright (C) 2022, 2023  Thomas Cort\n");
 				fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n");
 				fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 				fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
