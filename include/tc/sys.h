@@ -25,6 +25,7 @@ typedef int tc_mode_t;
 
 int tc_getc(int fd);
 int tc_putc(int fd, char ch);
+int tc_write(int fd, const void *buf, int len);
 int tc_open_reader(char *filepath);
 int tc_open_writer(char *filepath);
 int tc_close(int fd);

@@ -58,7 +58,23 @@ int tc_putc(int fd, char ch) {
 
 	s[0] = ch;
 
-	rc = write(fd, s, 1);
+	rc = tc_write(fd, s, 1);
+	if (rc == -1) {
+		return TC_ERR;
+	}
+
+	return TC_OK;
+}
+
+/*
+ * Write len bytes from a buffer buf to file descriptor fd
+ * returns TC_ERR or TC_OK
+ */
+int tc_write(int fd, const void *buf, int len) {
+
+	int rc;
+
+	rc = write(fd, buf, len);
 	if (rc == -1) {
 		return TC_ERR;
 	}
