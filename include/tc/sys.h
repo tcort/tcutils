@@ -21,6 +21,14 @@
 #ifndef TC_SYS_H
 #define TC_SYS_H
 
+#include "stdint.h"
+
+#define TC_SEEK_SET (0)
+#define TC_SEEK_CUR (1)
+#define TC_SEEK_END (2)
+#define TC_SEEK_HOLE (3)
+#define TC_SEEK_DATA (4)
+
 typedef int tc_mode_t;
 
 int tc_getc(int fd);
@@ -46,5 +54,6 @@ char *tc_getlogin(void);
 int tc_is_directory(int fd);
 int tc_is_file(int fd);
 int tc_unlink(const char *path);
+tc_int32_t tc_lseek(int fd, tc_int32_t pos, int whence);
 
 #endif
