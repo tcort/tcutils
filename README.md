@@ -124,7 +124,7 @@ enable -n true
 - sponge -- soak up standard input and write to a file
 - stat -- print file statistics
 - sum -- compute a BSD checksum of the input
-- sycn -- sync file system contents to persistent storage
+- sync -- sync file system contents to persistent storage
 - tac -- concatenate and print files in reverse
 - tail -- prints lines at the end of an input text
 - tee -- copy characters from standard input to standard output and a file
