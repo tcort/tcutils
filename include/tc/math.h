@@ -21,6 +21,8 @@
 #ifndef TC_MATH_H
 #define TC_MATH_H
 
+#define TC_PI (3.1415926)
+
 int tc_abs(int x);
 int tc_max(int x, int y);
 int tc_min(int x, int y);
