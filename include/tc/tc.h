@@ -43,5 +43,6 @@
 #include <tc/sys.h>
 #include <tc/tar.h>
 #include <tc/version.h>
+#include <tc/wav.h>
 
 #endif
