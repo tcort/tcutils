@@ -329,7 +329,7 @@ tc_int32_t tc_lseek(int fd, tc_int32_t pos, int whence) {
 	}
 
 	offset = lseek(fd, pos, whence);
-	if (offset = -1) {
+	if (offset == -1) {
 		return TC_ERR;
 	}
 
