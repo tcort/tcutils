@@ -21,10 +21,16 @@
 #ifndef TC_MATH_H
 #define TC_MATH_H
 
-#define TC_PI (3.1415926)
+#define TC_PI (3.14159265358979323)
+#define TC_PI_2 (TC_PI / 2.0f)
+#define TC_PI_TC_2 (TC_PI * 2.0f)
+#define TC_EPSILON (0.00000000000000000001)
 
 int tc_abs(int x);
 int tc_max(int x, int y);
 int tc_min(int x, int y);
+int tc_dcompar(double x, double y);
+double tc_fabs(double x);
+double tc_sin(double x);
 
 #endif
