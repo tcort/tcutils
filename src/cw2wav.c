@@ -20,8 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <math.h>
-
 const int NUM_SAMPLES = TC_WAV_SAMPLE_RATE * (TC_WAV_BITS_PER_SAMPLE/8);
 const double frequency = 600.0;
 const int volume = 32000;
@@ -41,7 +39,7 @@ static void write_dit(int fd) {
 	for (i = 0; i < nsamples; i++) {
 		double t = (double) i / TC_WAV_SAMPLE_RATE;
 		tc_int16_t samples[1];
-		samples[0] = volume*sin(frequency*t*2*M_PI);
+		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
 
 		tc_wav_write(fd, samples, 1);
 	}
@@ -54,7 +52,7 @@ static void write_dah(int fd) {
 	for (i = 0; i < nsamples; i++) {
 		double t = (double) i / TC_WAV_SAMPLE_RATE;
 		tc_int16_t samples[1];
-		samples[0] = volume*sin(frequency*t*2*M_PI);
+		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
 
 		tc_wav_write(fd, samples, 1);
 	}
