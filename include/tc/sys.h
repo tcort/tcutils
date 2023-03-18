@@ -26,8 +26,6 @@
 #define TC_SEEK_SET (0)
 #define TC_SEEK_CUR (1)
 #define TC_SEEK_END (2)
-#define TC_SEEK_HOLE (3)
-#define TC_SEEK_DATA (4)
 
 typedef int tc_mode_t;
 
