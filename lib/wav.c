@@ -78,7 +78,7 @@ int tc_wav_close(int fd) {
 	int rc;
 
 	tc_int32_t file_len = (tc_int32_t) tc_lseek(fd, 0, TC_SEEK_END);
-	tc_int32_t data_len = (tc_int32_t) (file_len - (tc_int32_t) (sizeof(struct tc_wav_riff_chunk) - sizeof(struct tc_wav_fmt_chunk)));
+	tc_int32_t data_len = (tc_int32_t) (file_len - sizeof(struct tc_wav_riff_chunk) - sizeof(struct tc_wav_fmt_chunk));
 	tc_int32_t riff_len = (tc_int32_t) (file_len - 8);
 
 	/* last field in header */
