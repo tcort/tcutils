@@ -104,7 +104,7 @@ int tc_open_reader(char *filepath) {
 int tc_open_writer(char *filepath) {
 	int fd;
 
-	fd = open(filepath, O_WRONLY | O_CREAT, 0666);
+	fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (fd == -1) {
 		return TC_ERR;
 	}
