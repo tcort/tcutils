@@ -20,7 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -35,9 +34,9 @@ int main(int argc, char *argv[]) {
 	int rc;
 
 	struct timeval tv;
-	uint64_t ts;
+	tc_uint64_t ts;
 	FILE *fp;
-	uint8_t random_bytes[18];
+	tc_uint8_t random_bytes[18];
 	size_t len;
 
 	struct tc_prog_arg *arg;
@@ -106,7 +105,7 @@ int main(int argc, char *argv[]) {
 
 	/* print timestamp portion '01234567-89ab' */
 	for (i = 3; i <= 8; i++) {
-		uint8_t byte = ((ts>>(64 - (i*8))) & 0xFF);
+		tc_uint8_t byte = ((ts>>(64 - (i*8))) & 0xFF);
 		fprintf(stdout, "%01x", (0xF0 & byte) >> 4);
 		fprintf(stdout, "%01x", (0x0F & byte));
 		if (i == 6) {
