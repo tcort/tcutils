@@ -20,10 +20,13 @@
 
 #include <tc/tc.h>
 
+#define DEFAULT_FREQUENCY (600)
+#define DEFAULT_WPM (18)
+
 const int NUM_SAMPLES = TC_WAV_SAMPLE_RATE * (TC_WAV_BITS_PER_SAMPLE/8);
 const int volume = 32000;
-double frequency = 600.0;
-int wpm = 18;
+double frequency = DEFAULT_FREQUENCY;
+int wpm = DEFAULT_WPM;
 
 static int nsamples_dit(void) {
 	return NUM_SAMPLES * (60.0 / (50.0 * wpm * 2)); 
@@ -393,6 +396,12 @@ int main(int argc, char *argv[]) {
 		},
 		TC_PROG_ARG_HELP,
 		TC_PROG_ARG_VERSION,
+		{
+			.arg = 'w',
+			.longarg = "wpm",
+			.description = "words per minute. Default 18.",
+			.has_value = 1
+		},
 		TC_PROG_ARG_END
 	};
 
@@ -418,13 +427,17 @@ int main(int argc, char *argv[]) {
 		switch (arg->arg) {
 			case 'f':
 				frequency = tc_atoi(argval);
-				frequency = frequency < 1 || frequency > 3000 ? 600 : frequency;
+				frequency = frequency < 60 || frequency > 3000 ? DEFAULT_FREQUENCY : frequency;
 				break;
 			case 'h':
 				tc_args_show_help(&prog);
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
+				break;
+			case 'w':
+				wpm = tc_atoi(argval);
+				wpm = wpm < 1 || wpm > 100 ? DEFAULT_WPM : wpm;
 				break;
 		}
 
