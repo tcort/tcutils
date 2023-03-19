@@ -21,9 +21,9 @@
 #include <tc/tc.h>
 
 const int NUM_SAMPLES = TC_WAV_SAMPLE_RATE * (TC_WAV_BITS_PER_SAMPLE/8);
-const double frequency = 600.0;
 const int volume = 32000;
-const int wpm = 18;
+double frequency = 600.0;
+int wpm = 18;
 
 static int nsamples_dit(void) {
 	return NUM_SAMPLES * (60.0 / (50.0 * wpm * 2)); 
@@ -385,6 +385,12 @@ int main(int argc, char *argv[]) {
 	struct tc_prog_arg *arg;
 
 	static struct tc_prog_arg args[] = {
+		{
+			.arg = 'f',
+			.longarg = "frequency",
+			.description = "the frequency of the generated tone in Hertz. Default 600.",
+			.has_value = 1
+		},
 		TC_PROG_ARG_HELP,
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
@@ -410,6 +416,10 @@ int main(int argc, char *argv[]) {
 
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
+			case 'f':
+				frequency = tc_atoi(argval);
+				frequency = frequency < 1 || frequency > 3000 ? 600 : frequency;
+				break;
 			case 'h':
 				tc_args_show_help(&prog);
 				break;
