@@ -20,7 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -29,22 +28,22 @@
 
 #define PROMPT "calc>"
 #define STSZ 10000
-static int64_t stack[STSZ];
+static tc_int64_t stack[STSZ];
 static size_t sp = 0;
-static int64_t reg[256];
+static tc_int64_t reg[256];
 
-static void push(int64_t v) {
+static void push(tc_int64_t v) {
 	if (sp == STSZ) return;
 	stack[sp] = v;
 	sp++;
 }
 
-static int64_t peek(void) {
+static tc_int64_t peek(void) {
 	if (sp == 0) return 0;
 	return stack[sp-1];
 }
 
-static int64_t pop(void) {
+static tc_int64_t pop(void) {
 	if (sp == 0) return 0;
 	sp--;
 	return stack[sp];
@@ -157,7 +156,7 @@ int main(int argc, char *argv[]) {
 
 			case 'f':
 				while (sp > 0) {
-					printf("%lld\n", pop());
+					printf("%ld\n", pop());
 				}
 				break;
 
@@ -167,7 +166,7 @@ int main(int argc, char *argv[]) {
 				break;
 
 			case 'p':
-				printf("%lld\n", peek());
+				printf("%ld\n", peek());
 				break;
 
 			case 'q':
