@@ -20,7 +20,6 @@
 
 #include <tc/tc.h>
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -29,7 +28,7 @@
 
 struct pass {
 	enum method { RANDOM, PATTERN } method;
-	uint8_t pattern[3];
+	tc_uint8_t pattern[3];
 };
 
 /*
