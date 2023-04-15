@@ -18,6 +18,7 @@ It provides a portable, well defined, and consistent interface with unit tests.
 * [cmake](https://cmake.org/)
 * curses library (e.g. [ncurses](https://invisible-island.net/ncurses/))
 * [libcurl](https://curl.se/)
+* [libtc](https://github.com/tcort/libtc)
 
 ## Installation
 

@@ -16,18 +16,11 @@ set(PROJECT_LICENSE "License GPLv3+: GNU GPL version 3 or later <https://gnu.org
 
 include(GNUInstallDirs)
 
-configure_file (
-    "${PROJECT_SOURCE_DIR}/include/tc/version.h.in"
-    "${PROJECT_BINARY_DIR}/include/tc/version.h"
-)
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/share/pkgconfig")
 
-include_directories(
-    "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_BINARY_DIR}/include"
-)
-
-file(GLOB LIBTC_SRC lib/*.c)
-add_library(tc STATIC ${LIBTC_SRC})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBTC REQUIRED tc)
+link_directories(${LIBTC_LIBRARY_DIRS})
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
@@ -151,25 +144,12 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
         target_link_libraries(${PROG} ${CURL_LIBRARY})
     endif()
 
+    target_link_libraries(${PROG} ${LIBTC_LIBRARIES})
+    target_include_directories(${PROG} PUBLIC ${LIBTC_INCLUDE_DIRS})
+    target_compile_options(${PROG} PUBLIC ${LIBTC_CFLAGS_OTHER})
+
     target_link_libraries(${PROG} tc)
 
     install(TARGETS ${PROG} DESTINATION bin)
 endforeach()
 
-list(APPEND TESTS ctype.check)
-list(APPEND TESTS errno.check)
-list(APPEND TESTS html.check)
-list(APPEND TESTS libgen.check)
-list(APPEND TESTS luhn.check)
-list(APPEND TESTS math.check)
-list(APPEND TESTS md2.check)
-list(APPEND TESTS mtrand.check)
-list(APPEND TESTS re.check)
-list(APPEND TESTS string.check)
-
-enable_testing(true)
-foreach(TESTPROG IN LISTS TESTS)
-    add_executable(${TESTPROG} tests/${TESTPROG}.c)
-    target_link_libraries(${TESTPROG} tc)
-    add_test(NAME ${TESTPROG} COMMAND ${TESTPROG})
-endforeach()
