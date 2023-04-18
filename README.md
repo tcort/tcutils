@@ -67,6 +67,7 @@ enable -n true
 - decompress -- run-length encoding decompression
 - dirname -- print the directory portion of a pathname
 - dos2unix -- replaces DOS line endings '\r\n' with UNIX line endings '\n'
+- dogfacts -- writes a random dog fact to standard output
 - du -- show disk usage
 - duck -- virtual rubber duck debugging tool
 - echo -- prints it's command line arguments
