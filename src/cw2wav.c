@@ -102,7 +102,7 @@ static void write_intra_character_space(int fd) {
 static void write_inter_word_space(int fd) {
 
 	int i;
-	const int nsamples = 7 * nsamples_dit();
+	const int nsamples = 5 * nsamples_dit();
 	for (i = 0; i < nsamples; i++) {
 		tc_int16_t samples[1];
 		samples[0] = 0;
