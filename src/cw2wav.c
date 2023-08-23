@@ -23,92 +23,147 @@
 #define DEFAULT_FREQUENCY (750)
 #define DEFAULT_WPM (18)
 
-const int NUM_SAMPLES = TC_WAV_SAMPLE_RATE * (TC_WAV_BITS_PER_SAMPLE/8);
-const int volume = 32000;
+const int volume = 16384 * (0.50);
 double frequency = DEFAULT_FREQUENCY;
-int wpm = DEFAULT_WPM;
 
-static int nsamples_dit(void) {
-	return NUM_SAMPLES * (60.0 / (50.0 * wpm * 2)); 
+/* useful timing details: https://morsecode.world/international/timing.html */
+
+static int nsamples_unit(int wpm) {
+	return TC_WAV_SAMPLE_RATE * (60.0 / (50.0 * wpm));
 }
 
-static int nsamples_dah(void) {
-	return 3 * NUM_SAMPLES * (60.0 / (50.0 * wpm * 2)); 
+static int nsamples_dit(int wpm) { return 1 * nsamples_unit(wpm); }
+static int nsamples_dah(int wpm) { return 3 * nsamples_unit(wpm); }
+static int nsamples_intra_character_space(int wpm) { return 1 * nsamples_unit(wpm); }
+static int nsamples_inter_character_space(int wpm) { return 3 * nsamples_unit(wpm); }
+static int nsamples_inter_word_space(int wpm)      { return 5 * nsamples_unit(wpm); }
+/* inter word space is 5 because there are nsamples_intra_character_space
+   before and after the space to bring it up to 7 */
+
+/* shape output waveform so sound isn't as harsh, rise and fall is 10% of dit */
+static int nsamples_rise_time(int wpm) { return nsamples_dit(wpm) / 10; }
+static int nsamples_fall_time(int wpm) { return nsamples_dit(wpm) / 10; }
+
+
+static tc_int16_t *dit_tone = TC_NULL;
+static unsigned int dit_tone_len = 0;
+static tc_int16_t *dah_tone = TC_NULL;
+static unsigned int dah_tone_len = 0;
+
+static void make_tone(tc_int16_t *samples, unsigned int nsamples, int rise_time, int fall_time) {
+	int i;
+	for (i = 0; i < nsamples; i++) {
+		double t = (double) i / TC_WAV_SAMPLE_RATE;
+		samples[i] = volume * tc_sin(frequency*t*2*TC_PI);
+
+		if (i < rise_time) {
+			samples[i] = samples[i] * (i*1.0/rise_time*1.0);
+		} else if (i > nsamples - fall_time) {
+			samples[i] = samples[i] * ((nsamples-i)*1.0/fall_time*1.0);
+		}
+	}
+}
+
+static int init_tone(int wpm) {
+
+	int rise_time;
+	int fall_time;
+
+	rise_time = nsamples_rise_time(wpm);
+	fall_time = nsamples_fall_time(wpm);
+
+	dit_tone_len = nsamples_dit(wpm);
+	dit_tone = (tc_int16_t *) tc_malloc(dit_tone_len * sizeof(tc_int16_t));
+	if (dit_tone == TC_NULL) {
+		return TC_ERR;
+	}
+	make_tone(dit_tone, dit_tone_len, rise_time, fall_time);
+
+	dah_tone_len = nsamples_dah(wpm);
+	dah_tone = (tc_int16_t *) tc_malloc(dah_tone_len * sizeof(tc_int16_t));
+	if (dah_tone == TC_NULL) {
+		return TC_ERR;
+	}
+	make_tone(dah_tone, dah_tone_len, rise_time, fall_time);
+
+	return TC_OK;
+}
+
+static void exit_tone(void) {
+	dit_tone = tc_free(dit_tone);
+	dit_tone_len = 0;
+	dah_tone = tc_free(dah_tone);
+	dah_tone_len = 0;
 }
 
 static void write_dit(int fd) {
-	int i;
-	const unsigned int nsamples = nsamples_dit();
-	const unsigned int rise_time = nsamples / 10;
-	const unsigned int fall_time = nsamples / 10;
-	for (i = 0; i < nsamples; i++) {
-		double t = (double) i / TC_WAV_SAMPLE_RATE;
-		tc_int16_t samples[1];
-		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
-
-		if (i < rise_time) {
-			samples[0] = samples[0] * (i*1.0/rise_time*1.0);
-		} else if (i > nsamples - fall_time) {
-			samples[0] = samples[0] * ((nsamples-i)*1.0/fall_time*1.0);
-		}
-
-		tc_wav_write(fd, samples, 1);
-	}
-
+	tc_wav_write(fd, dit_tone, dit_tone_len);
 }
 
 static void write_dah(int fd) {
+	tc_wav_write(fd, dah_tone, dah_tone_len);
+}
+
+static void make_space(tc_int16_t *samples, unsigned int nsamples) {
 	int i;
-	const unsigned int nsamples = nsamples_dah();
-	const unsigned int rise_time = nsamples / 10;
-	const unsigned int fall_time = nsamples / 10;
 	for (i = 0; i < nsamples; i++) {
-		double t = (double) i / TC_WAV_SAMPLE_RATE;
-		tc_int16_t samples[1];
-		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
-		if (i < rise_time) {
-			samples[0] = samples[0] * (i*1.0/rise_time*1.0);
-		} else if (i > nsamples - fall_time) {
-			samples[0] = samples[0] * ((nsamples-i)*1.0/fall_time*1.0);
-		}
-		tc_wav_write(fd, samples, 1);
+		samples[i] = 0;
 	}
+}
+
+static tc_int16_t *inter_character_space = TC_NULL;
+static unsigned int inter_character_space_len = 0;
+static tc_int16_t *intra_character_space = TC_NULL;
+static unsigned int intra_character_space_len = 0;
+static tc_int16_t *inter_word_space = TC_NULL;
+static unsigned int inter_word_space_len = 0;
+
+static int init_space(int wpm) {
+	inter_character_space_len = nsamples_inter_character_space(wpm);
+	inter_character_space = (tc_int16_t *) tc_malloc(inter_character_space_len * sizeof(tc_int16_t));
+	if (inter_character_space == TC_NULL) {
+		return TC_ERR;
+	}
+	make_space(inter_character_space, inter_character_space_len);
+
+	intra_character_space_len = nsamples_intra_character_space(wpm);
+	intra_character_space = (tc_int16_t *) tc_malloc(intra_character_space_len * sizeof(tc_int16_t));
+	if (intra_character_space == TC_NULL) {
+		return TC_ERR;
+	}
+	make_space(intra_character_space, intra_character_space_len);
+
+	inter_word_space_len = nsamples_inter_word_space(wpm);
+	inter_word_space = (tc_int16_t *) tc_malloc(inter_word_space_len * sizeof(tc_int16_t));
+	if (inter_word_space == TC_NULL) {
+		return TC_ERR;
+	}
+	make_space(inter_word_space, inter_word_space_len);
+
+	return TC_OK;
+}
+
+static void exit_space(void) {
+	inter_character_space = tc_free(inter_character_space);
+	inter_character_space_len = 0;
+
+	intra_character_space = tc_free(intra_character_space);
+	intra_character_space_len = 0;
+
+	inter_word_space = tc_free(inter_word_space);
+	inter_word_space_len = 0;
 }
 
 static void write_inter_character_space(int fd) {
-
-	int i;
-	const unsigned int nsamples = nsamples_dah();
-	for (i = 0; i < nsamples; i++) {
-		tc_int16_t samples[1];
-		samples[0] = 0;
-		tc_wav_write(fd, samples, 1);
-	}
-
+	tc_wav_write(fd, inter_character_space, inter_character_space_len);
 }
 
 static void write_intra_character_space(int fd) {
-
-	int i;
-	const unsigned int nsamples = nsamples_dit();
-	for (i = 0; i < nsamples; i++) {
-		tc_int16_t samples[1];
-		samples[0] = 0;
-		tc_wav_write(fd, samples, 1);
-	}
-
+	tc_wav_write(fd, intra_character_space, intra_character_space_len);
 }
 
 static void write_inter_word_space(int fd) {
-
-	int i;
-	const int nsamples = 5 * nsamples_dit();
-	for (i = 0; i < nsamples; i++) {
-		tc_int16_t samples[1];
-		samples[0] = 0;
-		tc_wav_write(fd, samples, 1);
-	}
-
+	tc_wav_write(fd, inter_word_space, inter_word_space_len);
 }
 
 const char *alphabet[] = {
@@ -397,9 +452,12 @@ int main(int argc, char *argv[]) {
 
 	char ch;
 	int i;
+	int rc;
 	int fd_in;
 	int fd_out;
 	struct tc_prog_arg *arg;
+
+	int wpm = DEFAULT_WPM;
 
 	static struct tc_prog_arg args[] = {
 		{
@@ -477,6 +535,17 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
+	rc = init_space(wpm);
+	if (rc == TC_ERR) {
+		tc_puterrln("Init Failed");
+		tc_exit(TC_EXIT_FAILURE);
+	}
+	rc = init_tone(wpm);
+	if (rc == TC_ERR) {
+		tc_puterrln("Init Failed");
+		tc_exit(TC_EXIT_FAILURE);
+	}
+
 	while ((ch = tc_getc(fd_in)) != TC_EOF) {
 		if (i != 0) {
 			write_inter_character_space(fd_out);
@@ -484,6 +553,9 @@ int main(int argc, char *argv[]) {
 		write_character(fd_out, ch);
 		i++;
 	}
+
+	exit_tone();
+	exit_space();
 
 	tc_wav_close(fd_out);
 	tc_close(fd_in);
