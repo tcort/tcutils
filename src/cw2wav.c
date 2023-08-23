@@ -20,7 +20,7 @@
 
 #include <tc/tc.h>
 
-#define DEFAULT_FREQUENCY (600)
+#define DEFAULT_FREQUENCY (750)
 #define DEFAULT_WPM (18)
 
 const int NUM_SAMPLES = TC_WAV_SAMPLE_RATE * (TC_WAV_BITS_PER_SAMPLE/8);
