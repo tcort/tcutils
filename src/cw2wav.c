@@ -39,10 +39,18 @@ static int nsamples_dah(void) {
 static void write_dit(int fd) {
 	int i;
 	const unsigned int nsamples = nsamples_dit();
+	const unsigned int rise_time = nsamples / 10;
+	const unsigned int fall_time = nsamples / 10;
 	for (i = 0; i < nsamples; i++) {
 		double t = (double) i / TC_WAV_SAMPLE_RATE;
 		tc_int16_t samples[1];
 		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
+
+		if (i < rise_time) {
+			samples[0] = samples[0] * (i*1.0/rise_time*1.0);
+		} else if (i > nsamples - fall_time) {
+			samples[0] = samples[0] * ((nsamples-i)*1.0/fall_time*1.0);
+		}
 
 		tc_wav_write(fd, samples, 1);
 	}
@@ -51,12 +59,18 @@ static void write_dit(int fd) {
 
 static void write_dah(int fd) {
 	int i;
-	const int nsamples = nsamples_dah();
+	const unsigned int nsamples = nsamples_dah();
+	const unsigned int rise_time = nsamples / 10;
+	const unsigned int fall_time = nsamples / 10;
 	for (i = 0; i < nsamples; i++) {
 		double t = (double) i / TC_WAV_SAMPLE_RATE;
 		tc_int16_t samples[1];
 		samples[0] = volume * tc_sin(frequency*t*2*TC_PI);
-
+		if (i < rise_time) {
+			samples[0] = samples[0] * (i*1.0/rise_time*1.0);
+		} else if (i > nsamples - fall_time) {
+			samples[0] = samples[0] * ((nsamples-i)*1.0/fall_time*1.0);
+		}
 		tc_wav_write(fd, samples, 1);
 	}
 }
