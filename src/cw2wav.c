@@ -463,7 +463,7 @@ int main(int argc, char *argv[]) {
 		{
 			.arg = 'f',
 			.longarg = "frequency",
-			.description = "the frequency of the generated tone in Hertz. Default 600.",
+			.description = "the frequency of the generated tone in Hertz. Default 750.",
 			.has_value = 1
 		},
 		TC_PROG_ARG_HELP,
