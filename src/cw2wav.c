@@ -22,6 +22,7 @@
 
 #define DEFAULT_FREQUENCY (750)
 #define DEFAULT_WPM (18)
+#define DEFAULT_FWPM (18)
 
 const int volume = 16384 * (0.50);
 double frequency = DEFAULT_FREQUENCY;
@@ -118,8 +119,8 @@ static unsigned int intra_character_space_len = 0;
 static tc_int16_t *inter_word_space = TC_NULL;
 static unsigned int inter_word_space_len = 0;
 
-static int init_space(int wpm) {
-	inter_character_space_len = nsamples_inter_character_space(wpm);
+static int init_space(int wpm, int fwpm) {
+	inter_character_space_len = nsamples_inter_character_space(fwpm);
 	inter_character_space = (tc_int16_t *) tc_malloc(inter_character_space_len * sizeof(tc_int16_t));
 	if (inter_character_space == TC_NULL) {
 		return TC_ERR;
@@ -133,7 +134,7 @@ static int init_space(int wpm) {
 	}
 	make_space(intra_character_space, intra_character_space_len);
 
-	inter_word_space_len = nsamples_inter_word_space(wpm);
+	inter_word_space_len = nsamples_inter_word_space(fwpm);
 	inter_word_space = (tc_int16_t *) tc_malloc(inter_word_space_len * sizeof(tc_int16_t));
 	if (inter_word_space == TC_NULL) {
 		return TC_ERR;
@@ -458,15 +459,22 @@ int main(int argc, char *argv[]) {
 	struct tc_prog_arg *arg;
 
 	int wpm = DEFAULT_WPM;
+	int fwpm = DEFAULT_FWPM;
 
 	static struct tc_prog_arg args[] = {
 		{
 			.arg = 'f',
-			.longarg = "frequency",
-			.description = "the frequency of the generated tone in Hertz. Default 750.",
+			.longarg = "fwpm",
+			.description = "Farnsworth spacing words per minute. Default 18.",
 			.has_value = 1
 		},
 		TC_PROG_ARG_HELP,
+		{
+			.arg = 't',
+			.longarg = "tone",
+			.description = "the frequency of the generated tone in Hertz. Default 750.",
+			.has_value = 1
+		},
 		TC_PROG_ARG_VERSION,
 		{
 			.arg = 'w',
@@ -498,11 +506,15 @@ int main(int argc, char *argv[]) {
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
 			case 'f':
-				frequency = tc_atoi(argval);
-				frequency = frequency < 60 || frequency > 3000 ? DEFAULT_FREQUENCY : frequency;
+				fwpm = tc_atoi(argval);
+				fwpm = fwpm < 1 || fwpm > 100 ? DEFAULT_FWPM : fwpm;
 				break;
 			case 'h':
 				tc_args_show_help(&prog);
+				break;
+			case 't':
+				frequency = tc_atoi(argval);
+				frequency = frequency < 60 || frequency > 3000 ? DEFAULT_FREQUENCY : frequency;
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
@@ -535,7 +547,7 @@ int main(int argc, char *argv[]) {
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
-	rc = init_space(wpm);
+	rc = init_space(wpm, fwpm);
 	if (rc == TC_ERR) {
 		tc_puterrln("Init Failed");
 		tc_exit(TC_EXIT_FAILURE);
