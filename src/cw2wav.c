@@ -22,7 +22,6 @@
 
 #define DEFAULT_FREQUENCY (750)
 #define DEFAULT_WPM (18)
-#define DEFAULT_FWPM (18)
 
 const int volume = 16384 * (0.50);
 double frequency = DEFAULT_FREQUENCY;
@@ -459,7 +458,7 @@ int main(int argc, char *argv[]) {
 	struct tc_prog_arg *arg;
 
 	int wpm = DEFAULT_WPM;
-	int fwpm = DEFAULT_FWPM;
+	int fwpm = 0;
 
 	static struct tc_prog_arg args[] = {
 		{
@@ -507,7 +506,7 @@ int main(int argc, char *argv[]) {
 		switch (arg->arg) {
 			case 'f':
 				fwpm = tc_atoi(argval);
-				fwpm = fwpm < 1 || fwpm > 100 ? DEFAULT_FWPM : fwpm;
+				fwpm = fwpm < 1 || fwpm > 100 ? 0 : fwpm;
 				break;
 			case 'h':
 				tc_args_show_help(&prog);
@@ -525,6 +524,10 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 
+	}
+
+	if (fwpm == 0) {
+		fwpm = wpm;
 	}
 
 	argc -= argi;
