@@ -28,7 +28,10 @@ int main(int argc, char *argv[]) {
 	unsigned seed;
 	int fd;
 	int i;
+	int j;
 	struct tc_prog_arg *arg;
+	unsigned pwlen = 8;
+	unsigned pwcnt = 1;
 
 	static struct tc_prog_arg args[] = {
 		TC_PROG_ARG_HELP,
@@ -43,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 	static struct tc_prog prog = {
 		.program = "pwgen",
-		.usage = "[OPTIONS]",
+		.usage = "[OPTIONS] [LENGTH] [COUNT]",
 		.description = "password generator",
 		.package = TC_VERSION_NAME,
 		.version = TC_VERSION_STRING,
@@ -69,6 +72,13 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
+	if (argc > 0) {
+		pwlen = (unsigned) tc_atoi(argv[0]);
+	}
+	if (argc > 1) {
+		pwcnt = (unsigned) tc_atoi(argv[1]);
+	}
+
 	fd = tc_open_reader("/dev/urandom");
 	if (fd == TC_ERR) {
 		tc_puterrln("Could not open /dev/urandom for reading");
@@ -82,11 +92,13 @@ int main(int argc, char *argv[]) {
 	tc_srand(seed);
 
 
-	for (i = 0; i < 8; i++) {
-		int n = tc_abs(tc_rand()) & (alphabet_size - 1);
-		tc_putc(TC_STDOUT, alphabet[n]);
+	for (i = 0; i < pwcnt; i++) {
+		for (j = 0; j < pwlen; j++) {
+			int n = tc_abs(tc_rand()) & (alphabet_size - 1);
+			tc_putc(TC_STDOUT, alphabet[n]);
+		}
+		tc_putc(TC_STDOUT, TC_NEWLINE);
 	}
-	tc_putc(TC_STDOUT, TC_NEWLINE);
 
 	tc_exit(TC_EXIT_SUCCESS);
 }
