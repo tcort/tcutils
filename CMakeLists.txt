@@ -150,8 +150,6 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
     target_include_directories(${PROG} PUBLIC ${LIBTC_INCLUDE_DIRS})
     target_compile_options(${PROG} PUBLIC ${LIBTC_CFLAGS_OTHER})
 
-    target_link_libraries(${PROG} tc)
-
     install(TARGETS ${PROG} DESTINATION bin)
 endforeach()
 
