@@ -1,6 +1,6 @@
  /*
     head -- prints lines at the beginning of an input text
-    Copyright (C) 2022, 2023  Thomas Cort
+    Copyright (C) 2022, 2023, 2024  Thomas Cort
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
