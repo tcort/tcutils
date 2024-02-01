@@ -23,16 +23,22 @@
 int main(int argc, char *argv[]) {
 
 	int ch;
+	int n;
 	struct tc_prog_arg *arg;
+	int flag_n;
+	int flag_s;
 
 	static struct tc_prog_arg args[] = {
 		TC_PROG_ARG_HELP,
+		{ .arg = 'n', .longarg = "count", .description = "number of blocks to read", .has_value = 1 },
+		{ .arg = 's', .longarg = "size", .description = "block size (in bytes)", .has_value = 1 },
 		TC_PROG_ARG_VERSION,
 		TC_PROG_ARG_END
 	};
 
 	static struct tc_prog_example examples[] = {
 		{ .command = "copy < ./foo > ./bar", .description = "file copy - creates a copy of ./foo named ./bar" },
+		{ .command = "copy -n 5 -s 1024 < /dev/random > ./foo", .description = "copy 5 KB from /dev/random into ./foo" },
 		TC_PROG_EXAMPLE_END
 	};
 
@@ -49,10 +55,22 @@ int main(int argc, char *argv[]) {
 		.examples = examples
 	};
 
+	/* defaults */
+	flag_n = -1; /* copy until EOF */
+	flag_s = 1; /* 1 byte */
+
 	while ((arg = tc_args_process(&prog, argc, argv)) != TC_NULL) {
 		switch (arg->arg) {
 			case 'h':
 				tc_args_show_help(&prog);
+				break;
+			case 'n':
+				flag_n = tc_atoi(argval);
+				flag_n = flag_n < 0 ? -1 : flag_n;
+				break;
+			case 's':
+				flag_s = tc_atoi(argval);
+				flag_s = flag_s < 0 ? 1 : flag_s;
 				break;
 			case 'V':
 				tc_args_show_version(&prog);
@@ -64,7 +82,15 @@ int main(int argc, char *argv[]) {
 	argc -= argi;
 	argv += argi;
 
-	tc_copylns(TC_STDIN, TC_STDOUT, -1);
-
-	tc_exit(TC_EXIT_SUCCESS);
+	if (flag_n == -1) {
+		tc_copylns(TC_STDIN, TC_STDOUT, -1);
+		tc_exit(TC_EXIT_SUCCESS);
+	} else {
+		int rc;
+		rc = TC_OK;
+		for (n = 0; n < flag_n && rc == TC_OK; n++) {
+			rc = tc_copynbytes(TC_STDIN, TC_STDOUT, flag_s);
+		}
+		tc_exit(rc == TC_OK ? TC_EXIT_SUCCESS : TC_EXIT_FAILURE);
+	}
 }
