@@ -95,14 +95,14 @@ int main(int argc, char *argv[]) {
 	cmd = argv[0];
 	cmd_args = tc_array_malloc(1);
 	if (cmd_args == TC_NULL) {
-		tc_puterr("Failed to Allocate Memory");
+		tc_puterr("Failed to Allocate Memory\n");
 		tc_exit(TC_EXIT_FAILURE);
 	}
 
 	for (i = 0; i < argc; i++) {
 		cmd_args = splay_add_arg(cmd_args, argv[i]);
 		if (cmd_args == TC_NULL) {
-			tc_puterr("Failed to Allocate Memory");
+			tc_puterr("Failed to Allocate Memory\n");
 			cmd_args = tc_array_free(cmd_args);
 			tc_exit(TC_EXIT_FAILURE);
 		}
@@ -110,28 +110,28 @@ int main(int argc, char *argv[]) {
 
 	do {
                 line = tc_getln(TC_STDIN, &status);
-                if (line == TC_NULL || status == TC_ERR) {
+                if (line == TC_NULL || status == TC_ERR || tc_strlen(line) == 0) {
 			line = tc_free(line);
                         break;
                 }
 
 		cmd_args = splay_add_arg(cmd_args, line);
 		if (cmd_args == TC_NULL) {
-			tc_puterr("Failed to Allocate Memory");
+			tc_puterr("Failed to Allocate Memory\n");
 			cmd_args = tc_array_free(cmd_args);
 			tc_exit(TC_EXIT_FAILURE);
 		}
 
 		line = tc_free(line);
-	} while (1);
 
-	for (i = 0; cmd_args[i] != TC_NULL; i++) {
-		tc_puts(TC_STDOUT, cmd_args[i]);
-	}
+		if (status == TC_EOF) {
+			break;
+		}
+	} while (1);
 
 	rc = tc_execvp(cmd, cmd_args);
 	if (rc == TC_ERR) {
-		tc_puterr("Failed to Execute Command");
+		tc_puterr("Failed to Execute Command\n");
 		line = tc_free(line);
 		tc_exit(TC_EXIT_FAILURE);
 	}
