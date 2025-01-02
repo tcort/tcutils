@@ -18,9 +18,16 @@ include(GNUInstallDirs)
 
 set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/share/pkgconfig")
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBTC REQUIRED tc)
-link_directories(${LIBTC_LIBRARY_DIRS})
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/include/tc/version.h.in"
+    "${PROJECT_BINARY_DIR}/include/tc/version.h"
+)
+
+include_directories(
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_BINARY_DIR}/include"
+)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
@@ -32,6 +39,13 @@ find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
 list(APPEND CURL_PROGS rest)
 list(APPEND CURL_PROGS up)
+
+## BUILD LIBTC
+
+file(GLOB LIBTC_SRC lib/*.c)
+add_library(tc STATIC ${LIBTC_SRC})
+
+## BUILD PROGS
 
 list(APPEND PROGS arch)
 list(APPEND PROGS basename)
@@ -148,10 +162,29 @@ foreach(PROG IN LISTS PROGS CURSES_PROGS CURL_PROGS)
         target_link_libraries(${PROG} ${CURL_LIBRARY})
     endif()
 
-    target_link_libraries(${PROG} ${LIBTC_LIBRARIES})
-    target_include_directories(${PROG} PUBLIC ${LIBTC_INCLUDE_DIRS})
-    target_compile_options(${PROG} PUBLIC ${LIBTC_CFLAGS_OTHER})
+    target_link_libraries(${PROG} tc)
 
     install(TARGETS ${PROG} DESTINATION bin)
 endforeach()
 
+## Testing
+
+list(APPEND TESTS adif.check)
+list(APPEND TESTS array.check)
+list(APPEND TESTS ctype.check)
+list(APPEND TESTS errno.check)
+list(APPEND TESTS html.check)
+list(APPEND TESTS libgen.check)
+list(APPEND TESTS luhn.check)
+list(APPEND TESTS math.check)
+list(APPEND TESTS md2.check)
+list(APPEND TESTS mtrand.check)
+list(APPEND TESTS stack.check)
+list(APPEND TESTS string.check)
+
+enable_testing(true)
+foreach(TESTPROG IN LISTS TESTS)
+    add_executable(${TESTPROG} tests/${TESTPROG}.c)
+    target_link_libraries(${TESTPROG} tc)
+    add_test(NAME ${TESTPROG} COMMAND ${TESTPROG})
+endforeach()
