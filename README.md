@@ -58,7 +58,6 @@ enable -n true
 - coinflip -- simulates a coinflip and prints the result
 - compress -- run-length encoding compression
 - copy -- copy characters from standard input to standard output
-- corrupt -- corrupt files by modifying a given number of bits
 - crc32 -- output the 32-bit cyclic redundancy check value for an input
 - cw2wav -- converts text into a morse code audio file
 - d6 -- simulates a 6-sided dice roll and prints the reults
