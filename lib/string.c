@@ -580,3 +580,26 @@ char *tc_ltrim(char *s) {
 
 	return tc_strdup(&(s[i]));
 }
+
+char *tc_rtrim(char *s) {
+	int i;
+	int len;
+	char *t;
+
+	if (s == TC_NULL) {
+		return TC_NULL;
+	}
+
+	t = tc_strdup(s);
+	if (t == TC_NULL) {
+		return TC_NULL;
+	}
+
+	len = tc_strlen(s);
+
+	for (i = len - 1; i >= 0 && tc_isspace(t[i]); i--) {
+		t[i] = '\0';
+	}
+
+	return t;
+}

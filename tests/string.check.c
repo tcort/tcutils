@@ -160,6 +160,22 @@ static int check_ltrim_leading_spaces(void) {
 	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
 }
 
+static int check_rtrim_no_leading_spaces(void) {
+	char *s = "foo";
+	char *trimmed = tc_rtrim(s);
+	int rc = tc_streql(trimmed, "foo");
+	trimmed = tc_free(trimmed);
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
+}
+
+static int check_rtrim_leading_spaces(void) {
+	char *s = "foo  ";
+	char *trimmed = tc_rtrim(s);
+	int rc = tc_streql(trimmed, "foo");
+	trimmed = tc_free(trimmed);
+	return rc == 1 ? TC_CHECK_PASS : TC_CHECK_FAIL;
+}
+
 int main(int argc, char *argv[]) {
 
 	static struct check checks[] = {
@@ -209,6 +225,8 @@ int main(int argc, char *argv[]) {
 		{ check_strcasecmp_foo_FOO, "\"foo\" cmp \"FOO\" is 0"},
 		{ check_ltrim_no_leading_spaces, "\"foo\" is \"foo\""},
 		{ check_ltrim_leading_spaces, "\"  foo\" is \"foo\""},
+		{ check_rtrim_no_leading_spaces, "\"foo\" is \"foo\""},
+		{ check_rtrim_leading_spaces, "\"foo  \" is \"foo\""},
 		{ TC_NULL, TC_NULL }
 	};
 
