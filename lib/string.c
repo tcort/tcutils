@@ -603,3 +603,22 @@ char *tc_rtrim(char *s) {
 
 	return t;
 }
+
+char *tc_trim(char *s) {
+	char *t;
+	char *u;
+
+	t = tc_ltrim(s);
+	if (t == TC_NULL) {
+		return TC_NULL;
+	}
+
+	u = tc_rtrim(t);
+	if (u == TC_NULL) {
+		t = tc_free(t);
+		return TC_NULL;
+	}
+
+	t = tc_free(t);
+	return u;
+}

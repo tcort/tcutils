@@ -53,5 +53,6 @@ char *tc_strstr(char *haystack, char *needle);
 int tc_itoc(int n, char *s, int i);
 char *tc_ltrim(char *s);
 char *tc_rtrim(char *s);
+char *tc_trim(char *s);
 
 #endif
