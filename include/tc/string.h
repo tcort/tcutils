@@ -51,5 +51,6 @@ int tc_chompd(char *s, int delimiter);
 int tc_strlist_includes(char *haystack[], char *needle);
 char *tc_strstr(char *haystack, char *needle);
 int tc_itoc(int n, char *s, int i);
+char *tc_ltrim(char *s);
 
 #endif

@@ -561,3 +561,22 @@ int tc_itoc(int n, char *s, int i) {
 	s[i + 1] = TC_ENDSTR;
 	return i + 1;
 }
+
+char *tc_ltrim(char *s) {
+	int i;
+	int len;
+
+	if (s == TC_NULL) {
+		return TC_NULL;
+	}
+
+	len = tc_strlen(s);
+
+	for (i = 0; i < len; i++) {
+		if (!tc_isspace(s[i])) {
+			break;
+		}
+	}
+
+	return tc_strdup(&(s[i]));
+}
