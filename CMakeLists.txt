@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # project version MUST be an integer
-project(tcutils VERSION 2024 DESCRIPTION "a collection of software tools, utilities, and games" LANGUAGES C)
+project(tcutils VERSION 2025 DESCRIPTION "a collection of software tools, utilities, and games" LANGUAGES C)
 
 set(PROJECT_AUTHOR "Thomas Cort")
 set(PROJECT_COPYRIGHT "Copyright (C) 2022, 2023, 2024, 2025  Thomas Cort")
